@@ -647,7 +647,7 @@ kept apart from the original data so that everything else stays checkable agains
   |---|---|---|---|---|---|---|
   | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 150 | Climb, Shoot and Move |
   | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Formation |
-  | Stone Sentinel | 3, formation | Stone Fist (Greatsword) | Heavy, shown as Living Stone | 3 | 350, elite | Unyielding, Fear, Fearless, Last Strike |
+  | Stone Sentinel | 3, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 350, elite | Unyielding, Fear, Fearless, Last Strike |
   | Marines | 4, skirmish | Cutlass (Sword) | Light & Shield | 2 | 125 | Amphibious |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
   | Battlemage | 4, formation | Chain Lightning 2-5 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Battle Standard, Fear, First Strike |

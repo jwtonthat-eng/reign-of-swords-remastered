@@ -73,7 +73,7 @@ THEMES = {
         "forest": [0],
         "house": [3],
         "rocky": [101, 102, 103, 104],
-        "stone": [250],
+        "stone": [103],  # a rock mound (the standing stone 250 sits on a sand plinth)
         "scrub": [64],
         "floor": [66],
         "road": None,  # autotiled

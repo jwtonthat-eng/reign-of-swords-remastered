@@ -70,14 +70,14 @@ export const BONUS_COMBAT = {
     formation: true,
     nullify: true,
   },
-  // armour 8 = the Heavy Armour column, shown as "Living Stone"
+  // armour 10 = the Heavy Armour & Shield column, shown as "Living Stone"
   sentinel: {
     move: 3,
     weapon: 38,
     weapon2: 0,
-    armour: 8,
-    rating: 3,
-    rf: 90,
+    armour: 10,
+    rating: 4,
+    rf: 100,
     abilities: [14, 2, 4],
     lastStrike: true,
     unyielding: true,
