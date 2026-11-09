@@ -41,3 +41,141 @@ describe("Tilicia 1, The Tolm Road (escape)", () => {
     expect(g.phase).toBe("victory");
   });
 });
+
+// ---- the scripted endings of the other battles, driven through the same scenario VM -------------------------------
+const fell = (g, u) => {
+  u.hp = 0;
+  u.dead = true;
+  u.dieT = 0;
+  step(g, 30);
+};
+const tag = (g, n) => g.mission.script.triggers.filter((t) => t.tag === n);
+// stand one of your units on a tile, as if it had just walked there
+const reach = (g, u, [x, y]) => {
+  put(g, u, x, y);
+  g.scenario.onTileReached(u);
+  step(g, 30);
+};
+const rounds = (g, turn) => {
+  for (let i = 0; i < 60 && g.turn < turn && g.phase === "player"; i++) nextRound(g);
+  step(g, 30);
+};
+// a hold battle is judged on its clock: keep the garrison alive and the field clear while the rounds pass
+const holdUntil = (g, turn) => {
+  for (let i = 0; i < 60 && g.turn < turn && g.phase === "player"; i++) {
+    for (const u of g.units) if (u.team === "blue") u.hp = 100;
+    for (const u of foes(g)) u.dead = true;
+    nextRound(g);
+  }
+  step(g, 30);
+};
+
+describe("Tilicia: scripted endings", () => {
+  it("Ostrak's Bargain is lost when the fourth clan band falls", () => {
+    const g = startBattle(makeGame(5902), "auto");
+    const clan = new Set(tag(g, 7).map((t) => t.a[0]));
+    const bands = g.units.filter((u) => u.ally && clan.has(u.sid));
+    expect(bands.length).toBe(6);
+    bands.slice(0, 3).forEach((u) => fell(g, u));
+    expect(g.phase).not.toBe("defeat");
+    fell(g, bands[3]);
+    expect(g.phase).toBe("defeat");
+  });
+  it("The Sealed Vale is won by holding out to round 11, not by clearing the field early", () => {
+    const g = startBattle(makeGame(5903), "auto");
+    expect(g.captureMode).toBe(1);
+    expect(g.captureAreas.length).toBe(3);
+    for (const u of foes(g)) u.dead = true;
+    step(g, 30);
+    expect(g.phase).toBe("player"); // the win switch is off: more are coming
+    holdUntil(g, 11);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Empty Tomb ends when Warden Tolm falls", () => {
+    const g = startBattle(makeGame(5906), "auto");
+    const tolm = foes(g).find((u) => u.type === "king");
+    expect(tolm).toBeTruthy();
+    expect(foes(g).some((u) => u.type === "sentinel")).toBe(true);
+    fell(g, tolm);
+    expect(g.phase).toBe("victory");
+  });
+  it("Winter Stores is won only once a unit has stood in both granaries", () => {
+    const g = startBattle(makeGame(5913), "auto");
+    const tiles = tag(g, 6);
+    const gates = [...new Set(tiles.map((t) => t.a[2]))];
+    expect(gates.length).toBe(2);
+    const first = tiles.find((t) => t.a[2] === gates[0]),
+      second = tiles.find((t) => t.a[2] === gates[1]);
+    reach(g, mine(g)[0], first.a);
+    expect(g.phase).not.toBe("victory");
+    reach(g, mine(g)[1], second.a);
+    expect(g.phase).toBe("victory");
+  });
+});
+
+describe("Isoluccia: scripted endings", () => {
+  it("Landfall: the second and third waves land under your command", () => {
+    const g = startBattle(makeGame(5921));
+    const start = mine(g).length;
+    rounds(g, 3);
+    expect(mine(g).length).toBeGreaterThan(start);
+    expect(mine(g).every((u) => !u.ally)).toBe(true);
+  });
+  it("Free Company is won when Captain Bellaro reaches the quay, and lost if he falls", () => {
+    let g = startBattle(makeGame(5923));
+    const escort = g.mission.script.escort;
+    expect(escort.units.length).toBe(1);
+    expect(g.units.some((u) => u.ally && u.type === "marines")).toBe(true);
+    reach(
+      g,
+      g.units.find((u) => u.sid === escort.units[0]),
+      escort.markers[0],
+    );
+    expect(g.phase).toBe("victory");
+    g = startBattle(makeGame(5923));
+    fell(
+      g,
+      g.units.find((u) => u.sid === g.mission.script.escort.units[0]),
+    );
+    expect(g.phase).toBe("defeat");
+  });
+  it("The Harbour Chain is won only once both towers are taken", () => {
+    const g = startBattle(makeGame(5924), "auto");
+    const tiles = tag(g, 6);
+    const gates = [...new Set(tiles.map((t) => t.a[2]))];
+    expect(gates.length).toBe(2);
+    reach(g, mine(g)[0], tiles.find((t) => t.a[2] === gates[0]).a);
+    expect(g.phase).not.toBe("victory");
+    reach(g, mine(g)[1], tiles.find((t) => t.a[2] === gates[1]).a);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Arsenal is held until round 13, and the Sentinels come ashore on the way", () => {
+    const g = startBattle(makeGame(5925), "auto");
+    let sentinels = false;
+    for (let i = 0; i < 60 && g.turn < 13 && g.phase === "player"; i++) {
+      sentinels = sentinels || foes(g).some((u) => u.type === "sentinel");
+      for (const u of g.units) if (u.team === "blue") u.hp = 100;
+      for (const u of foes(g)) u.dead = true;
+      nextRound(g);
+    }
+    step(g, 30);
+    expect(sentinels).toBe(true);
+    expect(g.phase).toBe("victory");
+  });
+  it("Reign of the Battlemage goes on after the Doge falls and ends when the Battlemage does", () => {
+    const g = startBattle(makeGame(5926), "auto");
+    const doge = foes(g).find((u) => u.type === "king"),
+      mage = foes(g).find((u) => u.type === "battlemage");
+    expect(doge && mage).toBeTruthy();
+    expect(doge.group).not.toBe(mage.group); // the Battlemage is an army of its own
+    fell(g, doge);
+    expect(g.phase).not.toBe("victory");
+    fell(g, mage);
+    expect(g.phase).toBe("victory");
+  });
+  it("Lighthouse Rock is held until round 11", () => {
+    const g = startBattle(makeGame(5932), "auto");
+    holdUntil(g, 11);
+    expect(g.phase).toBe("victory");
+  });
+});

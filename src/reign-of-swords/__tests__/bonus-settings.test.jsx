@@ -22,13 +22,13 @@ describe("Settings: Resume Episode II", () => {
     const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
     panel({ base: "/games/reign-of-swords-2/", onResume });
     fireEvent.click(screen.getByRole("button", { name: /Resume with the veteran army/ }));
+    await vi.waitFor(() => expect(confirm).toHaveBeenCalled(), { timeout: 5000 }); // (the file is read from disk)
     await settle();
-    expect(confirm).toHaveBeenCalled();
     expect(onResume).not.toHaveBeenCalled(); // declined: nothing changes
     confirm.mockReturnValue(true);
     fireEvent.click(screen.getByRole("button", { name: /Resume with the veteran army/ }));
+    await vi.waitFor(() => expect(onResume).toHaveBeenCalledTimes(1), { timeout: 5000 }); // (the file is read from disk)
     await settle();
-    expect(onResume).toHaveBeenCalledTimes(1);
     expect(onResume.mock.calls[0][0]).toMatchObject({ kind: "reign-of-swords-army", episode: 2 });
     expect(screen.getByRole("status").textContent).toMatch(/12 units and 4 collectibles.*bonus campaigns are open/);
   });
