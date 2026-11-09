@@ -17,7 +17,7 @@ function Sections({ sections, ours }) {
   ));
 }
 
-export default function Credits({ dataBase, onClose }) {
+export default function Credits({ dataBase, onClose, bonus = false }) {
   const [data, setData] = useState(null);
   useEffect(() => {
     let live = true;
@@ -46,6 +46,14 @@ export default function Credits({ dataBase, onClose }) {
                   "The original game's credits, as its About screen lists them. This remaster is an unofficial fan project.",
                 )}
               </p>
+              {bonus && (
+                // Episode II: the two bonus campaigns are ours, and say so
+                <p className="ros-settings-note">
+                  {tr(
+                    "The bonus campaigns of Tilicia and Isoluccia, their maps, story and six units are fan-made additions and are not part of the original game.",
+                  )}
+                </p>
+              )}
               <Sections sections={data.sections} />
               {(data.otherBuilds || []).map((b) => (
                 <div className="ros-credits-build" key={b.build}>

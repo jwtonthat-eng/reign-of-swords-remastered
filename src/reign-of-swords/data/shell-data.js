@@ -12,6 +12,10 @@
    ============================================================ */
 
 import { UNIT_TYPES, ASSET_V } from "../engine/engine.js";
+import { DEPLOY_COST } from "./game-data.js";
+import { BONUS_ORDER, BONUS_META, BONUS_SKILLS, BONUS_UPGRADES } from "./bonus-units.js";
+
+export { BONUS_ORDER };
 
 // Every static asset the game ships, for the "download all assets" button.
 export const ASSET_PATHS = [
@@ -85,6 +89,9 @@ export const KINGDOM_POS_EP2 = {
   zayandi: { left: "45%", top: "94%" },
   "sabbi-amar": { left: "76%", top: "90%" },
   abbisin: { left: "87%", top: "76%" },
+  // the two BONUS kingdoms (ours): on the names the Episode II map already prints
+  tilicia: { left: "87.5%", top: "44%" },
+  isoluccia: { left: "75%", top: "64%" },
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -141,6 +148,7 @@ export const STAND_UNITS = new Set([
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_ORDER,
 ]);
 export const IDLE_FRAME = { griffon: 3 }; // strip idle-frame override (only used for units NOT in STAND_UNITS)
 
@@ -520,6 +528,22 @@ export const UNIT_META = {
     note: "Giant leeches that heal themselves each time they Bite. Slow, so they always strike last.",
   },
 };
+// BONUS units (Tilicia & Isoluccia — ours; data/bonus-units.js). `bonus` keeps them, and the upgrade branches that
+// lead to them, out of the camp and the Field Manual until the bonus campaigns open (bonusOpen below).
+for (const k of BONUS_ORDER)
+  UNIT_META[k] = {
+    name: UNIT_TYPES[k].name,
+    cost: DEPLOY_COST[k],
+    upgrades: null,
+    ep2: true,
+    bonus: true,
+    ...BONUS_META[k],
+  };
+for (const { from, to, need } of BONUS_UPGRADES)
+  UNIT_META[from].upgrades = [...(UNIT_META[from].upgrades || []), { to, need, ep2: true, bonus: true }];
+// The bonus campaigns open once Episode II is finished: Oasis Standoff (5432), Abbisin's last battle, is won.
+export const BONUS_OPENS_AFTER = 5432;
+export const bonusOpen = (isEp2, progress) => !!isEp2 && !!progress && progress.has(BONUS_OPENS_AFTER);
 // Your Army grid order (one flat grid, no headers): by unit class — infantry, ranged, cavalry, casters, war engines,
 // flyers — and, inside a class, by upgrade depth (TREE_COL/TREE_ROW) so every upgrade chain reads in sequence. Ep2 units
 // sit with the class they fight in and show only on the Ep2 route (they are in EP2_ORDER, not ORDER).
@@ -528,9 +552,24 @@ export const ARMY_GROUPS = [
     id: "foot",
     label: "Infantry",
     icon: "class_light",
-    units: ["militiamen", "footmen", "swordsmen", "halberdiers", "greatswordsmen", "pikemen"],
+    units: [
+      "militiamen",
+      "footmen",
+      "swordsmen",
+      "halberdiers",
+      "greatswordsmen",
+      "pikemen",
+      "marines",
+      "spellwardens",
+      "sentinel",
+    ],
   },
-  { id: "ranged", label: "Ranged", icon: "skill_ranged", units: ["archers", "crossbowmen", "rangers", "musketeers"] },
+  {
+    id: "ranged",
+    label: "Ranged",
+    icon: "skill_ranged",
+    units: ["archers", "crossbowmen", "rangers", "musketeers", "cragsmen", "pavisiers"],
+  },
   {
     id: "cavalry",
     label: "Cavalry",
@@ -541,7 +580,7 @@ export const ARMY_GROUPS = [
     id: "caster",
     label: "Casters",
     icon: "class_caster",
-    units: ["shamans", "druids", "priests", "wizards", "dunesirens", "conjurer"],
+    units: ["shamans", "druids", "priests", "wizards", "dunesirens", "conjurer", "battlemage"],
   },
   {
     id: "siege",
@@ -771,6 +810,7 @@ const TRAIT_SKILLS = [
     d: "Builds a structure that provides healing — once per battle, on clear ground.",
   },
   { has: (T) => T.repair, n: "Repair", d: "Repairs a damaged adjacent structure or war engine." },
+  ...BONUS_SKILLS.map((skill) => ({ has: (T) => !!T[skill.flag], n: skill.n, d: skill.d })), // the bonus abilities (ours)
 ];
 
 // Build the skill pills for a unit from real data: its ability indices, then its trait flags. Each name once.
@@ -877,6 +917,7 @@ export const ABILITY_ICON = {
   Build: "skill_build",
   Repair: "skill_repair",
   Conjure: "skill_conjure",
+  ...Object.fromEntries(BONUS_SKILLS.map((skill) => [skill.n, skill.icon])), // the bonus abilities (art drawn for this project)
 };
 // Field Manual: the original help text is shown verbatim; where the recreation's mechanic reads differently (the four
 // siege tags especially), a short "in this recreation" line is added under it.
@@ -947,7 +988,8 @@ export const UPGRADE_FROM = (() => {
   return m;
 })();
 // The upgrades each episode offers: Episode I has none of Episode II's units, so its camp never lists them.
-export const upgradeOffered = (branch, isEp2) => isEp2 || !branch.ep2;
+// …and the bonus units' branches wait for the bonus campaigns (`bonus` = bonusOpen(isEp2, progress)).
+export const upgradeOffered = (branch, isEp2, bonus = false) => (isEp2 || !branch.ep2) && (bonus || !branch.bonus);
 // Episode II's new units open with its campaign (MenuScreen::onMenuEvent @0x5d2c2 and UnitSelector::createUnitInfoMenu
 // @0x8376e test the save's story bytes, Context+0x258 + story index): an upgrade TO one of them is listed but refused
 // until that story battle is won — "You have not completed the campaign mission required to unlock this unit upgrade."
@@ -959,6 +1001,7 @@ export const UPGRADE_GATES_EP2 = {
   dunesirens: 5429, // Sabbi Amar 3, Caladrin Defense
   bloodgorgers: 5430, // Abbisin 1, Dune with a View
   conjurer: 5431, // Abbisin 2, Secrets in the Sands
+  ...Object.fromEntries(BONUS_UPGRADES.map((u) => [u.to, u.gate])), // the bonus units wait on a bonus battle each
 };
 // The story battle an upgrade to `toKey` waits on, or null.
 export const upgradeGate = (toKey, isEp2) => (isEp2 && UPGRADE_GATES_EP2[toKey]) || null;
@@ -1019,6 +1062,7 @@ export const GET_OPTIONS = [
 export const MANUAL_UNIT_KEYS = [...ORDER, ...SPECIAL_ORDER, ...UNFIELDED_ORDER];
 // On the Ep2 route the Episode II units join the manual's ability/armour/movement tagging.
 const manualKeys = (ep2) => (ep2 ? [...MANUAL_UNIT_KEYS, ...EP2_ORDER] : MANUAL_UNIT_KEYS);
+// (the bonus units are listed apart: BONUS_ORDER, shown by the camp and the manual once the bonus campaigns open)
 export function unitsWithAbility(key, isEp2) {
   return manualKeys(isEp2).filter((u) => {
     const T = UNIT_TYPES[u] || {};
@@ -1254,6 +1298,13 @@ export const TREE_COL = {
   conjurer: 2,
   bloodgorgers: 3,
   ballistae: 3,
+  // the bonus units (shown once the bonus campaigns are open): one column past the unit each is upgraded from
+  cragsmen: 2,
+  marines: 2,
+  spellwardens: 3,
+  pavisiers: 3,
+  sentinel: 3,
+  battlemage: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1284,6 +1335,12 @@ export const TREE_ROW = {
   conjurer: 12,
   bloodgorgers: 6,
   ballistae: 7,
+  cragsmen: 13,
+  marines: 14,
+  spellwardens: 8,
+  pavisiers: 9,
+  sentinel: 10,
+  battlemage: 11,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",
@@ -1387,3 +1444,10 @@ export function drawReward(reward, random = Math.random) {
 export function unseenLines(lines, shown = []) {
   return (lines || []).filter((l) => !shown.includes(l.text));
 }
+
+// The BONUS abilities as Field Manual entries (ours — data/bonus-units.js), with the units that carry them.
+export const BONUS_ABILITY_HELP = BONUS_SKILLS.map((skill) => ({
+  title: skill.n,
+  text: skill.d,
+  units: BONUS_ORDER.filter((u) => (UNIT_TYPES[u] || {})[skill.flag]),
+}));

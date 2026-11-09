@@ -7,6 +7,7 @@ import {
   UNIT_META,
   SPECIAL_ORDER,
   EP2_ORDER,
+  BONUS_ABILITY_HELP,
   ABILITY_ICON,
   unitsWithAbility,
   unitsWithArmour,
@@ -26,7 +27,7 @@ import {
 import { tr, useGameLang } from "../../i18n/i18n.js";
 import { UnitSprite, SvgIcon } from "./common.jsx";
 
-export function UpgradeTree({ ep2: isEp2 = false }) {
+export function UpgradeTree({ ep2: isEp2 = false, bonus = false }) {
   const COLW = 208,
     HALF = 82,
     ROWH = 58,
@@ -35,7 +36,10 @@ export function UpgradeTree({ ep2: isEp2 = false }) {
   // Nodes/edges are filtered by episode: the Ep2 upgrade targets (craftsmen/ballistae/conjurer/dune sirens/
   // blood gorgers) and the edges leading to them appear only on the Ep2 route. Column heights are computed from
   // the visible nodes so the layout grows to fit Ep2's extra branches.
-  const nodes = Object.keys(TREE_COL).filter((u) => isEp2 || !(UNIT_META[u] || {}).ep2);
+  // …and the bonus units (Tilicia & Isoluccia) only once those campaigns are open (`bonus`).
+  const nodes = Object.keys(TREE_COL).filter(
+    (u) => (isEp2 || !(UNIT_META[u] || {}).ep2) && (bonus || !(UNIT_META[u] || {}).bonus),
+  );
   const maxCol = Math.max(...nodes.map((u) => TREE_COL[u]));
   const COL_ROWS = {};
   nodes.forEach((u) => {
@@ -148,7 +152,7 @@ export function UpgradeTree({ ep2: isEp2 = false }) {
   );
 }
 
-export function HelpScreen({ onBack, ep2: isEp2 = false, backLabel = null }) {
+export function HelpScreen({ onBack, ep2: isEp2 = false, bonus = false, backLabel = null }) {
   useGameLang();
   const [data, setData] = useState(null);
   const [tab, setTab] = useState("play");
@@ -211,6 +215,8 @@ export function HelpScreen({ onBack, ep2: isEp2 = false, backLabel = null }) {
           ep2Abilities.forEach((a) =>
             rows.push({ text: a.text, title: a.title, units: unitsWithAbility(a.trait, true) }),
           );
+          // …and the bonus campaigns' abilities, once those campaigns are open.
+          if (bonus) BONUS_ABILITY_HELP.forEach((a) => rows.push({ ...a, title: a.title + " ★" }));
           return rows.sort((a, b) => (b.units.length > 0) - (a.units.length > 0));
         })();
   return (
@@ -235,7 +241,7 @@ export function HelpScreen({ onBack, ep2: isEp2 = false, backLabel = null }) {
       </div>
       <div className="ros-help-list">
         {cur.id === "upgrades" ? (
-          <UpgradeTree ep2={isEp2} />
+          <UpgradeTree ep2={isEp2} bonus={bonus} />
         ) : (
           <>
             {cur.id === "online" ? (

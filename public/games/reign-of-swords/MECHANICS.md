@@ -521,7 +521,8 @@ value, cmd]`), 6 tile reached `[x, y, cmd]` / Ep2 `[x, y, counter, count, team, 
   sound id of §9 and every effect strip of §10; the tutorial battles and their lines.
 - **Ours**: the AI's one-pass choice over the tiles a unit can reach and its tie-breaks (§7); frame timings and projectile visuals; the parchment UI, camera and ambient playlist;
   the special win rules pinned from objective text; the kind grouping and ability description prose; the player's
-  heraldry ranks; the Ep2 world map keeping the Episode I kingdoms.
+  heraldry ranks; the Ep2 world map keeping the Episode I kingdoms; the two bonus campaigns of Tilicia and Isoluccia,
+  with their maps, story, six units and unit art (§13).
 - **Open**: the original's wall pathing bound (9999) in `calcShortestPath`. Every deliberate difference from the
   original is listed in §13.
 
@@ -620,6 +621,53 @@ not on this list is meant to match the binaries — a difference that is not lis
 - **Battle Lab** — batch simulations, autopilot strategies and same-seed replays.
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
+
+### The bonus campaigns: Tilicia and Isoluccia (Episode II only)
+
+Two fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+kept apart from the original data so that everything else stays checkable against the binaries.
+
+- **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
+  beside it) holds the two kingdoms, their 12 story battles and 6 raids (map ids 5901-5906, 5911-5913, 5921-5926,
+  5931-5933), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
+  `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
+  `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
+  the code. Their sprites and ability icons were drawn for this project (`tools/ros/bonus/draw_units.py`).
+- **Story.** They follow Episode II's last line (the letters naming Tilicia, Isoluccia and the "Battlemage"). The
+  maps reuse the Episode II tileset, the speakers reuse its portraits, and every battle runs on the original scenario
+  script (round, kill, tile, escape and escort triggers), with no new script commands.
+- **Opening.** The kingdoms appear on the Episode II world map, marked "Bonus campaign", once Oasis Standoff is won.
+  Tilicia opens first, Isoluccia after Tilicia. Until then nothing of them shows: not the kingdoms, the units, their
+  Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
+  battle, raid or battlefield.
+- **Six units**, each on the damage row of an original weapon and an original armour column (§2), so the real
+  weapon x armour table prices them:
+
+  | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
+  |---|---|---|---|---|---|---|
+  | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 150 | Climb, Shoot and Move |
+  | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Formation |
+  | Stone Sentinel | 3, formation | Stone Fist (Greatsword) | Heavy, shown as Living Stone | 3 | 350, elite | Unyielding, Fear, Fearless, Last Strike |
+  | Marines | 4, skirmish | Cutlass (Sword) | Light & Shield | 2 | 125 | Amphibious |
+  | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
+  | Battlemage | 4, formation | Chain Lightning 2-5 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Battle Standard, Fear, First Strike |
+
+- **Six abilities.** *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
+  attack from a deep-water tile. *Nullify*: a unit within 2 tiles (Manhattan) of a living Spellwarden of its side
+  takes 0 from enemy Fireball, Lightning Storm, Ice Field and Chain Lightning, is not slowed by an enemy Ice Field,
+  ignores an enemy Spirit Shroud and is not stopped or hurt by quicksand. *Unyielding*: no Heal from a Priest, immune
+  to quicksand, mended by Craftsmen like a war engine. *Pavise*: Pavisiers that end a turn without moving are planted
+  (as are those that have not had a turn yet); while planted, they and a friendly unit next to them and farther from
+  the shooter take half ranged damage, the same halving as a Priest's Shield, and the two do not stack. *Chain
+  Lightning*: after the bolt lands it leaps to up to two enemies next to the target, weakest first, at half strength.
+  The AI needs no new behaviour: all six act through the movement costs, target lists and damage it already reads.
+- **Upgrades.** Each unit hangs off an original unit in a collectible slot that unit leaves empty, and waits on a
+  bonus battle like Episode II's own units: Archers to Cragsmen (Armor, Ostrak's Bargain), Swordsmen to Spellwardens
+  (Lore, Frostgate), Craftsmen to Stone Sentinel (Spirit, The Empty Tomb), Footmen to Marines (Spirit, Free Company),
+  Crossbowmen to Pavisiers (Armor, The Harbour Chain), Wizards to Battlemage (Medal, Reign of the Battlemage).
+- **Resume Episode II** (Settings, Episode II only): reads an Episode II army file back in without the transfer
+  limits, marks every original Episode II battle and raid won, and replaces the army and collectibles with the
+  file's. A built-in veteran army is offered for the same purpose.
 
 ### Not reproduced
 

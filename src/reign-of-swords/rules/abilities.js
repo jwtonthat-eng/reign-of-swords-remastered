@@ -160,7 +160,13 @@ export const AbilityMethods = {
     }
     if (id === "repair") {
       const engine = this.unitAt(tx, ty);
-      if (engine && engine.team === sel.team && engine.T.al === 4 && engine.hp < 100 && dist === 1) {
+      if (
+        engine &&
+        engine.team === sel.team &&
+        (engine.T.al === 4 || engine.T.unyielding) &&
+        engine.hp < 100 &&
+        dist === 1
+      ) {
         this._castRepair(sel, engine);
         return true;
       }
@@ -392,7 +398,10 @@ export const AbilityMethods = {
         const x = unit.tx + dx,
           y = unit.ty + dy,
           e = this.unitAt(x, y);
-        if ((e && !e.dead && e.team === unit.team && e.T.al === 4 && e.hp < 100) || this._structureRepairable(x, y))
+        if (
+          (e && !e.dead && e.team === unit.team && (e.T.al === 4 || e.T.unyielding) && e.hp < 100) ||
+          this._structureRepairable(x, y)
+        )
           push(x, y);
       }
     } else if (id === "conjure_sapper" || id === "conjure_bodyguard") {

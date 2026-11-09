@@ -127,6 +127,13 @@ export const UNIT_CATEGORY = {
   ballistae: "Siege",
   conjurer: "Casters",
   dunesirens: "Casters",
+  // the bonus units (Tilicia & Isoluccia)
+  spellwardens: "Infantry",
+  sentinel: "Infantry",
+  marines: "Infantry",
+  cragsmen: "Missile",
+  pavisiers: "Missile",
+  battlemage: "Casters",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

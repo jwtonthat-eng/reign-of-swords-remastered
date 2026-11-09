@@ -30,6 +30,7 @@ import { LoopMethods } from "./loop.js";
 import { ScenarioRunner } from "./script.js";
 import { AbilityMethods } from "../rules/abilities.js";
 import { DebugMethods } from "./debug.js";
+import { BONUS_ORDER } from "../data/bonus-units.js";
 import { UNIT_TYPES, TINCTURE_RGB, FX_TYPES, DEPLOY_COST, UNIT_RAMPS } from "../data/game-data.js";
 import { DEPLOY_ELITE, DEPLOY_ORDER, DEPLOY_ROSTER, fallbackMission, buildMissions } from "../data/missions.js";
 export { ASSET_V, UNIT_TYPES }; // re-exported for the React layer (ReignShell imports them from here)
@@ -138,6 +139,7 @@ const STAND_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_ORDER, // the bonus units (drawn for this project — tools/ros/bonus/draw_units.py)
 ];
 // WALKING animation: each unit has its own 4-frame walk cycle (android walk sheets, 256x72 = 4 frames @ 64x72),
 // extracted to sprites/walk/<key>.png. A unit uses this real leg cycle while it moves; before, everything glided.
@@ -175,6 +177,7 @@ const WALK_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_ORDER, // the bonus units (drawn for this project — tools/ros/bonus/draw_units.py)
 ];
 // (WALK_FRAMES/WALK_W/WALK_H — the walk-strip frame dimensions — live in render/render.js, their only consumer.)
 async function loadAssets(base, dataBase = base) {

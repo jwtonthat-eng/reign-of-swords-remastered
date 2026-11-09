@@ -74,8 +74,81 @@ function ArmyTransfer({ transfer }) {
   );
 }
 
+// RESUME EPISODE II (ours, Episode II only): pick up a finished Episode II from an army file — every Episode II battle
+// and raid is marked won, the army and collectibles become the file's, and the bonus campaigns open. `resume` =
+// { base, onResume }: onResume(data) applies a parsed army file and returns { units, spoils }, or throws.
+function ResumeEpisode({ resume }) {
+  const [status, setStatus] = useState(null);
+  const apply = (data) => {
+    if (!window.confirm(tr("Replace your Episode II progress and army with this file? This cannot be undone."))) return;
+    try {
+      const got = resume.onResume(data);
+      const count = (m) => Object.values(m).reduce((a, n) => a + n, 0);
+      setStatus({
+        ok: true,
+        text: tr(
+          "Episode II marked complete. Your army: {u} units and {s} collectibles. The bonus campaigns are open.",
+          {
+            u: count(got.units),
+            s: count(got.spoils),
+          },
+        ),
+      });
+    } catch (err) {
+      setStatus({ ok: false, text: tr(err.message) });
+    }
+  };
+  const unreadable = () => setStatus({ ok: false, text: tr("This file could not be read.") });
+  const fromFile = async (e) => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = ""; // the same file may be picked again
+    if (!file) return;
+    try {
+      apply(JSON.parse(await file.text()));
+    } catch (err) {
+      unreadable();
+    }
+  };
+  const fromVeteran = () =>
+    fetch(resume.base + "veteran-army.json")
+      .then((r) => r.json())
+      .then(apply, unreadable);
+  return (
+    <div className="ros-settings-group">
+      <div className="ros-settings-label">{tr("Resume Episode II")}</div>
+      <div className="ros-settings-row">
+        <label className="btn-run ros-settings-opt ros-settings-file" htmlFor="ros-army-resume">
+          {"⤒ " + tr("Resume from an army file")}
+        </label>
+        <input id="ros-army-resume" type="file" accept=".json,application/json" hidden onChange={fromFile} />
+        <button className="btn-run ros-settings-opt" onClick={fromVeteran}>
+          {"♛ " + tr("Resume with the veteran army")}
+        </button>
+      </div>
+      <p className="ros-settings-note">
+        {tr(
+          "Skip to the end of Episode II: every Episode II battle and raid is marked won, your army and collectibles become exactly those in the file (an Episode II army exported above — or the built-in veteran army), and the bonus campaigns of Tilicia and Isoluccia open. It replaces your current Episode II save.",
+        )}
+      </p>
+      {status && (
+        <p className={"ros-settings-note ros-transfer-status" + (status.ok ? "" : " bad")} role="status">
+          {status.text}
+        </p>
+      )}
+    </div>
+  );
+}
+
 // ---- ⚙ Settings: the game's own language (separate from the site's EN / RU / UA switch), sound and gameplay ----
-export function SettingsPanel({ onClose, musicMuted, sfxMuted, onToggleMusic, onToggleSfx, transfer = null }) {
+export function SettingsPanel({
+  onClose,
+  musicMuted,
+  sfxMuted,
+  onToggleMusic,
+  onToggleSfx,
+  transfer = null,
+  resume = null,
+}) {
   const lang = useGameLang();
   const volume = useVolume();
   const options = useGameOptions();
@@ -176,6 +249,7 @@ export function SettingsPanel({ onClose, musicMuted, sfxMuted, onToggleMusic, on
             </p>
           </div>
           {transfer && <ArmyTransfer transfer={transfer} />}
+          {resume && <ResumeEpisode resume={resume} />}
           <ReportBugGroup />
         </div>
         <div className="ros-over-btns">

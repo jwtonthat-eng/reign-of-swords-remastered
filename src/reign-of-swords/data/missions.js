@@ -13,6 +13,7 @@
 import { makeRng } from "../util/util.js";
 import { tileProp, setTerrain, setTerrainTypes, setStructures, setMovement } from "../rules/terrain.js";
 import { DEPLOY_COST, ALLY_HP, ENEMY_HP, levelTitle } from "./game-data.js";
+import { BONUS_ORDER, BONUS_ELITE } from "./bonus-units.js";
 
 // ---- Deployment roster -------------------------------------------------
 // Real per-unit deploy points (unit table 5010); elites per DEPLOY_ELITE below. In campaign play the roster is the
@@ -25,7 +26,15 @@ import { DEPLOY_COST, ALLY_HP, ENEMY_HP, levelTitle } from "./game-data.js";
 // unit types UnitSelector::placeCurrent (iOS Ep2 @0x8154a) tests before spending an elite slot: 21 Wizards, 8 Hero,
 // 9 Griffon Riders, 25 Cannon, 30 Ballistae, 31 Conjurer. Catapults, trebuchets, knights, cavalry, rangers, druids and
 // priests are NOT elite (the siege drill's 900 points buy its three catapults and no elite at all).
-export const DEPLOY_ELITE = { wizards: true, king: true, griffon: true, cannon: true, ballistae: true, conjurer: true };
+export const DEPLOY_ELITE = {
+  wizards: true,
+  king: true,
+  griffon: true,
+  cannon: true,
+  ballistae: true,
+  conjurer: true,
+  ...BONUS_ELITE, // ours: the Stone Sentinel and the Battlemage
+};
 export const DEPLOY_ORDER = [
   "militiamen",
   "footmen",
@@ -55,6 +64,7 @@ export const DEPLOY_ORDER = [
   "dunesirens",
   "ballistae",
   "conjurer",
+  ...BONUS_ORDER, // the bonus campaigns' units (owned only once won or upgraded into there)
 ];
 // entries: [key, cost, count(null=unlimited), elite]
 export const DEPLOY_ROSTER = DEPLOY_ORDER.map((k) => [k, DEPLOY_COST[k], null, !!DEPLOY_ELITE[k]]);
@@ -471,35 +481,46 @@ export function buildMissionFromLevel(level) {
 // built array, or null if the fetch/parse fails (the engine then keeps its fallback). Pure — sets no globals.
 export async function buildMissions(base) {
   try {
-    const [terr, data, wavesData, eventsData, aiData, heraldData, terrTypes, structs, movement] = await Promise.all([
-      fetch(base + "terrain.json").then((r) => r.json()),
-      fetch(base + "levels.json").then((r) => r.json()),
-      fetch(base + "waves.json")
-        .then((r) => r.json())
-        .catch(() => ({})),
-      fetch(base + "battle_events.json")
-        .then((r) => r.json())
-        .catch(() => ({})),
-      fetch(base + "scripts_ai.json")
-        .then((r) => r.json())
-        .catch(() => ({})),
-      fetch(base + "group_heraldry.json")
-        .then((r) => r.json())
-        .catch(() => ({})),
-      // EPISODE II only: the real getTileType legend for the quicksand terrain gate. Ep1 has no such file
-      // (fetch fails → null → quicksand never forms there, which is correct — it's an Ep2 ability).
-      fetch(base + "terrain-types.json")
-        .then((r) => r.json())
-        .catch(() => null),
-      // Both episodes: the destructible-structure table (armour, damage stages, rubble terrain) from record 5010.
-      fetch(base + "structures.json")
-        .then((r) => r.json())
-        .catch(() => null),
-      // Both episodes: the original's movement table (per-tile terrain type, per-class cost rows, step links).
-      fetch(base + "movement.json")
-        .then((r) => r.json())
-        .catch(() => null),
-    ]);
+    const [terr, data, wavesData, eventsData, aiData, heraldData, terrTypes, structs, movement, bonus] =
+      await Promise.all([
+        fetch(base + "terrain.json").then((r) => r.json()),
+        fetch(base + "levels.json").then((r) => r.json()),
+        fetch(base + "waves.json")
+          .then((r) => r.json())
+          .catch(() => ({})),
+        fetch(base + "battle_events.json")
+          .then((r) => r.json())
+          .catch(() => ({})),
+        fetch(base + "scripts_ai.json")
+          .then((r) => r.json())
+          .catch(() => ({})),
+        fetch(base + "group_heraldry.json")
+          .then((r) => r.json())
+          .catch(() => ({})),
+        // EPISODE II only: the real getTileType legend for the quicksand terrain gate. Ep1 has no such file
+        // (fetch fails → null → quicksand never forms there, which is correct — it's an Ep2 ability).
+        fetch(base + "terrain-types.json")
+          .then((r) => r.json())
+          .catch(() => null),
+        // Both episodes: the destructible-structure table (armour, damage stages, rubble terrain) from record 5010.
+        fetch(base + "structures.json")
+          .then((r) => r.json())
+          .catch(() => null),
+        // Both episodes: the original's movement table (per-tile terrain type, per-class cost rows, step links).
+        fetch(base + "movement.json")
+          .then((r) => r.json())
+          .catch(() => null),
+        // EPISODE II only — the BONUS campaigns (Tilicia & Isoluccia: ours, not the original's; built by
+        // tools/ros/bonus/build_bonus.py into one file of the same record shapes).
+        fetch(base + "bonus.json")
+          .then((r) => r.json())
+          .catch(() => null),
+      ]);
+    if (bonus && bonus.levels) {
+      data.levels = data.levels.concat(bonus.levels);
+      Object.assign(aiData, bonus.scripts_ai);
+      Object.assign(heraldData, bonus.group_heraldry);
+    }
     if (terr && terr.props) setTerrain(terr.props, terr.cell, terr.cellH);
     setTerrainTypes(terrTypes && terrTypes.types, terrTypes && terrTypes.quicksandTypes);
     setStructures(structs);

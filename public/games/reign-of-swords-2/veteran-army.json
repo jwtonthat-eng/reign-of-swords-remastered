@@ -1,0 +1,39 @@
+{
+ "kind": "reign-of-swords-army",
+ "v": 1,
+ "episode": 2,
+ "army": {
+  "footmen": 10,
+  "swordsmen": 8,
+  "greatswordsmen": 4,
+  "pikemen": 11,
+  "halberdiers": 6,
+  "archers": 7,
+  "crossbowmen": 4,
+  "musketeers": 8,
+  "rangers": 4,
+  "horsebowmen": 5,
+  "knights": 3,
+  "king": 2,
+  "cavalry": 11,
+  "raiders": 6,
+  "catapult": 3,
+  "trebuchet": 3,
+  "cannon": 2,
+  "shamans": 1,
+  "druids": 6,
+  "wizards": 2,
+  "priests": 2,
+  "griffon": 7,
+  "craftsmen": 4,
+  "ballistae": 2,
+  "conjurer": 3,
+  "dunesirens": 3,
+  "bloodgorgers": 4
+ },
+ "spoils": {
+  "Medal": 4,
+  "Weapons": 1,
+  "Spirit": 1
+ }
+}

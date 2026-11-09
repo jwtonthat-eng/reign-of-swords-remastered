@@ -78,7 +78,10 @@ function options(argv) {
 // ---------------------------------------------------------------- the maps
 function levelsOf(ep) {
   const data = JSON.parse(readFileSync(join(ROOT, EP_DIR[ep], "levels.json"), "utf8"));
-  return data.levels || data;
+  // Episode II's bonus campaigns (ours — tools/ros/bonus/build_bonus.py) are played like any other map
+  const bonusFile = join(ROOT, EP_DIR[ep], "bonus.json");
+  const bonus = existsSync(bonusFile) ? JSON.parse(readFileSync(bonusFile, "utf8")).levels : [];
+  return (data.levels || data).concat(bonus);
 }
 
 // ---------------------------------------------------------------- one shard = one vitest process

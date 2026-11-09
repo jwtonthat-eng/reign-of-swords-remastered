@@ -267,6 +267,10 @@ export class GridMethods {
   moveCost(u, tx, ty, fx, fy) {
     if (!this.inBounds(tx, ty)) return 99;
     if (this.portals && this._portalBlocks(u, tx, ty)) return 99; // Map::getMoveCost's portal gates (fliers included)
+    // BONUS (ours, MECHANICS.md §13): Climb takes Cragsmen over cliffs (type 21) and Amphibious takes Marines through
+    // deep water (type 19), at 2 a tile — the two terrain types no other ground unit may enter.
+    const crossed = moveType(this.tileAt(tx, ty));
+    if ((crossed === 21 && u.T.climb) || (crossed === 19 && u.T.amphibious)) return 2;
     // Movement CATEGORY (real 5010 `al`): 0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 siege. Fall back to a
     // sensible class if a unit somehow lacks it (shifted druid-forms carry their beast's T, which has al set).
     const moveClass =
@@ -733,6 +737,7 @@ export class GridMethods {
   targetsFrom(u, tx, ty, moved) {
     const hasMoved = moved != null ? moved : this._movedThisTurn(u) && tx === u.tx && ty === u.ty;
     const out = [];
+    if (u.T.amphibious && moveType(this.tileAt(tx, ty)) === 19) return out; // BONUS: Marines can't attack from deep water
     for (const other of this.units) {
       if (other.dead || other.team === u.team || this._isHidden(other)) continue; // can't target a hidden (Stealth) unit
       const dist = Math.abs(other.tx - tx) + Math.abs(other.ty - ty); // manhattan — melee range 1 = ORTHOGONAL neighbour only

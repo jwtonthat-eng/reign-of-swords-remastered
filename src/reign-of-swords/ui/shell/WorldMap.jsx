@@ -1,5 +1,5 @@
 import { tr } from "../../i18n/i18n.js";
-import { KINGDOM_POS, KINGDOM_POS_EP2, TUTORIALS, TUTORIALS_EP2 } from "../../data/shell-data.js";
+import { KINGDOM_POS, KINGDOM_POS_EP2, TUTORIALS, TUTORIALS_EP2, bonusOpen } from "../../data/shell-data.js";
 import { kingdomUnlocked, missionUnlocked, kingdomRaids, raidGate, raidUnlocked } from "../../data/campaign-rules.js";
 import { SvgIcon, ResIcon } from "./common.jsx";
 
@@ -22,6 +22,8 @@ export default function WorldMap({
   return (
     <div className="ros-worldmap" style={{ backgroundImage: `url(${dataBase}worldmap.jpg)` }}>
       {camp.kingdoms.map((kingdom, kingdomIdx) => {
+        // the bonus kingdoms stay off the map until Episode II itself is finished
+        if (kingdom.bonus && !bonusOpen(isEp2, progress)) return null;
         const unlocked = kingdomUnlocked(camp, kingdomIdx, progress);
         const done = kingdom.missions.filter((m) => progress.has(m.mapId)).length;
         const complete = done === kingdom.missions.length;
@@ -32,7 +34,13 @@ export default function WorldMap({
         return (
           <button
             key={kingdom.id}
-            className={"ros-kmark" + (unlocked ? "" : " locked") + (complete ? " complete" : "")}
+            className={
+              "ros-kmark" +
+              (unlocked ? "" : " locked") +
+              (complete ? " complete" : "") +
+              (kingdom.bonus ? " bonus" : "")
+            }
+            title={kingdom.bonus ? tr("Bonus campaign — not part of the original game") : undefined}
             data-k={kingdom.id}
             style={pos}
             disabled={!unlocked}
@@ -109,6 +117,7 @@ function KingdomPanel({
           <b>
             {tr(kingdom.name)}
             {kingdom.legacy ? <small style={{ opacity: 0.7, fontWeight: 400 }}> · {tr("Episode I")}</small> : null}
+            {kingdom.bonus ? <small style={{ opacity: 0.7, fontWeight: 400 }}> · {tr("Bonus campaign")}</small> : null}
           </b>
           <button className="ros-kpanel-x" onClick={onClose}>
             ✕
@@ -137,6 +146,11 @@ function KingdomPanel({
               );
             })}
           </>
+        )}
+        {kingdom.bonus && (
+          <p className="ros-kpanel-sub">
+            {tr("A fan-made bonus campaign — not part of the original game. New story, maps and units.")}
+          </p>
         )}
         <p className="ros-kpanel-sub">{tr("War Plans — choose a battle.")}</p>
         {kingdom.missions.map((mission, missionIdx) => {

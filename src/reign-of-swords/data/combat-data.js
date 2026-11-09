@@ -3,6 +3,8 @@
 // and `… 2` (they decode table 5010 from each episode's .dat and must report no mismatches).
 // Damage(0-100 scale) = base[weapon-1][defenderArmour] * rating/100 * cover/100 * (attackerHP/100)
 //   (+30 charge, +30 pike-vs-mounted, x2 pierce-vs-shield, rating +/-15 aura). No RNG. HP=100 for all.
+import { BONUS_WEAPONS, BONUS_AL, BONUS_COMBAT } from "./bonus-units.js";
+
 export const WEAPON_DMG = {
   1: [60, 20, 30, 25, 25, 20, 15, 15, 15, 25, 5, 5, 30, 0, 0, 5], // Staff r1-1
   2: [80, 55, 65, 55, 55, 50, 40, 35, 25, 55, 20, 20, 65, 0, 0, 15], // Talon r1-1
@@ -786,4 +788,26 @@ export function spellStats(spell) {
   const [min, max] = WEAPON_RANGE[weapon] || [2, 7];
   const shares = BLAST_SHARE[weapon] || [100];
   return { lo: Math.min(...worn), hi: Math.max(...worn), min, max, splash: shares[1] != null ? shares[1] : shares[0] };
+}
+
+// ---- BONUS units (Tilicia & Isoluccia — ours, not record 5010; see data/bonus-units.js) ----------------------------
+// Merged in last, so everything above stays the transcription `tools/ros/units.py` audits. A bonus weapon copies the
+// damage row of the original weapon it names; a bonus unit's display numbers are derived the way the originals' are.
+for (const [id, weapon] of Object.entries(BONUS_WEAPONS)) {
+  WEAPON_DMG[id] = WEAPON_DMG[weapon.row].slice();
+  WEAPON_RANGE[id] = weapon.range;
+  if (weapon.tags.length) WEAPON_TAGS[id] = weapon.tags;
+  WEAPON_NAME[id] = weapon.name;
+  WEAPON_DESC[id] = weapon.desc;
+}
+Object.assign(UNIT_AL, BONUS_AL);
+for (const [unit, combat] of Object.entries(BONUS_COMBAT)) {
+  const [rmin, rmax] = WEAPON_RANGE[combat.weapon];
+  UNIT_COMBAT[unit] = {
+    ...combat,
+    rmin,
+    rmax,
+    dispAtk: Math.round((WEAPON_DMG[combat.weapon][3] * combat.rf) / 100),
+    dispDef: ARMOUR_DEF[combat.armour],
+  };
 }

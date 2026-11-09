@@ -735,6 +735,7 @@ export class TurnFlowMethods {
   }
   _endTurnBrace(units) {
     for (const u of units) if (u.T.pikeWall) u.walled = !u.attackedTurn;
+    for (const u of units) if (u.T.pavise) u.planted = !this._movedThisTurn(u); // BONUS: Pavise — plant when it did not move
     for (const u of units) this._unitEndTurn(u); // the idle ones' Unit::endTurn (shroud, charge)
   }
   _startFriendlyTurnEnd() {

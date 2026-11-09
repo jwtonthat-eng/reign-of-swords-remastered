@@ -15,6 +15,7 @@
 import { manhattan, cheb, clamp, key, strictMost, toHp256, wholeHp, shownDamage, healStep } from "../util/util.js";
 import { WEAPON_DMG, WEAPON_RANGE, WEAPON_TAGS, BLAST_SHARE, spellStats } from "../data/combat-data.js";
 import { UNIT_TYPES, FX_TYPES, meleeHitFx } from "../data/game-data.js";
+import { MAGIC_WEAPONS, CHAIN_WEAPON } from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
 
 // Which weapon a unit swings at a target `dist` tiles away. A unit can carry two
@@ -38,7 +39,7 @@ const isFireWeapon = (w) => w === 25 || (WEAPON_TAGS[w] || []).some((t) => t ===
 // bolt, shock) — their hits are area cells, not a state-2 strike.
 const AREA_WEAPONS = new Set([20, 21, 22, 23, 24, 25, 26, 27, 28, 34]);
 // every weapon that is not swung in melee: the bows and the Musket, the area weapons, the Hammer Throw
-const RANGED_WEAPONS = new Set([16, 17, 18, 19, 29, ...AREA_WEAPONS]);
+const RANGED_WEAPONS = new Set([16, 17, 18, 19, 29, ...AREA_WEAPONS, 35, 36]); // + the bonus Javelin and Chain Lightning
 // The Lightning Storm's switch tables (see _resolveLightning): index → code, and code → the cell offset it strikes.
 const LIGHTNING_CODE = [0, 9, 1, 5, 8, 4, 10, 2, 6];
 const LIGHTNING_CELL = {
@@ -101,7 +102,44 @@ export class CombatMethods {
   // Great Eagle type 26) and the Sirens themselves. Quicksand only forms on getTileType ∈ {2,3,18,22,26,27}
   // (terrain-types.json — the real per-tile type legend). Enemy-only; the Siren lays a 3-tile line (see ai/ai).
   _quicksandImmune(u) {
-    return u.T.al === 0 || u.type === "dunesirens";
+    return u.T.al === 0 || u.type === "dunesirens" || !!u.T.unyielding || this._warded(u); // (+ the bonus units' Unyielding / Nullify)
+  }
+  // ===== BONUS abilities (Tilicia & Isoluccia — ours, MECHANICS.md §13) ===================================
+  // NULLIFY: a unit within 2 tiles of a living Spellwarden of its own side (the Spellwarden included) is warded —
+  // enemy spells deal it nothing and do not slow it, an enemy Spirit Shroud saps nothing, quicksand lets it pass.
+  _warded(u) {
+    return this.units.some((w) => !w.dead && w.T.nullify && w.team === u.team && manhattan(w, u) <= 2);
+  }
+  // PAVISE: Pavisiers that ended their last turn without moving stand behind a planted pavise (a unit that has not
+  // had a turn yet is planted). It covers the Pavisiers and a friendly unit directly behind them — next to them, and
+  // farther from the shooter than they are.
+  _planted(u) {
+    return !!u.T.pavise && !u.dead && u.planted !== false;
+  }
+  _pavised(defender, attacker) {
+    if (this._planted(defender)) return true;
+    const range = manhattan(attacker, defender);
+    return this.units.some(
+      (p) =>
+        p.team === defender.team && this._planted(p) && manhattan(p, defender) === 1 && manhattan(p, attacker) < range,
+    );
+  }
+  // CHAIN LIGHTNING: after the Battlemage's bolt lands, it leaps to up to two enemies standing next to the target, at
+  // half strength — the weakest first.
+  _resolveChain(attacker, defender) {
+    const tile = this.tile;
+    const near = this.units
+      .filter((e) => !e.dead && e !== defender && e.team !== attacker.team && manhattan(e, defender) === 1)
+      .filter((e) => !this._isHidden(e))
+      .sort((a, b) => a.hp - b.hp || a.id - b.id)
+      .slice(0, 2);
+    near.forEach((e, i) =>
+      this._after(0.12 * (i + 1), () => {
+        if (e.dead) return;
+        this.spawnFx("bolt", e.tx * tile + tile / 2, e.ty * tile + tile * 0.42 - tile * 0.5, {});
+        this._applyHit(e, attacker, shared(this.computeDamage(attacker, e, { weapon: CHAIN_WEAPON }), 0.5), false);
+      }),
+    );
   }
   _quicksandAt(tx, ty) {
     return this.quicksand ? this.quicksand.get(tx + "," + ty) || 0 : 0;
@@ -207,7 +245,7 @@ export class CombatMethods {
   _repairTargetFor(u) {
     for (const other of this.units) {
       if (other.dead || other === u || other.team !== u.team) continue;
-      if (other.T.al === 4 && other.hp < 100 && manhattan(other, u) === 1) return other;
+      if ((other.T.al === 4 || other.T.unyielding) && other.hp < 100 && manhattan(other, u) === 1) return other; // (+ BONUS: a Stone Sentinel)
     }
     return null;
   }
@@ -282,6 +320,7 @@ export class CombatMethods {
     const dist = manhattan(attacker, defender);
     const weapon = opts.weapon != null ? opts.weapon : weaponAt(attacker, dist);
     if (weapon === 0) return 0; // no weapon slot (0xff): calculateAttackDamage @0x6af68 deals nothing
+    if (MAGIC_WEAPONS.includes(weapon) && attacker.team !== defender.team && this._warded(defender)) return 0; // BONUS: Nullify
     const siegeShot = weapon === 21 || weapon === 23;
     if (siegeShot && defender.T.al === 0) return 0; // Boulder / Cannonball cannot touch a flier (class 0)
     let base = weaponBase(defender, weapon);
@@ -298,7 +337,8 @@ export class CombatMethods {
     let dmg = (Math.trunc((cover * 256) / 100) * Math.trunc((base * 256) / 100)) >> 8;
     dmg = (dmg * skill) >> 8;
     if (dist > 1) {
-      if (this._shielded(defender)) dmg = Math.trunc(dmg / 2); // Map::isUnitShielded — a Priest's Shield
+      // Map::isUnitShielded — a Priest's Shield; BONUS: a planted Pavise halves a shot the same way (they don't stack)
+      if (this._shielded(defender) || this._pavised(defender, attacker)) dmg = Math.trunc(dmg / 2);
     } else if (this._siegeArmored(defender)) dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
     return Math.max(0, dmg);
   }
@@ -526,6 +566,7 @@ export class CombatMethods {
         else if (other.T.shroud && other._shroudOn) rally = true;
       } else if (other.T.shroud) shroud = true;
     }
+    if (shroud && this._warded(u)) shroud = false; // BONUS: Nullify — an enemy Spirit Shroud saps nothing here
     return { rally, shroud };
   }
   ratingAura(u) {
@@ -598,6 +639,18 @@ export class CombatMethods {
         icon: "status_rally",
         name: "Holding the objective +15",
         desc: "Its side holds the objective (more units on the capture tiles than the enemy): +15 attack and +15 courage.",
+      });
+    if (this._warded(u))
+      out.push({
+        icon: "skill_nullify",
+        name: "Warded",
+        desc: "A friendly Spellwarden within 2 tiles nullifies enemy magic: spells deal it no damage and do not slow it, an enemy Spirit Shroud saps nothing, and quicksand does not hold it.",
+      });
+    if (this._planted(u))
+      out.push({
+        icon: "skill_pavise",
+        name: "Pavise planted",
+        desc: "It did not move on its last turn: it and a friendly unit directly behind it take half damage from ranged attacks.",
       });
     if (this._shielded(u))
       out.push({
@@ -1158,6 +1211,12 @@ export class CombatMethods {
     if (attacker.T.grapeshot && manhattan(attacker, defender) === 1)
       return this._resolveGrapeshot(attacker, defender, opts);
     const wMain = opts.weapon != null ? opts.weapon : weaponAt(attacker, manhattan(attacker, defender));
+    if (wMain === CHAIN_WEAPON) {
+      // BONUS: Chain Lightning — a bolt on the target, then the leaps
+      this.spawnFx("bolt", defender.tx * this.tile + this.tile / 2, defender.ty * this.tile - this.tile * 0.08, {});
+      this.audio.play("thunder", 0.5, 1.0);
+      this._resolveChain(attacker, defender);
+    }
     const pierceShot = attacker.T.pierce && !!this._ballistaStep(attacker, defender.tx, defender.ty); // Piercing Bolt: the aimed cell is the bolt's first (85%)
     const damage = shared(this.computeDamage(attacker, defender, opts), pierceShot ? blastShare(28, 0) : 1);
     this._applyHit(defender, attacker, damage, damage >= 55, !!opts.siege, wMain);
@@ -1230,7 +1289,7 @@ export class CombatMethods {
       const e = this.unitAt(centerX + dx, centerY + dy);
       if (e && !e.dead) {
         this._applyHit(e, attacker, shared(this.computeDamage(attacker, e, { weapon: 27 }), blastShare(27)), false); // weapon 27, 100% per cell
-        if (!e.slowed) e.slowed = true; // Unit::onTick (@0x78f44): only an unslowed unit is slowed (a second Ice doesn't extend it)
+        if (!e.slowed && !(e.team !== attacker.team && this._warded(e))) e.slowed = true; // (BONUS: Nullify stops the slow) Unit::onTick (@0x78f44): only an unslowed unit is slowed (a second Ice doesn't extend it)
       }
       this._areaStructureHit(attacker, centerX + dx, centerY + dy, blastShare(27), 27);
     }
