@@ -177,12 +177,12 @@ def compile_terrain(theme_name, grid, seed):
             elif ch == "b":
                 if theme_name != "green":
                     out.append(pick("road"))  # the sand set has no bridge: a paved causeway
-                elif at(x - 1, y) in "~-b" and at(x + 1, y) in "~-b" and at(x, y - 1) not in ("~", "-"):
-                    out.append(116)  # mid-span of an east-west bridge
-                elif at(x, y - 1) in ("~", "-", "b") or at(x, y + 1) in ("~", "-", "b"):
-                    out.append(71 if at(x, y - 1) != "b" else 117)  # a north-south deck
+                elif (at(x - 1, y) or " ") in "~-" or (at(x + 1, y) or " ") in "~-":
+                    # water to the east or west: a deck carrying a north-south road (71 its first tile, then 117)
+                    out.append(117 if at(x, y - 1) == "b" else 71)
                 else:
-                    out.append(68 if at(x + 1, y) == "b" else 69)
+                    # water to the north or south: a span carrying an east-west road (68 west end, 116 middle, 69 east end)
+                    out.append(68 if at(x - 1, y) != "b" else 69 if at(x + 1, y) != "b" else 116)
             elif ch == "W" or ch == "G":
                 horizontal = (at(x - 1, y) or " ") in WALLISH or (at(x + 1, y) or " ") in WALLISH
                 table = theme["wall" if ch == "W" else "gate"]
