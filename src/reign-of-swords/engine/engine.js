@@ -751,7 +751,9 @@ class Game {
   healOnKeeps(team, only) {
     for (const u of this.units) {
       if (u.dead || u.team !== team || (only && !only(u))) continue;
-      const terrain = this.terrainAt(u.tx, u.ty);
+      // BONUS: Spellwardens mend themselves (T.regen) at the same moment, on top of anything the ground heals
+      const ground = this.terrainAt(u.tx, u.ty);
+      const terrain = u.T.regen ? { heal: (ground.heal || 0) + u.T.regen } : ground;
       if (terrain.heal && u.hp < 100) {
         // GameScreen::hideCurrentMenu's turn-start heal (iOS Ep2 @0x1f856) works on the shown HP: + bonus, capped at 100
         const before = u.hp;

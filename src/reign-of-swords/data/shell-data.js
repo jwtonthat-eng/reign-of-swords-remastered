@@ -592,7 +592,7 @@ export const ARMY_GROUPS = [
     icon: "class_siege",
     units: ["craftsmen", "catapult", "trebuchet", "cannon", "ballistae"],
   },
-  { id: "fly", label: "Flyers", icon: "class_fly", units: ["bloodgorgers", "griffon"] },
+  { id: "fly", label: "Flyers", icon: "class_fly", units: ["bloodgorgers", "griffon", "dragonrider"] },
 ];
 export const ORDER = [
   "militiamen",
@@ -1311,6 +1311,7 @@ export const TREE_COL = {
   battlemage: 3,
   gladiator: 3,
   samurai: 3,
+  dragonrider: 4,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1349,6 +1350,7 @@ export const TREE_ROW = {
   battlemage: 11,
   gladiator: 12,
   samurai: 13,
+  dragonrider: 3,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

@@ -489,7 +489,7 @@ export class GridMethods {
   // Android port's a.j likewise — so there a flyer goes round enemy units like everyone else.
   _passesOverFoes(u) {
     if (!(this.mission && this.mission.ep === 2)) return false;
-    return u.type === "griffon" || u.type === "greateagle" || u.type === "dunesirens";
+    return u.type === "griffon" || u.type === "greateagle" || u.type === "dunesirens" || u.type === "dragonrider"; // (+ the bonus flier)
   }
   _walkReach(u, moveBudget) {
     const dist = new Map(),
@@ -753,6 +753,9 @@ export class GridMethods {
         other.tx === u.tx + u.chargeDir.dx &&
         other.ty === u.ty + u.chargeDir.dy;
       if (this._weaponUselessVs(u, other, dist) && !this._chargeReaches(u, tx, ty, other) && !charged) continue; // Boulder / Cannonball can't hit fliers
+      // BONUS: the Marines' Boarding Musket reaches 3 only from open ground — 2 from woods, tall grass, scrub, rocks
+      // or shallows (terrain types 3, 4, 5, 22, 27, 28)
+      if (u.T.terrainRange && dist > 2 && [3, 4, 5, 22, 27, 28].includes(moveType(this.tileAt(tx, ty)))) continue;
       if (this._inWeaponRange(u, dist, hasMoved) || this._chargeReaches(u, tx, ty, other) || charged) out.push(other);
     }
     return out;

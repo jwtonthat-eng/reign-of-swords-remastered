@@ -23,7 +23,7 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
-SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg"}  # a unit's "sheet" (default first)
+SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -85,6 +85,18 @@ UNITS = {
                   (1321, 1431), (1512, 1671), (1722, 1824)],
         "stand": 0, "walk": [1, 2, 3, 4], "attack": [5, 6, 7, 8, 9, 10], "height": 64, "team": True,
     },
+    # The Dragon Rider's sheet is laid out freely, so each pose is a box (x0, y0, x1, y1) with the x of the dragon's
+    # body in it ("anchor": what stands on the tile's centre). Its frames are larger (176 x 128), the flying poses
+    # hang a little above the ground line ("lift"), and the fire-breath pose is cut where the flame leaves the frame
+    # (the shot itself is the engine's fireball). Attack strip: fly, breathe, fly | fly, dive, strike, fly.
+    "dragonrider": {
+        "sheet": "dragon",
+        "boxes": [(4, 120, 370, 392), (5, 610, 428, 992), (457, 616, 985, 1108), (1176, 612, 1568, 1030),
+                  (1570, 660, 1986, 1030)],
+        "anchors": [185, 215, 690, 1370, 1770],
+        "stand": 0, "walk": None, "attack": [1, 2, 1, 1, 3, 4, 1], "height": 84, "team": "blue",
+        "frame": (176, 128), "lift": 10,
+    },
 }
 
 
@@ -121,10 +133,13 @@ def cut(sheet, box):
                     drop.append((x, y))
         for x, y in drop:
             px[x, y] = (0, 0, 0, 0)
-    return cell.crop(cell.getbbox())
+    box = cell.getbbox()
+    out = cell.crop(box)
+    out.info["dx"] = box[0]  # how far the crop moved the pose's left edge (for poses placed by a measured anchor)
+    return out
 
 
-def team_colours(image):
+def team_colours(image, only=None):
     """Blue and green cloth -> the key ramps (three flat shades each), so an army's heraldry recolours it."""
     px = image.load()
     for y in range(image.height):
@@ -134,6 +149,8 @@ def team_colours(image):
                 continue
             h, s, v = colorsys.rgb_to_hsv(r / 255, g / 255, b / 255)
             ramp = BLUE if 0.57 < h < 0.72 and s > 0.42 and v > 0.2 else GREEN if 0.24 < h < 0.44 and s > 0.42 and v > 0.2 else None
+            if only == "blue" and ramp is GREEN:
+                ramp = None  # (a green dragon stays green: only its blue wing membranes take the army's colour)
             if ramp:
                 px[x, y] = ramp[0 if v > 0.62 else 1 if v > 0.42 else 2] + (255,)
             elif (r, g, b) in KEYS:
@@ -150,7 +167,7 @@ def scaled(pose, scale, team):
             r, g, b, a = px[x, y]
             px[x, y] = (r, g, b, 255) if a >= 120 else (0, 0, 0, 0)
     small = small.crop(small.getbbox())
-    return team_colours(small) if team else small
+    return team_colours(small, team if isinstance(team, str) else None) if team else small
 
 
 def feet_x(pose):
@@ -174,14 +191,26 @@ def framed(pose, width, height, at):
 
 def build(sheet, key):
     unit = UNITS[key]
-    top, bottom = unit["rows"]
-    poses = [cut(sheet, (x0, top, x1, bottom)) for x0, x1 in unit["cells"]]
+    if "boxes" in unit:
+        poses = [cut(sheet, box) for box in unit["boxes"]]
+    else:
+        top, bottom = unit["rows"]
+        poses = [cut(sheet, (x0, top, x1, bottom)) for x0, x1 in unit["cells"]]
     scale = unit["height"] / poses[unit["stand"]].height
     small = [scaled(p, scale, unit["team"]) for p in poses]
     stand = small[unit["stand"]]
-    strip = Image.new("RGBA", (FRAME * len(unit["attack"]), FRAME), (0, 0, 0, 0))
+    width, height = unit.get("frame", (FRAME, FRAME))
+    strip = Image.new("RGBA", (width * len(unit["attack"]), height), (0, 0, 0, 0))
     for i, n in enumerate(unit["attack"]):
-        strip.alpha_composite(framed(small[n], FRAME, FRAME, 40), (i * FRAME, 0))
+        if "anchors" in unit:  # the body's x, measured on the sheet: put it on the frame's centre, lifted off the ground
+            # (cut() crops to the pose's own bounding box, which starts at or after the box's left edge)
+            frame = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+            pose = small[n]
+            left = round(width / 2 - (unit["anchors"][n] - unit["boxes"][n][0] - poses[n].info.get("dx", 0)) * scale)
+            frame.alpha_composite(pose, (max(0, left), max(0, height - pose.height - unit.get("lift", 0))))
+        else:
+            frame = framed(small[n], width, height, 40)
+        strip.alpha_composite(frame, (i * width, 0))
     walk = None
     if unit["walk"]:
         walk = Image.new("RGBA", (WALK_W * 4, WALK_H), (0, 0, 0, 0))
@@ -194,7 +223,9 @@ def preview(built, path):
     rows = []
     for key, (strip, stand, walk) in built.items():
         parts = [stand] + ([walk] if walk else []) + [strip]
-        row = Image.new("RGBA", (sum(p.width for p in parts) + 8 * (len(parts) + 1), FRAME + 14), (84, 122, 84, 255))
+        row = Image.new(
+            "RGBA", (sum(p.width for p in parts) + 8 * (len(parts) + 1), strip.height + 14), (84, 122, 84, 255)
+        )
         ImageDraw.Draw(row).text((4, 0), key, fill=(255, 255, 255, 255))
         x = 8
         for part in parts:
@@ -222,7 +253,8 @@ def main():
         elif os.path.exists(walk_path):
             os.remove(walk_path)
         built[key] = (strip, stand, walk)
-        print("%-13s attack %d frames  stand %dx%d" % (key, strip.width // FRAME, stand.width, stand.height))
+        frame_w = UNITS[key].get("frame", (FRAME, FRAME))[0]
+        print("%-13s attack %d frames  stand %dx%d" % (key, strip.width // frame_w, stand.width, stand.height))
     preview(built, os.path.join(ROOT, "docs", "images", "bonus-units.png"))
 
 

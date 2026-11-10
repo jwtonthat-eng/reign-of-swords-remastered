@@ -643,23 +643,29 @@ kept apart from the original data so that everything else stays checkable agains
   (the top-right corner), each after the one before. Until then nothing of them shows: not the kingdoms, the units, their
   Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
   battle, raid or battlefield.
-- **Eight units**, each on the damage row of an original weapon and an original armour column (§2), so the real
+- **Nine units**, each on the damage row of an original weapon and an original armour column (§2), so the real
   weapon x armour table prices them:
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
   |---|---|---|---|---|---|---|
   | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 150 | Climb, Shoot and Move |
-  | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Formation |
-  | Stone Sentinel | 3, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 350, elite | Unyielding, Fear, Fearless, Last Strike |
-  | Marines | 4, skirmish | Boarding Musket, range 1 (Sword) | Light & Shield | 2 | 125 | Amphibious |
+  | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Mending Runes, Formation |
+  | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 350 | Unyielding, Fear, Fearless, Last Strike |
+  | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Short Sword | Light & Shield | 2 | 125 | Amphibious, Move or Shoot |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
-  | Battlemage | 4, formation | Chain Lightning 2-5 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Battle Standard, Fear, First Strike |
+  | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
   | Gladiators | 4, skirmish | Gladius (Sword) | Light & Shield | 3 | 200 | Whirl |
-  | Samurai | 4, formation | Katana (Sword) | Heavy | 3 | 250 | Lesser Shroud |
+  | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 250 | Lesser Shroud, Pike Wall |
+  | Dragon Riders | 8, flying | Dragonfire 3-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Shoot and Move, First Strike, Fear, Charge |
 
 - **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
   to the Gladiators takes 3/4 of the same blow. *Lesser Shroud* (Samurai): the Shaman's Spirit Shroud with a reach of
-  2 tiles instead of 4, raised the same way. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
+  2 tiles instead of 4, raised the same way. *Mending Runes* (Spellwardens): +10 HP at the start of each of their
+  turns, with the village heal. The *Boarding Musket* reaches 3 tiles, but only 2 when the Marines stand in woods,
+  tall grass, scrub, rocky ground or shallows (terrain types 3, 4, 5, 22, 27, 28). *Master Swordsman* (Samurai): +10
+  on the weapon x armour cell of every blow dealt, -10 on every blow taken (never below 1). *Dragonfire*: a single-
+  target fire weapon on the Cannonball's row that also reaches fliers, drawn as a fireball; it obeys cover like any
+  shot, unlike the Cannonball. The Battlemage's Teleport is the Wizard's. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
   attack from a deep-water tile. *Nullify*: a unit within 2 tiles (Manhattan) of a living Spellwarden of its side
   takes 0 from enemy Fireball, Lightning Storm, Ice Field and Chain Lightning, is not slowed by an enemy Ice Field,
   ignores an enemy Spirit Shroud and is not stopped or hurt by quicksand. *Unyielding*: no Heal from a Priest, immune
@@ -672,7 +678,8 @@ kept apart from the original data so that everything else stays checkable agains
   bonus battle like Episode II's own units: Archers to Cragsmen (Armor, Ostrak's Bargain), Swordsmen to Spellwardens
   (Lore, Frostgate), Craftsmen to Stone Sentinel (Spirit, The Empty Tomb), Footmen to Marines (Spirit, Free Company),
   Crossbowmen to Pavisiers (Armor, The Harbour Chain), Wizards to Battlemage (Medal, Reign of the Battlemage),
-  Halberdiers to Gladiators (Weapons, The Lashed Convoy), Swordsmen to Samurai (Spirit, Ishiro's Hill).
+  Halberdiers to Gladiators (Weapons, The Lashed Convoy), Swordsmen to Samurai (Spirit, Ishiro's Hill), Griffon
+  Riders to Dragon Riders (Medal, The Admiral's Deck).
 - **Ships.** The Mirror Sea's battles are fought on hulls lashed together. There is no ship art: a hull is the
   Episode II paving tiles laid on open sea, the obelisk as a mast and the house as a cabin, joined by gangplanks.
 - **Resume Episode II** (Settings, Episode II only). *From an army file*: reads an Episode II army file back in

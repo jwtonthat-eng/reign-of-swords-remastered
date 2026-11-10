@@ -643,6 +643,14 @@ for (const k in UNIT_TYPES) {
   // BONUS abilities (ours — rules/bonus.js): one trait flag per bonus unit.
   for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
     T[flag] = !!c[flag];
+  for (const flag of ["terrainRange", "dragonfire", "keen"]) T[flag] = !!c[flag];
+  if (c.teleport) T.teleport = true; // the Battlemage moves as the Wizard does
+  if (c.fly) T.fly = true; // the Dragon Rider
+  T.regen = c.regen || 0; // HP mended at the start of its turn (Spellwardens)
+  T.dmgBonus = c.dmgBonus || 0; // added to the weapon x armour cell of its blows (Samurai)
+  T.armourBonus = c.armourBonus || 0; // …and taken off the cell of blows against it
+  if (T.dmgBonus) T.atk += Math.round((T.dmgBonus * c.rf) / 100); // (the display numbers follow)
+  if (T.armourBonus) T.def = Math.min(0.95, T.def + T.armourBonus / 100);
   T.shroudRange = c.shroudRange || 4; // how far a Spirit Shroud reaches (the Samurai's lesser one: 2)
   // more real abilities (index from data/combat-data.js): 1 First Strike, 4 Fearless, 7 Move-or-Shoot,
   // 3 Blast Area / 24 Barrage / 25 Low Arc (siege area), 14 Fear. Prayer is 19 (Old Priest) / 23 (Priest);

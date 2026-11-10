@@ -15,7 +15,7 @@
 import { manhattan, cheb, clamp, key, strictMost, toHp256, wholeHp, shownDamage, healStep } from "../util/util.js";
 import { WEAPON_DMG, WEAPON_RANGE, WEAPON_TAGS, BLAST_SHARE, spellStats } from "../data/combat-data.js";
 import { UNIT_TYPES, FX_TYPES, meleeHitFx } from "../data/game-data.js";
-import { MAGIC_WEAPONS, CHAIN_WEAPON } from "../data/bonus-units.js";
+import { MAGIC_WEAPONS, CHAIN_WEAPON, BONUS_RANGED } from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
 
 // Which weapon a unit swings at a target `dist` tiles away. A unit can carry two
@@ -39,7 +39,7 @@ const isFireWeapon = (w) => w === 25 || (WEAPON_TAGS[w] || []).some((t) => t ===
 // bolt, shock) — their hits are area cells, not a state-2 strike.
 const AREA_WEAPONS = new Set([20, 21, 22, 23, 24, 25, 26, 27, 28, 34]);
 // every weapon that is not swung in melee: the bows and the Musket, the area weapons, the Hammer Throw
-const RANGED_WEAPONS = new Set([16, 17, 18, 19, 29, ...AREA_WEAPONS, 35, 36]); // + the bonus Javelin and Chain Lightning
+const RANGED_WEAPONS = new Set([16, 17, 18, 19, 29, ...AREA_WEAPONS, ...BONUS_RANGED]); // + the bonus units' missiles
 // The Lightning Storm's switch tables (see _resolveLightning): index → code, and code → the cell offset it strikes.
 const LIGHTNING_CODE = [0, 9, 1, 5, 8, 4, 10, 2, 6];
 const LIGHTNING_CELL = {
@@ -328,6 +328,8 @@ export class CombatMethods {
     if (opts.charge) base += 30; // the rider's charging flag
     if (opts.brace) base += 30; // Ep1: a braced Pike Wall's first strike
     if (base <= 0) return 0;
+    // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
+    base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (defender.T.armourBonus || 0));
     const tileDef = Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
     let cover = tileDef - (defender.T.formation && !siegeShot ? 10 * this.formationAllies(defender) : 0);
     if (siegeShot && tileDef <= 80) cover += Math.trunc((100 - tileDef) / 2);

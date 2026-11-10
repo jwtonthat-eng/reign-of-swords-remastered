@@ -38,7 +38,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("eight units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("nine units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -48,6 +48,7 @@ describe("bonus units: the data", () => {
       "battlemage",
       "gladiator",
       "samurai",
+      "dragonrider",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -57,8 +58,10 @@ describe("bonus units: the data", () => {
       expect(UNIT_COMBAT[k].armour).toBeLessThanOrEqual(15);
       expect(DEPLOY_ORDER).toContain(k);
     }
-    for (const [id, w] of Object.entries(BONUS_WEAPONS)) expect(WEAPON_DMG[id]).toEqual(WEAPON_DMG[w.row]);
-    expect(DEPLOY_ELITE.battlemage && DEPLOY_ELITE.sentinel).toBe(true);
+    for (const [id, w] of Object.entries(BONUS_WEAPONS))
+      expect(WEAPON_DMG[id]).toEqual(Object.assign(WEAPON_DMG[w.row].slice(), w.patch || {})); // (Dragonfire patches one cell)
+    expect(DEPLOY_ELITE.battlemage && DEPLOY_ELITE.dragonrider).toBe(true);
+    expect(DEPLOY_ELITE.sentinel).toBeUndefined(); // the Stone Sentinel is no elite
     expect(DEPLOY_ELITE.cragsmen).toBeUndefined();
   });
   it("the original units' records are untouched", () => {
@@ -71,7 +74,7 @@ describe("bonus units: the data", () => {
     expect(skill("cragsmen")).toContain("Climb");
     expect(skill("spellwardens")).toContain("Nullify");
     expect(skill("sentinel")).toEqual(expect.arrayContaining(["Unyielding", "Fear", "Last Strike", "Fearless"]));
-    expect(skill("marines")).toContain("Amphibious");
+    expect(skill("marines")).toEqual(expect.arrayContaining(["Amphibious", "Boarding Musket", "Move or Shoot"]));
     expect(skill("pavisiers")).toEqual(expect.arrayContaining(["Pavise", "Formation", "Move or Shoot"]));
     expect(skill("battlemage")).toEqual(expect.arrayContaining(["Chain Lightning", "Battle Standard", "Fear"]));
   });
@@ -88,6 +91,7 @@ describe("bonus units: upgrade paths", () => {
       ["wizards", "battlemage", "Medal"],
       ["halberdiers", "gladiator", "Weapons"],
       ["swordsmen", "samurai", "Spirit"],
+      ["griffon", "dragonrider", "Medal"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -321,6 +325,141 @@ describe("Lesser Shroud (Samurai)", () => {
     expect(g._auraFlags(beyond).rally).toBe(false);
     expect(g.computeDamage(samurai, foe)).toBeGreaterThan(0);
     expect(g._weaponAt(samurai, 1)).toBe(41);
-    expect(unitSkills("samurai").map((s) => s.n)).toEqual(["Lesser Shroud"]);
+    expect(unitSkills("samurai").map((s) => s.n)).toEqual(["Pike Wall", "Lesser Shroud", "Master Swordsman"]);
+  });
+});
+
+describe("the units as retuned", () => {
+  it("Battlemage: Chain Lightning at 2–7, teleports like a Wizard, strikes first, may attack after moving", () => {
+    const g = field();
+    const mage = spawn(g, "battlemage", "blue", 5, 5),
+      far = spawn(g, "footmen", "red", 12, 5),
+      beyond = spawn(g, "footmen", "red", 13, 6);
+    expect(mage.T.minRange).toBe(1);
+    expect(mage.T.range).toBe(7);
+    expect(g.targetsFrom(mage, 5, 5)).toContain(far); // 7 away
+    expect(g.targetsFrom(mage, 5, 5)).not.toContain(beyond); // 9 away
+    expect(mage.T.teleport).toBe(true);
+    expect(mage.T.firstStrike).toBe(true);
+    expect(mage.T.shootMove).toBe(true);
+    expect(g.targetsFrom(mage, 5, 5, true)).toContain(far); // judged as having moved: it still shoots
+    // the blink: an empty tile within its move is a stop even with a wall of foes between
+    spawn(g, "footmen", "red", 6, 5);
+    spawn(g, "footmen", "red", 5, 4);
+    spawn(g, "footmen", "red", 5, 6);
+    spawn(g, "footmen", "red", 4, 5);
+    expect(g.computeReach(mage).stops.has("7,5")).toBe(true);
+    const sword = spawn(g, "swordsmen", "blue", 2, 2);
+    for (const [x, y] of [
+      [3, 2],
+      [1, 2],
+      [2, 1],
+      [2, 3],
+    ])
+      spawn(g, "footmen", "red", x, y);
+    expect(g.computeReach(sword).stops.has("4,2")).toBe(false); // a walker is boxed in
+  });
+  it("Marines: a Boarding Musket at 2–3 from open ground, 2 from rough ground, a Short Sword up close", () => {
+    const g = startBattle(makeGame(5430)); // Dune with a View: sand, scrub and boulders
+    only(g);
+    let open = null,
+      rough = null;
+    for (let y = 2; y < g.rows - 2 && !(open && rough); y++)
+      for (let x = 4; x < g.cols - 4; x++) {
+        const type = moveType(g.tileAt(x, y)),
+          clear = [1, 2, 3].every((d) => [2, 26].includes(moveType(g.tileAt(x + d, y))));
+        if (!open && [2, 26].includes(type) && clear) open = [x, y];
+        if (!rough && [3, 22, 27].includes(type)) rough = [x, y];
+      }
+    const marine = spawn(g, "marines", "blue", open[0], open[1]),
+      at2 = spawn(g, "footmen", "red", open[0] + 2, open[1]),
+      at3 = spawn(g, "footmen", "red", open[0] + 3, open[1]);
+    expect(g._weaponAt(marine, 3)).toBe(39);
+    expect(g._weaponAt(marine, 1)).toBe(8);
+    expect(g.targetsFrom(marine, open[0], open[1], false)).toEqual(expect.arrayContaining([at2, at3]));
+    expect(g.targetsFrom(marine, open[0], open[1], true)).toEqual([]); // Move or Shoot
+    expect(g.computeDamage(marine, at3)).toBe(
+      g.computeDamage(spawn(g, "musketeers", "blue", open[0], open[1] + 0), at3),
+    );
+    // from rough ground the same two foes: only the one 2 away
+    only(g);
+    const scout = spawn(g, "marines", "blue", rough[0], rough[1]),
+      near = spawn(g, "footmen", "red", rough[0], rough[1] + 2),
+      far = spawn(g, "footmen", "red", rough[0], rough[1] + 3);
+    const seen = g.targetsFrom(scout, rough[0], rough[1], false);
+    expect(seen).toContain(near);
+    expect(seen).not.toContain(far);
+  });
+  it("Stone Sentinel moves 4; Spellwardens mend 10 HP at the start of their turn", () => {
+    expect(UNIT_TYPES.sentinel.move).toBe(4);
+    const g = field();
+    const warden = spawn(g, "spellwardens", "blue", 8, 5),
+      foot = spawn(g, "footmen", "blue", 8, 6);
+    warden.hp = 50;
+    foot.hp = 50;
+    g.healOnKeeps("blue");
+    expect(warden.hp).toBe(60);
+    expect(foot.hp).toBe(50);
+    warden.hp = 95;
+    g.healOnKeeps("blue");
+    expect(warden.hp).toBe(100);
+    expect(unitSkills("spellwardens").map((s) => s.n)).toContain("Mending Runes");
+  });
+  it("Samurai: +10 on the blows they deal, −10 on the blows they take, and a Pike Wall", () => {
+    const g = field();
+    const samurai = spawn(g, "samurai", "blue", 8, 5),
+      plain = spawn(g, "swordsmen", "blue", 8, 9),
+      foe = spawn(g, "footmen", "red", 9, 5),
+      foe2 = spawn(g, "footmen", "red", 9, 9);
+    samurai._shroudOn = false;
+    // the same Sword row and rating tier as… a Swordsman is tier 2; compare cell by cell instead
+    const cell = WEAPON_DMG[41][foe.T.armour];
+    expect(WEAPON_DMG[41]).toEqual(WEAPON_DMG[5]);
+    only(g, samurai, foe);
+    const withBonus = g.computeDamage(samurai, foe);
+    samurai.T = { ...samurai.T, dmgBonus: 0 };
+    expect(withBonus).toBeGreaterThan(g.computeDamage(samurai, foe));
+    expect(cell).toBeGreaterThan(0);
+    const taken = g.computeDamage(foe, samurai);
+    samurai.T = { ...samurai.T, armourBonus: 0 };
+    expect(taken).toBeLessThan(g.computeDamage(foe, samurai));
+    expect(UNIT_TYPES.samurai.pikeWall).toBe(true);
+    expect(plain && foe2).toBeTruthy();
+  });
+});
+
+describe("Dragon Riders", () => {
+  it("a 750-point elite flier in Relic Armour at the Hero's rating, upgraded from Griffon Riders with a Medal", () => {
+    const T = UNIT_TYPES.dragonrider,
+      hero = UNIT_TYPES.king;
+    expect(DEPLOY_COST.dragonrider).toBe(750);
+    expect(T.fly && T.al === 0).toBe(true);
+    expect(T.armour).toBe(hero.armour);
+    expect(T.rf).toBe(hero.rf);
+    expect(T.move).toBeGreaterThanOrEqual(hero.move);
+    expect(T.firstStrike && T.fear && T.hasCharge && T.shootMove).toBe(true);
+    expect(UPGRADE_FROM.dragonrider).toEqual({ from: "griffon", need: "Medal" });
+    expect(upgradeGate("dragonrider", true)).toBe(5943);
+    expect(unitSkills("dragonrider").map((s) => s.n)).toEqual(expect.arrayContaining(["Dragonfire", "Flight", "Fear"]));
+  });
+  it("Dragonfire: a cannon-like shot at 3–8 that also burns fliers and war engines; a Lance up close", () => {
+    const g = field();
+    const dragon = spawn(g, "dragonrider", "blue", 4, 5),
+      foot = spawn(g, "footmen", "red", 10, 5),
+      griffon = spawn(g, "griffon", "red", 9, 6),
+      catapult = spawn(g, "catapult", "red", 8, 5),
+      adjacent = spawn(g, "footmen", "red", 5, 5),
+      tooFar = spawn(g, "footmen", "red", 13, 5);
+    expect(g._weaponAt(dragon, 6)).toBe(42);
+    expect(g._weaponAt(dragon, 1)).toBe(15);
+    expect(WEAPON_DMG[42][0]).toBe(WEAPON_DMG[23][0]); // the Cannonball's row…
+    expect(g.computeDamage(dragon, griffon)).toBeGreaterThan(0); // …but it reaches fliers
+    const cannon = spawn(g, "cannon", "blue", 4, 6);
+    expect(g.computeDamage(cannon, griffon, { weapon: 23 })).toBe(0);
+    expect(g.computeDamage(dragon, catapult)).toBeGreaterThan(g.computeDamage(dragon, foot)); // fire on a Flammable engine
+    const targets = g.targetsFrom(dragon, 4, 5, true); // after a move: Shoot and Move
+    expect(targets).toEqual(expect.arrayContaining([foot, griffon, catapult, adjacent]));
+    expect(targets).not.toContain(tooFar);
+    expect(g.moveCost(dragon, 0, 0)).toBe(1); // it flies: any tile costs 1
   });
 });

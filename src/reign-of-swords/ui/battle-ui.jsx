@@ -136,6 +136,7 @@ export const UNIT_CATEGORY = {
   battlemage: "Casters",
   gladiator: "Infantry",
   samurai: "Infantry",
+  dragonrider: "Flying",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

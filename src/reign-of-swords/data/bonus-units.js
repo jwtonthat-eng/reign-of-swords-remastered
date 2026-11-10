@@ -17,6 +17,7 @@ export const BONUS_ORDER = [
   "battlemage",
   "gladiator", // the Mirror Sea
   "samurai", // Satoshi
+  "dragonrider", // the Mirror Sea
 ];
 
 // New weapon ids (the originals end at 34). `row` = the ORIGINAL weapon whose damage row it copies.
@@ -31,8 +32,8 @@ export const BONUS_WEAPONS = {
   36: {
     name: "Chain Lightning",
     row: 25, // Fireball
-    range: [2, 5],
-    tags: [7], // Move or Shoot
+    range: [2, 7],
+    tags: [8], // Shoot and Move
     desc: "Chain Lightning strikes its target, then leaps to up to two enemies standing next to it at half strength.",
   },
   37: {
@@ -51,10 +52,10 @@ export const BONUS_WEAPONS = {
   },
   39: {
     name: "Boarding Musket",
-    row: 5, // Sword
-    range: [1, 1],
-    tags: [],
-    desc: "A Boarding Musket is fired at arm's length across a deck or a breach: good damage against all armor types, but less effective against the heaviest armors.",
+    row: 18, // Musket
+    range: [2, 3],
+    tags: [7], // Move or Shoot
+    desc: "A Boarding Musket is a short musket for decks and breaches: consistent against all armor types. It reaches 3 tiles from open ground and 2 from woods, scrub, rocks or shallows.",
   },
   40: {
     name: "Gladius",
@@ -70,9 +71,19 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "A Katana delivers good damage against all armor types, but is less effective against the heaviest armors.",
   },
+  42: {
+    name: "Dragonfire",
+    row: 23, // Cannonball
+    patch: { 7: 35 }, // …but it burns fliers too (the Cannonball's Feathered Hide cell is 0)
+    range: [3, 8],
+    tags: [8, 13], // Shoot and Move, Burst (a fire weapon: double damage to Flammable war engines)
+    desc: "Dragonfire is a gout of flame hurled like a cannon shot: one target, far away, and ruinous to war engines and walls.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
 export const MAGIC_WEAPONS = [25, 26, 27, 36];
+// every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
+export const BONUS_RANGED = [35, 36, 39, 42];
 export const CHAIN_WEAPON = 36;
 
 // Movement class (0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 war engine), as data/combat-data UNIT_AL.
@@ -85,12 +96,14 @@ export const BONUS_AL = {
   battlemage: 2,
   gladiator: 1,
   samurai: 2,
+  dragonrider: 0,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
 // Trait flags: climb · nullify · unyielding · amphibious · pavise · chain (the six bonus abilities, rules/bonus.js).
 export const BONUS_COMBAT = {
   cragsmen: { move: 4, weapon: 35, weapon2: 3, armour: 3, rating: 2, rf: 75, abilities: [8], climb: true },
+  // regen: the HP it mends by itself at the start of each of its turns
   spellwardens: {
     move: 3,
     weapon: 37,
@@ -101,10 +114,11 @@ export const BONUS_COMBAT = {
     abilities: [5],
     formation: true,
     nullify: true,
+    regen: 10,
   },
   // armour 10 = the Heavy Armour & Shield column, shown as "Living Stone"
   sentinel: {
-    move: 3,
+    move: 4,
     weapon: 38,
     weapon2: 0,
     armour: 10,
@@ -115,7 +129,18 @@ export const BONUS_COMBAT = {
     unyielding: true,
     armourName: "Living Stone",
   },
-  marines: { move: 4, weapon: 39, weapon2: 0, armour: 6, rating: 2, rf: 75, abilities: [], amphibious: true },
+  // terrainRange: the musket reaches 3 tiles from open ground, 2 from woods, scrub, rocks or shallows
+  marines: {
+    move: 4,
+    weapon: 39,
+    weapon2: 8,
+    armour: 6,
+    rating: 2,
+    rf: 75,
+    abilities: [7],
+    amphibious: true,
+    terrainRange: true,
+  },
   pavisiers: {
     move: 4,
     weapon: 17,
@@ -127,6 +152,7 @@ export const BONUS_COMBAT = {
     formation: true,
     pavise: true,
   },
+  // teleport: it moves as the Wizard does; First Strike (1) as the Hero has it; Shoot and Move (8)
   battlemage: {
     move: 4,
     weapon: 36,
@@ -134,12 +160,14 @@ export const BONUS_COMBAT = {
     armour: 15,
     rating: 4,
     rf: 100,
-    abilities: [1, 11, 14, 7],
+    abilities: [1, 11, 14, 8],
     standard: true,
     chain: true,
+    teleport: true,
   },
   gladiator: { move: 4, weapon: 40, weapon2: 0, armour: 6, rating: 3, rf: 90, abilities: [], whirl: true },
-  // a swordsman who is also a lesser Shaman: the Spirit Shroud aura (flag `shroud`), reaching 2 tiles instead of 4
+  // a swordsman who is also a lesser Shaman: the Spirit Shroud aura (flag `shroud`), reaching 2 tiles instead of 4.
+  // dmgBonus / armourBonus: +10 on the weapon x armour cell of every blow it deals, -10 on every blow it takes.
   samurai: {
     move: 4,
     weapon: 41,
@@ -147,10 +175,27 @@ export const BONUS_COMBAT = {
     armour: 8,
     rating: 3,
     rf: 90,
-    abilities: [],
+    abilities: [27],
+    pikeWall: true,
     shroud: true,
     shroudRange: 2,
     lesserShroud: true,
+    keen: true,
+    dmgBonus: 10,
+    armourBonus: 10,
+  },
+  // a flier in Relic Armour at the Hero's rating: the Lance (15) up close, Dragonfire at 3-8
+  dragonrider: {
+    move: 8,
+    weapon: 42,
+    weapon2: 15,
+    armour: 15,
+    rating: 5,
+    rf: 115,
+    abilities: [1, 14, 15, 8],
+    charge: true,
+    fly: true,
+    dragonfire: true,
   },
 };
 export const BONUS_COURAGE = {
@@ -162,6 +207,7 @@ export const BONUS_COURAGE = {
   battlemage: 5,
   gladiator: 3,
   samurai: 4,
+  dragonrider: 5,
 };
 export const BONUS_COST = {
   cragsmen: 150,
@@ -172,9 +218,10 @@ export const BONUS_COST = {
   battlemage: 600,
   gladiator: 200,
   samurai: 250,
+  dragonrider: 750,
 };
-// "You may only deploy 1 Elite unit per 1000 deployment points" — the two heavyweights count as elites.
-export const BONUS_ELITE = { sentinel: true, battlemage: true };
+// "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
+export const BONUS_ELITE = { battlemage: true, dragonrider: true };
 
 // Sprite strips: cut from the supplied art sheets by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
 // one attack (frame 0 a ready pose), `hitFrame` the frame the blow lands or the shot leaves on.
@@ -214,9 +261,11 @@ export const BONUS_TYPES = {
   marines: {
     name: "Marines",
     sprite: "marines",
-    ...strip(7, 5),
-    kind: "melee",
-    ability: "Amphibious — wades through deep water at double cost; cannot attack while standing in it.",
+    ...both(7, 5),
+    kind: "ranged",
+    projectile: "bullet",
+    ability:
+      "Amphibious — wades through deep water at double cost; cannot attack while standing in it. Boarding Musket: 2–3 tiles.",
   },
   pavisiers: {
     name: "Pavisiers",
@@ -247,6 +296,25 @@ export const BONUS_TYPES = {
     kind: "melee",
     ability:
       "Lesser Shroud — a swordsman with a Shaman's aura: allies within 2 tiles gain +15, enemies within 2 lose 15.",
+  },
+  // one strip, two attacks: frames 0–2 breathe fire (it leaves on frame 1), frames 3–6 are the lance dive (it lands on 5)
+  dragonrider: {
+    name: "Dragon Riders",
+    sprite: "dragonrider",
+    frames: 7,
+    frameW: 176,
+    frameH: 128,
+    rangedFrom: 0,
+    rangedTo: 2,
+    rangedHit: 1,
+    meleeFrom: 3,
+    meleeTo: 6,
+    hitFrame: 5,
+    kind: "cavalry",
+    projectile: "ball",
+    magic: true, // the shot is drawn and sounds as a fireball, not a cannonball
+    ability:
+      "Dragonfire — hurls a gout of flame at 3–8 tiles like a cannon shot, and may still move; a flier in Relic Armour.",
   },
 };
 
@@ -300,6 +368,30 @@ export const BONUS_SKILLS = [
     icon: "skill_shroud",
     d: "A Shaman's Spirit Shroud at half the reach: once an enemy has come near, allies within 2 tiles gain +15 attack and courage, and enemies within 2 tiles lose 15.",
   },
+  {
+    flag: "regen",
+    n: "Mending Runes",
+    icon: "skill_prayer",
+    d: "Mends itself by 10 HP at the start of each of its turns.",
+  },
+  {
+    flag: "terrainRange",
+    n: "Boarding Musket",
+    icon: "skill_ranged",
+    d: "Fires at 2–3 tiles: 3 from open ground, walls and decks, only 2 from woods, tall grass, scrub, rocks or shallows. Up close it draws a Short Sword.",
+  },
+  {
+    flag: "dragonfire",
+    n: "Dragonfire",
+    icon: "skill_fireball",
+    d: "A gout of flame hurled like a cannon shot at 3–8 tiles: one target, double damage to flammable war engines, and it breaks walls. Unlike a cannon it may fire and move in the same turn.",
+  },
+  {
+    flag: "keen",
+    n: "Master Swordsman",
+    icon: "skill_first",
+    d: "Every blow it deals is 10 stronger and every blow it takes is 10 weaker, on the weapon and armour table.",
+  },
 ];
 
 // UPGRADE ARMY — each bonus unit hangs off an original unit, in a collectible slot that unit leaves empty, and waits
@@ -313,6 +405,7 @@ export const BONUS_UPGRADES = [
   { from: "wizards", to: "battlemage", need: "Medal", gate: 5926 }, // Isoluccia 6, Reign of the Battlemage
   { from: "halberdiers", to: "gladiator", need: "Weapons", gate: 5942 }, // Mirror Sea 2
   { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
+  { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mirror Sea 3, The Admiral's Deck
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
@@ -334,8 +427,8 @@ export const BONUS_META = {
   },
   marines: {
     role: "Shore Raider",
-    kit: "⚔ Boarding Musket · 🛡 Light Armor & Shield",
-    note: "Isoluccian marines who wade through deep water to strike where no one else can reach.",
+    kit: "⚔ Boarding Musket / Short Sword · 🛡 Light Armor & Shield",
+    note: "Isoluccian marines who wade through deep water to shoot from where no one else can reach.",
   },
   pavisiers: {
     role: "Shielded Crossbow",
@@ -356,6 +449,11 @@ export const BONUS_META = {
     role: "Spirit Swordsman",
     kit: "⚔ Katana · 🛡 Heavy Armor",
     note: "Warriors of Satoshi who fight as swordsmen and carry their ancestors with them: a lesser Spirit Shroud steadies allies and unnerves foes within 2 tiles.",
+  },
+  dragonrider: {
+    role: "Flying Terror",
+    kit: "⚔ Dragonfire / Lance · 🛡 Relic Armor",
+    note: "A lancer on a sea-dragon of Mare Nostra. It flies over anything, breathes fire like a cannon shot at long range, and fights in the air like a Hero.",
   },
 };
 // Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi

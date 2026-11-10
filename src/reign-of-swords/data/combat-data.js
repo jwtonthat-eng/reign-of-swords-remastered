@@ -795,6 +795,7 @@ export function spellStats(spell) {
 // damage row of the original weapon it names; a bonus unit's display numbers are derived the way the originals' are.
 for (const [id, weapon] of Object.entries(BONUS_WEAPONS)) {
   WEAPON_DMG[id] = WEAPON_DMG[weapon.row].slice();
+  for (const [armour, value] of Object.entries(weapon.patch || {})) WEAPON_DMG[id][armour] = value;
   WEAPON_RANGE[id] = weapon.range;
   if (weapon.tags.length) WEAPON_TAGS[id] = weapon.tags;
   WEAPON_NAME[id] = weapon.name;
