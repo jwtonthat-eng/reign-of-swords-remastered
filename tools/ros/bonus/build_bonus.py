@@ -49,6 +49,15 @@ SPEAKERS = {
     "enemy": ("Enemy Commander", "foe", "face066"),
     "enemy_hurt": ("Enemy Commander", "foe", "face068"),
     "clansman": ("Tilician Clansman", "you", "face086"),
+    # the Mirror Sea and Satoshi
+    "admiral": ("Admiral Corvane", "foe", "face066"),
+    "admiral_angry": ("Admiral Corvane", "foe", "face067"),
+    "admiral_hurt": ("Admiral Corvane", "foe", "face068"),
+    "gladiator": ("Arena Champion", "foe", "face086"),
+    "daimyo": ("Lord Kagemori", "foe", "face064"),
+    "daimyo_hurt": ("Lord Kagemori", "foe", "face065"),
+    "ishiro": ("Lord Ishiro", "you", "face079"),
+    "ishiro_grim": ("Lord Ishiro", "you", "face081"),
 }
 
 
@@ -107,6 +116,11 @@ THEMES = {
         "barricade": [18],
         "portal": [215],
         "fountain": [214],
+        # SHIPS (the Mirror Sea): there is no ship art, so a hull is laid in the paving tiles on open water —
+        # "b" plain deck, "m" a mast (the obelisk on its paved plinth), "c" a cabin (the house on paving: it
+        # heals and gives cover, like any house). The sea keeps its open-water tiles beside them.
+        "mast": [250],
+        "cabin": [249],
     },
 }
 WATERISH = (19, 20, 5)
@@ -164,7 +178,7 @@ def compile_terrain(theme_name, grid, seed):
         for x in range(cols):
             ch = grid[y][x]
             if ch in "~-^" or (ch == "=" and theme["road"] is None):
-                same = {"~": "~-b", "-": "~-b", "^": "^", "=": "=bG_"}[ch]
+                same = {"~": "~-bmc", "-": "~-bmc", "^": "^", "=": "=bG_"}[ch]
                 mask = 0
                 for i, (dx, dy) in enumerate(DIRS):
                     n = at(x + dx, y + dy)
@@ -207,6 +221,8 @@ def compile_terrain(theme_name, grid, seed):
                     "p": "woodgate",
                     "x": "barricade",
                     "O": "portal",
+                    "m": "mast",
+                    "c": "cabin",
                 }.get(ch)
                 if key is None:
                     raise ValueError("unknown terrain %r at %d,%d" % (ch, x, y))
@@ -222,7 +238,7 @@ MOVE_CLASS = {
     "griffon": 0,
     "footmen": 2, "swordsmen": 2, "greatswordsmen": 2, "pikemen": 2, "halberdiers": 2, "crossbowmen": 2,
     "musketeers": 2, "conjurer": 2, "bodyguard": 2, "bloodgorgers": 2,
-    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2,
+    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2,
 }
 CROSSES = {"cragsmen": 21, "marines": 19}  # Climb / Amphibious
 
@@ -564,7 +580,9 @@ def build(kingdoms):
     for kingdom in kingdoms:
         missions = []
         for spec in kingdom["levels"]:
-            spec = dict(spec, kingdom=kingdom["short"], theme=spec.get("theme", kingdom["theme"]))
+            name = kingdom.get("name") or "Kingdom of " + kingdom["short"]  # a region that is no kingdom names itself
+            # (the shell matches a region's raids on its name without "Kingdom of ")
+            spec = dict(spec, kingdom=name.replace("Kingdom of ", ""), theme=spec.get("theme", kingdom["theme"]))
             spec.setdefault("heraldry", {})
             for side, arms in kingdom.get("heraldry", {}).items():
                 spec["heraldry"].setdefault(side, arms)
@@ -587,7 +605,7 @@ def build(kingdoms):
         out["kingdoms"].append(
             {
                 "id": kingdom["id"],
-                "name": "Kingdom of " + kingdom["short"],
+                "name": kingdom.get("name") or "Kingdom of " + kingdom["short"],
                 "order": kingdom["order"],
                 "emperorBrief": lines(kingdom["brief"]),
                 "legacy": False,
@@ -603,8 +621,10 @@ def main():
     sys.path.insert(0, HERE)
     import tilicia
     import isoluccia
+    import mirror_sea
+    import satoshi
 
-    data = build([tilicia.KINGDOM, isoluccia.KINGDOM])
+    data = build([tilicia.KINGDOM, isoluccia.KINGDOM, mirror_sea.KINGDOM, satoshi.KINGDOM])
     stats = ", ".join("%d %s" % (sum(1 for l in data["levels"] if l["group"] == g), g) for g in ("story", "siege"))
     if "--check" in sys.argv:
         print("ok:", stats)

@@ -7,8 +7,17 @@
    Pure literals — no imports (combat-data and game-data both import this file).
    ============================================================ */
 
-// The six bonus units, in Field Manual order.
-export const BONUS_ORDER = ["cragsmen", "spellwardens", "sentinel", "marines", "pavisiers", "battlemage"];
+// The bonus units, in Field Manual order.
+export const BONUS_ORDER = [
+  "cragsmen",
+  "spellwardens",
+  "sentinel",
+  "marines",
+  "pavisiers",
+  "battlemage",
+  "gladiator", // the Mirror Sea
+  "samurai", // Satoshi
+];
 
 // New weapon ids (the originals end at 34). `row` = the ORIGINAL weapon whose damage row it copies.
 export const BONUS_WEAPONS = {
@@ -47,13 +56,36 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "A Boarding Musket is fired at arm's length across a deck or a breach: good damage against all armor types, but less effective against the heaviest armors.",
   },
+  40: {
+    name: "Gladius",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Gladius is a short stabbing sword: good damage against all armor types, but less effective against the heaviest armors.",
+  },
+  41: {
+    name: "Katana",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Katana delivers good damage against all armor types, but is less effective against the heaviest armors.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
 export const MAGIC_WEAPONS = [25, 26, 27, 36];
 export const CHAIN_WEAPON = 36;
 
 // Movement class (0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 war engine), as data/combat-data UNIT_AL.
-export const BONUS_AL = { cragsmen: 1, spellwardens: 2, sentinel: 2, marines: 1, pavisiers: 2, battlemage: 2 };
+export const BONUS_AL = {
+  cragsmen: 1,
+  spellwardens: 2,
+  sentinel: 2,
+  marines: 1,
+  pavisiers: 2,
+  battlemage: 2,
+  gladiator: 1,
+  samurai: 2,
+};
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
 // Trait flags: climb · nullify · unyielding · amphibious · pavise · chain (the six bonus abilities, rules/bonus.js).
@@ -106,8 +138,31 @@ export const BONUS_COMBAT = {
     standard: true,
     chain: true,
   },
+  gladiator: { move: 4, weapon: 40, weapon2: 0, armour: 6, rating: 3, rf: 90, abilities: [], whirl: true },
+  // a swordsman who is also a lesser Shaman: the Spirit Shroud aura (flag `shroud`), reaching 2 tiles instead of 4
+  samurai: {
+    move: 4,
+    weapon: 41,
+    weapon2: 0,
+    armour: 8,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    shroud: true,
+    shroudRange: 2,
+    lesserShroud: true,
+  },
 };
-export const BONUS_COURAGE = { cragsmen: 2, spellwardens: 3, sentinel: 5, marines: 2, pavisiers: 2, battlemage: 5 };
+export const BONUS_COURAGE = {
+  cragsmen: 2,
+  spellwardens: 3,
+  sentinel: 5,
+  marines: 2,
+  pavisiers: 2,
+  battlemage: 5,
+  gladiator: 3,
+  samurai: 4,
+};
 export const BONUS_COST = {
   cragsmen: 150,
   spellwardens: 225,
@@ -115,6 +170,8 @@ export const BONUS_COST = {
   marines: 125,
   pavisiers: 200,
   battlemage: 600,
+  gladiator: 200,
+  samurai: 250,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the two heavyweights count as elites.
 export const BONUS_ELITE = { sentinel: true, battlemage: true };
@@ -176,6 +233,23 @@ export const BONUS_TYPES = {
     kind: "ranged",
     ability: "Chain Lightning — strikes its target, then leaps to up to two adjacent enemies at half strength.",
   },
+  // (stand-in art until the Samurai / Gladiator sheet is imported: Swordsmen and Greatswordsmen with their team
+  // colours swapped — tools/ros/bonus/import_sheet.py STANDINS — so these are those units' frame numbers)
+  gladiator: {
+    name: "Gladiators",
+    sprite: "gladiator",
+    ...strip(5, 3),
+    kind: "melee",
+    ability: "Whirl — its blow spins on through every other enemy standing next to it.",
+  },
+  samurai: {
+    name: "Samurai",
+    sprite: "samurai",
+    ...strip(7, 4),
+    kind: "melee",
+    ability:
+      "Lesser Shroud — a swordsman with a Shaman's aura: allies within 2 tiles gain +15, enemies within 2 lose 15.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -216,6 +290,18 @@ export const BONUS_SKILLS = [
     icon: "skill_chain",
     d: "Its ranged attack (2–5 tiles) hits the target at full strength, then leaps to up to two enemies standing next to the target at half strength.",
   },
+  {
+    flag: "whirl",
+    n: "Whirl",
+    icon: "skill_melee",
+    d: "It spins as it strikes: after its blow lands on its target, every other enemy standing next to the Gladiators takes three quarters of the same blow.",
+  },
+  {
+    flag: "lesserShroud",
+    n: "Lesser Shroud",
+    icon: "skill_shroud",
+    d: "A Shaman's Spirit Shroud at half the reach: once an enemy has come near, allies within 2 tiles gain +15 attack and courage, and enemies within 2 tiles lose 15.",
+  },
 ];
 
 // UPGRADE ARMY — each bonus unit hangs off an original unit, in a collectible slot that unit leaves empty, and waits
@@ -227,6 +313,8 @@ export const BONUS_UPGRADES = [
   { from: "footmen", to: "marines", need: "Spirit", gate: 5923 }, // Isoluccia 3, Free Company
   { from: "crossbowmen", to: "pavisiers", need: "Armor", gate: 5924 }, // Isoluccia 4, The Harbour Chain
   { from: "wizards", to: "battlemage", need: "Medal", gate: 5926 }, // Isoluccia 6, Reign of the Battlemage
+  { from: "halberdiers", to: "gladiator", need: "Weapons", gate: 5942 }, // Mirror Sea 2
+  { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
@@ -261,6 +349,17 @@ export const BONUS_META = {
     kit: "⚔ Chain Lightning / Runesword · 🛡 Relic Armor",
     note: "The archaic weapon itself: a war-sorcerer in relic armour whose lightning leaps from foe to foe, and whose presence steadies an army.",
   },
+  gladiator: {
+    role: "Arena Fighter",
+    kit: "⚔ Gladius · 🛡 Light Armor & Shield",
+    note: "Deck-fighters of Mare Nostra, trained in the arenas of the island cities. Surrounded, they are at their best: their blow spins on through every foe beside them.",
+  },
+  samurai: {
+    role: "Spirit Swordsman",
+    kit: "⚔ Katana · 🛡 Heavy Armor",
+    note: "Warriors of Satoshi who fight as swordsmen and carry their ancestors with them: a lesser Spirit Shroud steadies allies and unnerves foes within 2 tiles.",
+  },
 };
-// Battle ids of the two bonus kingdoms (story 5901–5906 / 5921–5926, raids 5911–5913 / 5931–5933).
+// Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi
+// 5961–5972).
 export const isBonusMap = (mapId) => mapId >= 5900 && mapId < 6000;

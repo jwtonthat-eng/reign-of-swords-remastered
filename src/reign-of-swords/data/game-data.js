@@ -641,7 +641,9 @@ for (const k in UNIT_TYPES) {
   T.build = !!c.build; // Craftsmen (29): build a village on open ground (Build)
   T.repair = !!c.repair; // Craftsmen (29): repair an adjacent damaged war engine (Repair)
   // BONUS abilities (ours — rules/bonus.js): one trait flag per bonus unit.
-  for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain"]) T[flag] = !!c[flag];
+  for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
+    T[flag] = !!c[flag];
+  T.shroudRange = c.shroudRange || 4; // how far a Spirit Shroud reaches (the Samurai's lesser one: 2)
   // more real abilities (index from data/combat-data.js): 1 First Strike, 4 Fearless, 7 Move-or-Shoot,
   // 3 Blast Area / 24 Barrage / 25 Low Arc (siege area), 14 Fear. Prayer is 19 (Old Priest) / 23 (Priest);
   // ability 18/22 is FIREBALL (the Wizard), NOT Prayer — do not include 22 here or wizards wrongly gain Retribution.

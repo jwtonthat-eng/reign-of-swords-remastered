@@ -92,6 +92,8 @@ export const KINGDOM_POS_EP2 = {
   // the two BONUS kingdoms (ours): on the names the Episode II map already prints
   tilicia: { left: "87.5%", top: "44%" },
   isoluccia: { left: "75%", top: "64%" },
+  "mirror-sea": { left: "57%", top: "72%" }, // in Mare Nostra (user decision; the map prints "Mirror Sea" further north-east)
+  satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -562,6 +564,8 @@ export const ARMY_GROUPS = [
       "marines",
       "spellwardens",
       "sentinel",
+      "gladiator",
+      "samurai",
     ],
   },
   {
@@ -1305,6 +1309,8 @@ export const TREE_COL = {
   pavisiers: 3,
   sentinel: 3,
   battlemage: 3,
+  gladiator: 3,
+  samurai: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1341,6 +1347,8 @@ export const TREE_ROW = {
   pavisiers: 9,
   sentinel: 10,
   battlemage: 11,
+  gladiator: 12,
+  samurai: 13,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

@@ -152,6 +152,8 @@ const RANK = {
   cragsmen: 5,
   pavisiers: 5,
   battlemage: 7,
+  samurai: 2,
+  gladiator: 3,
 };
 const slotRank = (u) => (RANK[u.type] != null ? RANK[u.type] : -1);
 // Row width for one rank category (the C.119 map: ranks 0–6 → category 0, ranks 7–8 → category 1): five exactly →

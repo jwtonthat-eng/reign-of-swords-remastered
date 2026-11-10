@@ -38,8 +38,17 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("six units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
-    expect(BONUS_ORDER).toEqual(["cragsmen", "spellwardens", "sentinel", "marines", "pavisiers", "battlemage"]);
+  it("eight units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+    expect(BONUS_ORDER).toEqual([
+      "cragsmen",
+      "spellwardens",
+      "sentinel",
+      "marines",
+      "pavisiers",
+      "battlemage",
+      "gladiator",
+      "samurai",
+    ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
       expect(T.bonus).toBe(true);
@@ -77,6 +86,8 @@ describe("bonus units: upgrade paths", () => {
       ["footmen", "marines", "Spirit"],
       ["crossbowmen", "pavisiers", "Armor"],
       ["wizards", "battlemage", "Medal"],
+      ["halberdiers", "gladiator", "Weapons"],
+      ["swordsmen", "samurai", "Spirit"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -248,5 +259,68 @@ describe("Unyielding (Stone Sentinel)", () => {
     g.selected = priest;
     expect(g._clickHeal(sentinel)).toBe(false);
     expect(g._repairTargetFor(crafts)).toBe(sentinel);
+  });
+});
+
+describe("Whirl (Gladiators)", () => {
+  it("the blow lands on its target in full and spins through every other adjacent enemy at 3/4 — never a friend", () => {
+    const g = field();
+    const glad = spawn(g, "gladiator", "blue", 8, 5),
+      target = spawn(g, "footmen", "red", 9, 5),
+      north = spawn(g, "militiamen", "red", 8, 4),
+      south = spawn(g, "militiamen", "red", 8, 6),
+      friend = spawn(g, "footmen", "blue", 7, 5),
+      apart = spawn(g, "militiamen", "red", 10, 5);
+    const full = g.computeDamage(glad, target),
+      side = g.computeDamage(glad, north);
+    g.resolveDamage(glad, target, {});
+    expect(100 - target.hp).toBe(full);
+    for (const e of [north, south]) {
+      expect(100 - e.hp).toBeGreaterThan(0);
+      expect(100 - e.hp).toBeLessThan(side);
+      expect(100 - e.hp).toBeGreaterThanOrEqual(Math.floor(side * 0.7));
+    }
+    expect(friend.hp).toBe(100);
+    expect(apart.hp).toBe(100);
+    expect(unitSkills("gladiator").map((s) => s.n)).toContain("Whirl");
+  });
+  it("an ordinary swordsman's blow touches nobody else", () => {
+    const g = field();
+    const sword = spawn(g, "swordsmen", "blue", 8, 5),
+      target = spawn(g, "footmen", "red", 9, 5),
+      north = spawn(g, "militiamen", "red", 8, 4);
+    g.resolveDamage(sword, target, {});
+    expect(north.hp).toBe(100);
+  });
+});
+
+describe("Lesser Shroud (Samurai)", () => {
+  it("is a Spirit Shroud that reaches 2 tiles: enemies within 2 lose 15, a Shaman's own still reaches 4", () => {
+    const g = field();
+    const samurai = spawn(g, "samurai", "blue", 8, 5),
+      near = spawn(g, "footmen", "red", 10, 5),
+      far = spawn(g, "footmen", "red", 11, 5);
+    expect(samurai.T.shroud && samurai.T.shroudRange).toBe(2);
+    expect(g._auraFlags(near).shroud).toBe(true);
+    expect(g._auraFlags(far).shroud).toBe(false);
+    expect(g.ratingAura(near)).toBe(-15);
+    const shaman = spawn(g, "shamans", "blue", 8, 6);
+    expect(shaman.T.shroudRange).toBe(4);
+    expect(g._auraFlags(far).shroud).toBe(true); // 4 from the Shaman
+  });
+  it("once raised it steadies allies within 2, and the Samurai fights as a swordsman", () => {
+    const g = field();
+    const samurai = spawn(g, "samurai", "blue", 8, 5),
+      beside = spawn(g, "footmen", "blue", 8, 7),
+      beyond = spawn(g, "footmen", "blue", 8, 8),
+      foe = spawn(g, "footmen", "red", 9, 5);
+    expect(g._auraFlags(beside).rally).toBe(false); // not raised yet
+    g._shroudEndTurn(samurai); // an enemy is near: the shroud rises
+    expect(samurai._shroudOn).toBe(true);
+    expect(g._auraFlags(beside).rally).toBe(true);
+    expect(g._auraFlags(beyond).rally).toBe(false);
+    expect(g.computeDamage(samurai, foe)).toBeGreaterThan(0);
+    expect(g._weaponAt(samurai, 1)).toBe(41);
+    expect(unitSkills("samurai").map((s) => s.n)).toEqual(["Lesser Shroud"]);
   });
 });

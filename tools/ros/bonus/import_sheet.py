@@ -72,6 +72,26 @@ UNITS = {
 }
 
 
+# STAND-INS: the Gladiators and the Samurai wait for their own sheet. Until it is imported they wear an original
+# unit's art with its two team-colour ramps swapped (data/bonus-units.js uses that unit's frame numbers).
+STANDINS = {"gladiator": "swordsmen", "samurai": "greatswordsmen"}
+SWAP = {**dict(zip(GREEN, BLUE)), **dict(zip(BLUE, GREEN))}
+
+
+def standin(source):
+    out = []
+    for folder in ("", "stand", "walk"):
+        image = Image.open(os.path.join(SPRITES, folder, source + ".png")).convert("RGBA")
+        px = image.load()
+        for y in range(image.height):
+            for x in range(image.width):
+                r, g, b, a = px[x, y]
+                if a and (r, g, b) in SWAP:
+                    px[x, y] = SWAP[(r, g, b)] + (a,)
+        out.append(image)
+    return out
+
+
 def cut(sheet, box):
     """One pose, its ground flood-filled to transparent from the cell's edges."""
     cell = sheet.crop(box).convert("RGBA")
@@ -207,6 +227,12 @@ def main():
             os.remove(walk_path)
         built[key] = (strip, stand, walk)
         print("%-13s attack %d frames  stand %dx%d" % (key, strip.width // FRAME, stand.width, stand.height))
+    for key, source in STANDINS.items():
+        strip, stand, walk = standin(source)
+        strip.save(os.path.join(SPRITES, key + ".png"))
+        stand.save(os.path.join(SPRITES, "stand", key + ".png"))
+        walk.save(os.path.join(SPRITES, "walk", key + ".png"))
+        print("%-13s stand-in: %s with its team colours swapped" % (key, source))
     preview(built, os.path.join(ROOT, "docs", "images", "bonus-units.png"))
 
 

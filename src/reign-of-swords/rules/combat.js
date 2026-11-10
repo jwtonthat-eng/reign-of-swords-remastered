@@ -560,11 +560,13 @@ export class CombatMethods {
     let rally = false,
       shroud = false;
     for (const other of this.units) {
-      if (other.dead || manhattan(other, u) > 4) continue;
+      const dist = manhattan(other, u);
+      if (other.dead || dist > 4) continue;
+      const shrouds = other.T.shroud && dist <= other.T.shroudRange; // (BONUS: the Samurai's lesser Shroud reaches 2)
       if (other.team === u.team) {
         if (other !== u && (courage || u.type !== "king") && other.T.standard) rally = true;
-        else if (other.T.shroud && other._shroudOn) rally = true;
-      } else if (other.T.shroud) shroud = true;
+        else if (shrouds && other._shroudOn) rally = true;
+      } else if (shrouds) shroud = true;
     }
     if (shroud && this._warded(u)) shroud = false; // BONUS: Nullify — an enemy Spirit Shroud saps nothing here
     return { rally, shroud };
@@ -1226,6 +1228,11 @@ export class CombatMethods {
     // EPISODE II — Ballistae Piercing Bolt (help string 758): the bolt "damages three squares in a row" —
     // after the main hit it pierces the next two tiles behind the target, in the direction _ballistaStep picks.
     this._resolvePierce(attacker, defender, opts, wMain);
+    // BONUS: Whirl — the Gladiators' blow spins on through every other enemy standing next to them, at 3/4 strength
+    if (attacker.T.whirl && manhattan(attacker, defender) === 1 && opts.weapon == null)
+      for (const e of this.units)
+        if (!e.dead && e !== defender && e.team !== attacker.team && manhattan(e, attacker) === 1 && !this._isHidden(e))
+          this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.75), false, false, wMain);
     // A wizard jabbing point-blank uses its Wand (weapon 7) — a plain melee hit, no spell splash.
     if (attacker.T.splash && !(attacker.T.canLightning && manhattan(attacker, defender) <= 1))
       this._resolveSplash(attacker, defender, opts, wMain);
