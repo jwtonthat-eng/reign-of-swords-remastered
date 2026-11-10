@@ -139,7 +139,7 @@ const STAND_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
-  ...BONUS_ORDER, // the bonus units (drawn for this project — tools/ros/bonus/draw_units.py)
+  ...BONUS_ORDER, // the bonus units (original art repainted — tools/ros/bonus/remix_units.py; the Battlemage, like the Wizard, has no walk sheet)
 ];
 // WALKING animation: each unit has its own 4-frame walk cycle (android walk sheets, 256x72 = 4 frames @ 64x72),
 // extracted to sprites/walk/<key>.png. A unit uses this real leg cycle while it moves; before, everything glided.
@@ -177,7 +177,7 @@ const WALK_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
-  ...BONUS_ORDER, // the bonus units (drawn for this project — tools/ros/bonus/draw_units.py)
+  ...BONUS_ORDER, // the bonus units (original art repainted — tools/ros/bonus/remix_units.py; the Battlemage, like the Wizard, has no walk sheet)
 ];
 // (WALK_FRAMES/WALK_W/WALK_H — the walk-strip frame dimensions — live in render/render.js, their only consumer.)
 async function loadAssets(base, dataBase = base) {

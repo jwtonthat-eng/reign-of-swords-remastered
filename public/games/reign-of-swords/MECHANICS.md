@@ -632,7 +632,10 @@ kept apart from the original data so that everything else stays checkable agains
   5931-5933), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
-  the code. Their sprites and ability icons were drawn for this project (`tools/ros/bonus/draw_units.py`).
+  the code. Their sprites are original units' art repainted (`tools/ros/bonus/remix_units.py`: Cragsmen from Militiamen,
+  Spellwardens from Swordsmen, the Stone Sentinel from the Bodyguard, Marines from the Musketeers' sword frames,
+  Pavisiers from Crossbowmen with a pavise drawn in, the Battlemage from the Wizard); the six ability icons were
+  drawn for this project (`draw_units.py`).
 - **Story.** They follow Episode II's last line (the letters naming Tilicia, Isoluccia and the "Battlemage"). The
   maps reuse the Episode II tileset, the speakers reuse its portraits, and every battle runs on the original scenario
   script (round, kill, tile, escape and escort triggers), with no new script commands.

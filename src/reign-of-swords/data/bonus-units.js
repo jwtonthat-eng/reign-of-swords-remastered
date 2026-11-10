@@ -119,22 +119,19 @@ export const BONUS_COST = {
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the two heavyweights count as elites.
 export const BONUS_ELITE = { sentinel: true, battlemage: true };
 
-// Sprite strips (drawn for this project — tools/ros/bonus/draw_units.py) and the display fallbacks, in the shape of
-// data/game-data UNIT_TYPES. A unit with a projectile plays its whole strip for both the shot and the hand-to-hand blow.
-const strip = (frames, hitFrame) => ({ frames, frameW: 72, frameH: 72, hitFrame });
-const both = (frames, hitFrame) => ({
-  ...strip(frames, hitFrame),
-  rangedFrom: 0,
-  rangedTo: frames - 1,
-  rangedHit: hitFrame,
-  meleeFrom: 0,
-  meleeTo: frames - 1,
-});
+// Sprite strips: each bonus unit's art is an ORIGINAL unit's, repainted (tools/ros/bonus/remix_units.py), so its strip
+// has that unit's frame layout — the numbers below are the source unit's own (data/game-data.js).
+const strip = (size, frames, hitFrame) => ({ frames, frameW: size, frameH: size, hitFrame });
 export const BONUS_TYPES = {
   cragsmen: {
     name: "Cragsmen",
     sprite: "cragsmen",
-    ...both(7, 4),
+    ...strip(88, 4, 2), // Militiamen
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
     kind: "ranged",
     projectile: "bolt",
     ability: "Climb — crosses cliffs no other ground unit can. Throws Javelins at 2–3 tiles and may still move.",
@@ -142,28 +139,33 @@ export const BONUS_TYPES = {
   spellwardens: {
     name: "Spellwardens",
     sprite: "spellwardens",
-    ...strip(7, 4),
+    ...strip(88, 5, 3), // Swordsmen
     kind: "melee",
     ability: "Nullify — enemy magic does nothing to units within 2 tiles of a Spellwarden.",
   },
   sentinel: {
     name: "Stone Sentinel",
     sprite: "sentinel",
-    ...strip(8, 5),
+    ...strip(72, 11, 5), // Bodyguard
     kind: "melee",
     ability: "Unyielding — feels no Fear, ignores quicksand, cannot be healed by Priests; Craftsmen can repair it.",
   },
   marines: {
     name: "Marines",
     sprite: "marines",
-    ...strip(7, 4),
+    ...strip(88, 5, 3), // the Musketeers' sword frames
     kind: "melee",
     ability: "Amphibious — wades through deep water at double cost; cannot attack while standing in it.",
   },
   pavisiers: {
     name: "Pavisiers",
     sprite: "pavisiers",
-    ...both(8, 3),
+    ...strip(88, 16, 13), // Crossbowmen: the shot is frames 0–10, the Short Sword 11–15
+    rangedFrom: 0,
+    rangedTo: 10,
+    rangedHit: 2,
+    meleeFrom: 11,
+    meleeTo: 15,
     kind: "ranged",
     projectile: "arrow",
     ability: "Pavise — while it has not moved, it and the ally behind it take half ranged damage.",
@@ -171,7 +173,7 @@ export const BONUS_TYPES = {
   battlemage: {
     name: "Battlemage",
     sprite: "battlemage",
-    ...strip(7, 4),
+    ...strip(88, 8, 4), // Wizards
     kind: "ranged",
     ability: "Chain Lightning — strikes its target, then leaps to up to two adjacent enemies at half strength.",
   },

@@ -19,6 +19,7 @@ the engine re-palettises per army (render.js _recolored) -- so those pixels must
 """
 import math
 import os
+import sys
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
@@ -947,21 +948,17 @@ def preview(built, icons, path, scale=2):
 
 
 def main():
-    built = {}
-    for key in UNITS:
-        strip, stand, walk = build(key)
-        strip.save(os.path.join(OUT, "sprites", key + ".png"))
-        stand.save(os.path.join(OUT, "sprites", "stand", key + ".png"))
-        walk.save(os.path.join(OUT, "sprites", "walk", key + ".png"))
-        built[key] = (strip, stand, walk)
-        print("%-13s attack %d frames (hit %d)  stand %dx%d" % (key, strip.width // 72, UNITS[key]["hit"], stand.width, stand.height))
-    icons = {}
+    # The unit sprites this file draws were the first, from-scratch versions. The game now uses original unit art
+    # repainted by remix_units.py, so only the six ability icons are written — pass --sprites to write the old
+    # sprites too (they would replace the remixed ones).
+    if "--sprites" in sys.argv:
+        for key in UNITS:
+            strip, stand, walk = build(key)
+            strip.save(os.path.join(OUT, "sprites", key + ".png"))
+            stand.save(os.path.join(OUT, "sprites", "stand", key + ".png"))
+            walk.save(os.path.join(OUT, "sprites", "walk", key + ".png"))
     for name, fn in ICONS.items():
-        im = fn().image()
-        im.save(os.path.join(OUT, "hud", "skill_" + name + ".png"))
-        icons[name] = im
-    os.makedirs(os.path.join(ROOT, "docs", "images"), exist_ok=True)
-    preview(built, icons, os.path.join(ROOT, "docs", "images", "bonus-units.png"))
+        fn().image().save(os.path.join(OUT, "hud", "skill_" + name + ".png"))
 
 
 if __name__ == "__main__":
