@@ -41,11 +41,11 @@ export const BONUS_WEAPONS = {
     desc: "A Stone Fist delivers crushing melee damage, but the Sentinel is slow and strikes last.",
   },
   39: {
-    name: "Cutlass",
+    name: "Boarding Musket",
     row: 5, // Sword
     range: [1, 1],
     tags: [],
-    desc: "A Cutlass delivers good damage against all armor types, but is less effective against the heaviest armors.",
+    desc: "A Boarding Musket is fired at arm's length across a deck or a breach: good damage against all armor types, but less effective against the heaviest armors.",
   },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
@@ -119,19 +119,23 @@ export const BONUS_COST = {
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the two heavyweights count as elites.
 export const BONUS_ELITE = { sentinel: true, battlemage: true };
 
-// Sprite strips: each bonus unit's art is an ORIGINAL unit's, repainted (tools/ros/bonus/remix_units.py), so its strip
-// has that unit's frame layout — the numbers below are the source unit's own (data/game-data.js).
-const strip = (size, frames, hitFrame) => ({ frames, frameW: size, frameH: size, hitFrame });
+// Sprite strips: cut from the supplied art sheet by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
+// one attack (frame 0 a ready pose), `hitFrame` the frame the blow lands or the shot leaves on.
+const strip = (frames, hitFrame) => ({ frames, frameW: 88, frameH: 88, hitFrame });
+// a unit with a projectile plays the same strip for its shot and for its hand-to-hand blow
+const both = (frames, hitFrame) => ({
+  ...strip(frames, hitFrame),
+  rangedFrom: 0,
+  rangedTo: frames - 1,
+  rangedHit: hitFrame,
+  meleeFrom: 0,
+  meleeTo: frames - 1,
+});
 export const BONUS_TYPES = {
   cragsmen: {
     name: "Cragsmen",
     sprite: "cragsmen",
-    ...strip(88, 4, 2), // Militiamen
-    rangedFrom: 0,
-    rangedTo: 3,
-    rangedHit: 2,
-    meleeFrom: 0,
-    meleeTo: 3,
+    ...both(5, 3),
     kind: "ranged",
     projectile: "bolt",
     ability: "Climb — crosses cliffs no other ground unit can. Throws Javelins at 2–3 tiles and may still move.",
@@ -139,33 +143,28 @@ export const BONUS_TYPES = {
   spellwardens: {
     name: "Spellwardens",
     sprite: "spellwardens",
-    ...strip(88, 5, 3), // Swordsmen
+    ...strip(6, 4),
     kind: "melee",
     ability: "Nullify — enemy magic does nothing to units within 2 tiles of a Spellwarden.",
   },
   sentinel: {
     name: "Stone Sentinel",
     sprite: "sentinel",
-    ...strip(72, 11, 5), // Bodyguard
+    ...strip(8, 5),
     kind: "melee",
     ability: "Unyielding — feels no Fear, ignores quicksand, cannot be healed by Priests; Craftsmen can repair it.",
   },
   marines: {
     name: "Marines",
     sprite: "marines",
-    ...strip(88, 5, 3), // the Musketeers' sword frames
+    ...strip(7, 5),
     kind: "melee",
     ability: "Amphibious — wades through deep water at double cost; cannot attack while standing in it.",
   },
   pavisiers: {
     name: "Pavisiers",
     sprite: "pavisiers",
-    ...strip(88, 16, 13), // Crossbowmen: the shot is frames 0–10, the Short Sword 11–15
-    rangedFrom: 0,
-    rangedTo: 10,
-    rangedHit: 2,
-    meleeFrom: 11,
-    meleeTo: 15,
+    ...both(8, 5),
     kind: "ranged",
     projectile: "arrow",
     ability: "Pavise — while it has not moved, it and the ally behind it take half ranged damage.",
@@ -173,7 +172,7 @@ export const BONUS_TYPES = {
   battlemage: {
     name: "Battlemage",
     sprite: "battlemage",
-    ...strip(88, 8, 4), // Wizards
+    ...strip(8, 3),
     kind: "ranged",
     ability: "Chain Lightning — strikes its target, then leaps to up to two adjacent enemies at half strength.",
   },
@@ -249,7 +248,7 @@ export const BONUS_META = {
   },
   marines: {
     role: "Shore Raider",
-    kit: "⚔ Cutlass · 🛡 Light Armor & Shield",
+    kit: "⚔ Boarding Musket · 🛡 Light Armor & Shield",
     note: "Isoluccian marines who wade through deep water to strike where no one else can reach.",
   },
   pavisiers: {

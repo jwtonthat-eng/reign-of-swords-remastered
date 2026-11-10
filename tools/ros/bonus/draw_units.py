@@ -948,9 +948,9 @@ def preview(built, icons, path, scale=2):
 
 
 def main():
-    # The unit sprites this file draws were the first, from-scratch versions. The game now uses original unit art
-    # repainted by remix_units.py, so only the six ability icons are written — pass --sprites to write the old
-    # sprites too (they would replace the remixed ones).
+    # The unit sprites this file draws were the first, from-scratch versions. The game now uses the supplied art
+    # sheet, cut up by import_sheet.py, so only the six ability icons are written — pass --sprites to write the old
+    # sprites too (they would replace the imported ones).
     if "--sprites" in sys.argv:
         for key in UNITS:
             strip, stand, walk = build(key)
