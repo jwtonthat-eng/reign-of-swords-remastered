@@ -262,10 +262,11 @@ export default function ReignShell({ assetBase = null }) {
     setScreen("campaign");
   };
   // ⚙ Settings → Resume Episode II (ours): every battle and raid of the ORIGINAL kingdoms is marked won (bonus battles
-  // already won stay won), and the army file becomes the army.
-  const resumeEpisode = (data) => {
+  // already won stay won), and the army file becomes the army. `everything` (the built-in veteran army, for testing):
+  // every battle of every kingdom, the bonus ones included, is marked won — all of them open to replay.
+  const resumeEpisode = (data, everything = false) => {
     const original = { ...camp, kingdoms: camp.kingdoms.filter((k) => !k.bonus) };
-    const won = progressBefore(original, levels, -1);
+    const won = progressBefore(everything ? camp : original, levels, -1);
     for (const mapId of progress) if (isBonusMap(mapId)) won.add(mapId);
     const got = save.resumeEpisode(data, won);
     setKingdomOpen(null);

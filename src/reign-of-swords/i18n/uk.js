@@ -1520,8 +1520,8 @@ export default {
   "Resume Episode II": "Продовжити Епізод II",
   "Resume from an army file": "Продовжити з файлу армії",
   "Resume with the veteran army": "Продовжити з армією ветеранів",
-  "Skip to the end of Episode II: every Episode II battle and raid is marked won, your army and collectibles become exactly those in the file (an Episode II army exported above — or the built-in veteran army), and the bonus campaigns of Tilicia and Isoluccia open. It replaces your current Episode II save.":
-    "Перейти до кінця Епізоду II: усі битви й набіги Епізоду II позначаються виграними, ваша армія і трофеї стають точно такими, як у файлі (армія Епізоду II, експортована вище, або вбудована армія ветеранів), і відкриваються бонусні кампанії Тіліції та Ізолуччії. Поточне збереження Епізоду II буде замінено.",
+  "Resume from an army file: every Episode II battle and raid is marked won, your army and collectibles become exactly those in the file (an Episode II army exported above), and the bonus campaigns open. Resume with the veteran army, for testing: every battle of every campaign, the bonus ones included, is marked won and open to replay, with 8 of every unit and collectible. Either replaces your current Episode II save.":
+    "Продовжити з файлу армії: усі битви й набіги Епізоду II позначаються виграними, ваша армія і трофеї стають точно такими, як у файлі (армія Епізоду II, експортована вище), і відкриваються бонусні кампанії. Продовжити з армією ветеранів, для перевірки: виграними позначаються всі битви всіх кампаній, зокрема бонусні, їх можна переграти, і ви отримуєте по 8 загонів і трофеїв кожного виду. В обох випадках поточне збереження Епізоду II замінюється.",
   "Bonus campaign — not part of the original game": "Бонусна кампанія — не входить до оригінальної гри",
   "Bonus campaign": "Бонусна кампанія",
   "A fan-made bonus campaign — not part of the original game. New story, maps and units.":
@@ -1530,4 +1530,6 @@ export default {
     "Ця армія з Епізоду I — для продовження потрібен файл армії Епізоду II.",
   "The bonus campaigns of Tilicia and Isoluccia, their maps, story and six units are fan-made additions and are not part of the original game.":
     "Бонусні кампанії Тіліції та Ізолуччії, їхні карти, сюжет і шість загонів — фанатські доповнення, вони не входять до оригінальної гри.",
+  "Every battle unlocked. Your army: {u} units and {s} collectibles.":
+    "Усі битви відкрито. Ваша армія: загонів — {u}, трофеїв — {s}.",
 };

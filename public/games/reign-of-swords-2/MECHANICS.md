@@ -622,14 +622,14 @@ not on this list is meant to match the binaries — a difference that is not lis
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
 
-### The bonus campaigns: Tilicia and Isoluccia (Episode II only)
+### The bonus campaigns: Tilicia, Isoluccia, the Mirror Sea and Satoshi (Episode II only)
 
-Two fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+Four fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
 kept apart from the original data so that everything else stays checkable against the binaries.
 
 - **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
-  beside it) holds the two kingdoms, their 12 story battles and 6 raids (map ids 5901-5906, 5911-5913, 5921-5926,
-  5931-5933), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
+  beside it) holds the four regions, their 18 story battles and 10 raids (map ids 5901-5913 Tilicia, 5921-5933 Isoluccia,
+  5941-5952 the Mirror Sea, 5961-5972 Satoshi), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
   the code. Their sprites are cut from art sheets supplied for this project
@@ -639,10 +639,11 @@ kept apart from the original data so that everything else stays checkable agains
   maps reuse the Episode II tileset, the speakers reuse its portraits, and every battle runs on the original scenario
   script (round, kill, tile, escape and escort triggers), with no new script commands.
 - **Opening.** The kingdoms appear on the Episode II world map, marked "Bonus campaign", once Oasis Standoff is won.
-  Tilicia opens first, Isoluccia after Tilicia. Until then nothing of them shows: not the kingdoms, the units, their
+  Tilicia opens first, then Isoluccia, the Mirror Sea (its marker is in Mare Nostra, by user decision) and Satoshi
+  (the top-right corner), each after the one before. Until then nothing of them shows: not the kingdoms, the units, their
   Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
   battle, raid or battlefield.
-- **Six units**, each on the damage row of an original weapon and an original armour column (§2), so the real
+- **Eight units**, each on the damage row of an original weapon and an original armour column (§2), so the real
   weapon x armour table prices them:
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
@@ -653,8 +654,12 @@ kept apart from the original data so that everything else stays checkable agains
   | Marines | 4, skirmish | Boarding Musket, range 1 (Sword) | Light & Shield | 2 | 125 | Amphibious |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
   | Battlemage | 4, formation | Chain Lightning 2-5 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Battle Standard, Fear, First Strike |
+  | Gladiators | 4, skirmish | Gladius (Sword) | Light & Shield | 3 | 200 | Whirl |
+  | Samurai | 4, formation | Katana (Sword) | Heavy | 3 | 250 | Lesser Shroud |
 
-- **Six abilities.** *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
+- **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
+  to the Gladiators takes 3/4 of the same blow. *Lesser Shroud* (Samurai): the Shaman's Spirit Shroud with a reach of
+  2 tiles instead of 4, raised the same way. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
   attack from a deep-water tile. *Nullify*: a unit within 2 tiles (Manhattan) of a living Spellwarden of its side
   takes 0 from enemy Fireball, Lightning Storm, Ice Field and Chain Lightning, is not slowed by an enemy Ice Field,
   ignores an enemy Spirit Shroud and is not stopped or hurt by quicksand. *Unyielding*: no Heal from a Priest, immune
@@ -666,10 +671,16 @@ kept apart from the original data so that everything else stays checkable agains
 - **Upgrades.** Each unit hangs off an original unit in a collectible slot that unit leaves empty, and waits on a
   bonus battle like Episode II's own units: Archers to Cragsmen (Armor, Ostrak's Bargain), Swordsmen to Spellwardens
   (Lore, Frostgate), Craftsmen to Stone Sentinel (Spirit, The Empty Tomb), Footmen to Marines (Spirit, Free Company),
-  Crossbowmen to Pavisiers (Armor, The Harbour Chain), Wizards to Battlemage (Medal, Reign of the Battlemage).
-- **Resume Episode II** (Settings, Episode II only): reads an Episode II army file back in without the transfer
-  limits, marks every original Episode II battle and raid won, and replaces the army and collectibles with the
-  file's. A built-in veteran army is offered for the same purpose.
+  Crossbowmen to Pavisiers (Armor, The Harbour Chain), Wizards to Battlemage (Medal, Reign of the Battlemage),
+  Halberdiers to Gladiators (Weapons, The Lashed Convoy), Swordsmen to Samurai (Spirit, Ishiro's Hill).
+- **Ships.** The Mirror Sea's battles are fought on hulls lashed together. There is no ship art: a hull is the
+  Episode II paving tiles laid on open sea, the obelisk as a mast and the house as a cabin, joined by gangplanks.
+- **Resume Episode II** (Settings, Episode II only). *From an army file*: reads an Episode II army file back in
+  without the transfer limits, marks every original Episode II battle and raid won, and replaces the army and
+  collectibles with the file's. *With the veteran army* (for testing): marks every battle of every campaign won, the
+  bonus ones included, so all are open to replay, with 8 of every unit and collectible.
+- **The page.** The standalone site gives the game the whole window: the page never scrolls, the campaign screen's
+  map and army panel scroll on their own, and the battle board is sized to the window height.
 
 ### Not reproduced
 

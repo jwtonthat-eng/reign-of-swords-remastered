@@ -46,9 +46,10 @@ It is a remake, not an exact copy.
 - **The original army.** Knights, Pikemen, Swordsmen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen,
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
-- **Two fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia and
-  Isoluccia, 12 battles and 6 raids that follow the "Battlemage" letters Episode II ends on, with six new units
-  (Cragsmen, Spellwardens, Stone Sentinels, Marines, Pavisiers and the Battlemage).
+- **Four fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
+  Isoluccia, the Mirror Sea (ship-to-ship boarding battles) and Satoshi, 18 battles and 10 raids that follow the
+  "Battlemage" letters Episode II ends on, with eight new units (Cragsmen, Spellwardens, Stone Sentinels, Marines,
+  Pavisiers, the Battlemage, Gladiators and Samurai).
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.

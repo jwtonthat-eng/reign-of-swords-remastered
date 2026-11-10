@@ -27,20 +27,22 @@ function App() {
     document.title = seo.heading + " — Remastered";
   }, [seo]);
   return (
-    <section className="section" style={{ paddingTop: "10px" }}>
-      <div className="wrap">
-        <nav className="game-switch">
-          {Object.keys(GAMES).map((id) => (
-            <a key={id} href={"#" + id} className={id === gameId ? "on" : ""}>
-              {ROS_SEO[id].heading}
-            </a>
-          ))}
-        </nav>
-        <h1 className="section-title" style={{ marginBottom: "8px" }}>
-          {seo.heading}
-        </h1>
-        <p className="game-blurb">{seo.blurb[lang] || seo.blurb.en}</p>
-        <ReignShell key={gameId} assetBase={GAMES[gameId].assetBase} />
+    // The game fills the window (app.css .game-screen): the episode switch is a slim row above it and nothing else
+    // shares the page, so the page itself never scrolls — a screen taller than the window scrolls inside the frame.
+    <section className="game-screen">
+      <nav className="game-switch">
+        {Object.keys(GAMES).map((id) => (
+          <a key={id} href={"#" + id} className={id === gameId ? "on" : ""}>
+            {ROS_SEO[id].heading}
+          </a>
+        ))}
+      </nav>
+      <h1 className="visually-hidden">{seo.heading}</h1>
+      <p className="visually-hidden">{seo.blurb[lang] || seo.blurb.en}</p>
+      <div className="game-fit">
+        <div className="wrap">
+          <ReignShell key={gameId} assetBase={GAMES[gameId].assetBase} />
+        </div>
       </div>
     </section>
   );

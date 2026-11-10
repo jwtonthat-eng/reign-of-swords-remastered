@@ -30,7 +30,8 @@ describe("Settings: Resume Episode II", () => {
     await vi.waitFor(() => expect(onResume).toHaveBeenCalledTimes(1), { timeout: 5000 }); // (the file is read from disk)
     await settle();
     expect(onResume.mock.calls[0][0]).toMatchObject({ kind: "reign-of-swords-army", episode: 2 });
-    expect(screen.getByRole("status").textContent).toMatch(/12 units and 4 collectibles.*bonus campaigns are open/);
+    expect(onResume.mock.calls[0][1]).toBe(true); // the veteran army unlocks everything
+    expect(screen.getByRole("status").textContent).toMatch(/Every battle unlocked.*12 units and 4 collectibles/);
   });
   it("an army file: a wrong or unreadable file is refused with the reason", async () => {
     const onResume = vi.fn(() => {

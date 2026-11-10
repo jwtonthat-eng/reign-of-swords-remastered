@@ -11,7 +11,7 @@ import {
   kingdomRaids,
   progressBefore,
 } from "../data/campaign-rules.js";
-import { combineCounts, KINGDOM_POS_EP2, unlocksOf } from "../data/shell-data.js";
+import { combineCounts, KINGDOM_POS_EP2, unlocksOf, ALL_TYPES, EP2_ORDER, BONUS_ORDER } from "../data/shell-data.js";
 import { isBonusMap } from "../data/bonus-units.js";
 
 const dir = join(process.cwd(), "public/games/reign-of-swords-2");
@@ -26,12 +26,14 @@ const idx = (id) => camp.kingdoms.findIndex((k) => k.id === id);
 const storyOf = (id) => camp.kingdoms[idx(id)].missions.map((m) => m.mapId);
 
 describe("bonus kingdoms on the campaign map", () => {
-  it("are two extra kingdoms, six story battles and three raids each, with a place on the Episode II map", () => {
-    expect(bonus.kingdoms.map((k) => k.id).slice(0, 2)).toEqual(["tilicia", "isoluccia"]);
-    for (const kingdom of bonus.kingdoms.slice(0, 2)) {
+  it("are four extra regions with their story battles and raids, each with a place on the Episode II map", () => {
+    expect(bonus.kingdoms.map((k) => k.id)).toEqual(["tilicia", "isoluccia", "mirror-sea", "satoshi"]);
+    expect(bonus.kingdoms.map((k) => k.name).slice(2)).toEqual(["The Mirror Sea", "The Isles of Satoshi"]);
+    for (const kingdom of bonus.kingdoms) {
+      const small = kingdom.id === "mirror-sea" || kingdom.id === "satoshi"; // 3 battles and 2 raids each
       expect(kingdom.bonus).toBe(true);
-      expect(kingdom.missions.length).toBe(6);
-      expect(kingdomRaids(levels, kingdom).length).toBe(3);
+      expect(kingdom.missions.length).toBe(small ? 3 : 6);
+      expect(kingdomRaids(levels, kingdom).length).toBe(small ? 2 : 3);
       expect(KINGDOM_POS_EP2[kingdom.id]).toBeTruthy();
       for (const mission of kingdom.missions) {
         expect(isBonusMap(mission.mapId)).toBe(true);
@@ -51,6 +53,12 @@ describe("bonus kingdoms on the campaign map", () => {
     expect(missionUnlocked(camp, idx("tilicia"), 1, done)).toBe(false);
     const tiliciaDone = new Set([...done, ...storyOf("tilicia")]);
     expect(kingdomUnlocked(camp, idx("isoluccia"), tiliciaDone)).toBe(true);
+    // …then the Mirror Sea after Isoluccia, and Satoshi after the Mirror Sea
+    expect(kingdomUnlocked(camp, idx("mirror-sea"), tiliciaDone)).toBe(false);
+    const isolucciaDone = new Set([...tiliciaDone, ...storyOf("isoluccia")]);
+    expect(kingdomUnlocked(camp, idx("mirror-sea"), isolucciaDone)).toBe(true);
+    expect(kingdomUnlocked(camp, idx("satoshi"), isolucciaDone)).toBe(false);
+    expect(kingdomUnlocked(camp, idx("satoshi"), new Set([...isolucciaDone, ...storyOf("mirror-sea")]))).toBe(true);
   });
   it("their raids open as the story advances, like the Eastern Kingdoms' (raid n after story battle n + 1)", () => {
     const done = progressBefore(original, levels, -1);
@@ -68,6 +76,8 @@ describe("bonus kingdoms on the campaign map", () => {
       [5923, "marines"],
       [5924, "pavisiers"],
       [5926, "battlemage"],
+      [5942, "gladiator"],
+      [5962, "samurai"],
     ]) {
       expect(gives(mapId)).toContain(unit);
       expect(unlocksOf(mapId, true)).toEqual([unit]);
@@ -80,14 +90,39 @@ describe("bonus kingdoms on the campaign map", () => {
 
 describe("Resume Episode II (⚙ Settings)", () => {
   const veteran = json("veteran-army.json");
+  // an Episode II army as the game exports it
+  const exported = {
+    kind: "reign-of-swords-army",
+    v: 1,
+    episode: 2,
+    army: { footmen: 10, pikemen: 11, cavalry: 11, king: 2, conjurer: 3, bloodgorgers: 4, wizards: 2 },
+    spoils: { Medal: 4, Weapons: 1, Spirit: 1 },
+  };
   it("reads an Episode II army file whole — no transfer limits", () => {
+    const got = readResume(exported);
+    expect(got.units).toEqual(exported.army);
+    expect(got.spoils).toEqual(exported.spoils);
+    expect(() => readTransfer(exported, { ep2: true })).toThrow(/import it in Episode I/); // the ordinary import refuses it
+  });
+  it("the built-in veteran army is 8 of every unit that can be owned, and 8 of every collectible", () => {
     const got = readResume(veteran);
-    expect(got.units).toMatchObject({ pikemen: 11, cavalry: 11, king: 2, conjurer: 3, bloodgorgers: 4 });
-    expect(got.spoils).toEqual({ Medal: 4, Weapons: 1, Spirit: 1 });
-    expect(Object.values(got.units).reduce((a, n) => a + n, 0)).toBe(
-      Object.values(veteran.army).reduce((a, n) => a + n, 0),
-    );
-    expect(() => readTransfer(veteran, { ep2: true })).toThrow(/import it in Episode I/); // the ordinary import refuses it
+    for (const k of [...ALL_TYPES, ...EP2_ORDER, ...BONUS_ORDER].filter((u) => u !== "sapper" && u !== "bodyguard"))
+      expect(got.units[k], k).toBe(8);
+    expect(got.units.sapper).toBeUndefined();
+    expect(Object.keys(got.units).length).toBe(36);
+    expect(got.spoils).toEqual({ Medal: 8, Armor: 8, Weapons: 8, Beasts: 8, Spirit: 8, Lore: 8 });
+  });
+  it("…and resuming with it marks every battle of every campaign won, the bonus ones included", () => {
+    const won = progressBefore(camp, levels, -1);
+    for (const kingdom of camp.kingdoms) {
+      for (const mission of kingdom.missions) expect(won.has(mission.mapId)).toBe(true);
+      for (const raid of kingdomRaids(levels, kingdom)) expect(won.has(raid.mapId)).toBe(true);
+    }
+    expect(won.has(5963) && won.has(5972) && won.has(5943)).toBe(true);
+    const earned = combineCounts(...[...won].map((id) => (rewards[id] && rewards[id].units) || {}));
+    const army = combineCounts(earned, resumeDelta(readResume(veteran).units, earned));
+    expect(army.samurai).toBe(8);
+    expect(army.militiamen).toBe(8);
   });
   it("refuses anything else, and caps a count at 500", () => {
     expect(() => readResume({ kind: "x" })).toThrow(/not a Reign of Swords army file/);
@@ -100,7 +135,7 @@ describe("Resume Episode II (⚙ Settings)", () => {
     expect([...won].some(isBonusMap)).toBe(false);
     expect(won.has(5432) && won.has(5401) && won.has(5631)).toBe(true);
     const earned = combineCounts(...[...won].map((id) => (rewards[id] && rewards[id].units) || {}));
-    const got = readResume(veteran);
+    const got = readResume(exported);
     const army = combineCounts(earned, resumeDelta(got.units, earned));
     for (const k of new Set([...Object.keys(army), ...Object.keys(got.units)]))
       expect(army[k] || 0).toBe(got.units[k] || 0);

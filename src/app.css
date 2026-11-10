@@ -155,3 +155,69 @@ code {
 .game-switch a.on {
   color: var(--accent);
 }
+
+/* THE GAME FILLS THE WINDOW. The page is one screen tall and never scrolls: the episode switch is a slim row, the
+   game takes the rest. A game screen taller than the window (the Field Manual, a long war-plans list) scrolls inside
+   its own frame instead of the page. (Phones have their own fit-to-screen layout: reign-of-swords/ui/styles.) */
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  overflow: hidden;
+}
+.game-screen {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+.game-screen .game-switch {
+  flex: none;
+  margin: 0;
+  padding: 4px 24px;
+  justify-content: center;
+  font-size: 0.82rem;
+}
+.game-fit {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-gutter: stable both-edges;
+}
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* The campaign screen on a desktop: the world map and the army panel each keep to the window and scroll on their
+   own (the army list is long), so the screen as a whole stays put. */
+@media (min-width: 821px) and (min-height: 601px) {
+  .game-fit .ros-campaign-cols {
+    height: calc(100dvh - 222px);
+    min-height: 380px;
+    align-items: stretch;
+  }
+  .game-fit .ros-campaign-cols > .ros-worldmap-col,
+  .game-fit .ros-campaign-cols > .ros-camp-panel {
+    min-height: 0;
+    overflow: hidden auto;
+  }
+  .game-fit .ros-campaign .ros-worldmap {
+    max-height: 100%;
+    max-width: min(540px, calc((100dvh - 222px) * 0.893)); /* the map is 1260 × 1411: fit its height to the column */
+  }
+}
+/* …and the game's height floor (shell.css: 700px) gives way on a short window, so the menu fits a small laptop. */
+@media (min-width: 821px) and (min-height: 601px) {
+  .game-fit .ros-shell {
+    min-height: min(700px, calc(100dvh - 34px));
+  }
+  .game-fit .ros-shell .ros-cutscene {
+    min-height: min(660px, calc(100dvh - 110px));
+  }
+}

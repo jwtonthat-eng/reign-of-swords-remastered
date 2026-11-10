@@ -790,7 +790,7 @@ class Game {
     // only fall back to half the viewport if the stage hasn't been measured yet (rect.height 0 on first mount).
     const availH = mobile
       ? Math.round(rect.height) || Math.round((window.innerHeight || 800) * 0.5)
-      : clamp((window.innerHeight || 800) - 470, 300, 530);
+      : clamp((window.innerHeight || 800) - 510, 240, 530); // (510 = the battle's own bars and panel: the page is one window tall, src/app.css)
     // Tile sized so ~N columns fill the available width. Desktop targets ~15 cols; on a phone we target fewer so
     // tiles (and tap targets) stay large — the camera pans/zooms to reveal wider maps.
     this.tile = mobile

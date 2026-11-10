@@ -79,19 +79,18 @@ function ArmyTransfer({ transfer }) {
 // { base, onResume }: onResume(data) applies a parsed army file and returns { units, spoils }, or throws.
 function ResumeEpisode({ resume }) {
   const [status, setStatus] = useState(null);
-  const apply = (data) => {
+  const apply = (data, everything = false) => {
     if (!window.confirm(tr("Replace your Episode II progress and army with this file? This cannot be undone."))) return;
     try {
-      const got = resume.onResume(data);
+      const got = resume.onResume(data, everything);
       const count = (m) => Object.values(m).reduce((a, n) => a + n, 0);
       setStatus({
         ok: true,
         text: tr(
-          "Episode II marked complete. Your army: {u} units and {s} collectibles. The bonus campaigns are open.",
-          {
-            u: count(got.units),
-            s: count(got.spoils),
-          },
+          everything
+            ? "Every battle unlocked. Your army: {u} units and {s} collectibles."
+            : "Episode II marked complete. Your army: {u} units and {s} collectibles. The bonus campaigns are open.",
+          { u: count(got.units), s: count(got.spoils) },
         ),
       });
     } catch (err) {
@@ -112,7 +111,7 @@ function ResumeEpisode({ resume }) {
   const fromVeteran = () =>
     fetch(resume.base + "veteran-army.json")
       .then((r) => r.json())
-      .then(apply, unreadable);
+      .then((data) => apply(data, true), unreadable);
   return (
     <div className="ros-settings-group">
       <div className="ros-settings-label">{tr("Resume Episode II")}</div>
@@ -127,7 +126,7 @@ function ResumeEpisode({ resume }) {
       </div>
       <p className="ros-settings-note">
         {tr(
-          "Skip to the end of Episode II: every Episode II battle and raid is marked won, your army and collectibles become exactly those in the file (an Episode II army exported above — or the built-in veteran army), and the bonus campaigns of Tilicia and Isoluccia open. It replaces your current Episode II save.",
+          "Resume from an army file: every Episode II battle and raid is marked won, your army and collectibles become exactly those in the file (an Episode II army exported above), and the bonus campaigns open. Resume with the veteran army, for testing: every battle of every campaign, the bonus ones included, is marked won and open to replay, with 8 of every unit and collectible. Either replaces your current Episode II save.",
         )}
       </p>
       {status && (

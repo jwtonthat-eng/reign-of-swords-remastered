@@ -179,3 +179,45 @@ describe("Isoluccia: scripted endings", () => {
     expect(g.phase).toBe("victory");
   });
 });
+
+describe("The Mirror Sea and Satoshi: scripted endings", () => {
+  it("The Admiral's Deck is fought on ships and ends when Admiral Corvane falls", () => {
+    const g = startBattle(makeGame(5943), "auto");
+    const corvane = foes(g).find((u) => u.type === "king");
+    expect(corvane).toBeTruthy();
+    expect(foes(g).some((u) => u.type === "gladiator")).toBe(true);
+    // every unit stands on a deck: no one starts in the sea
+    for (const u of g.units) expect(g.terrainAt(u.tx, u.ty).passable, u.type).toBe(true);
+    fell(g, corvane);
+    expect(g.phase).toBe("victory");
+  });
+  it("Blockade Runner is held until round 9", () => {
+    const g = startBattle(makeGame(5951), "auto");
+    holdUntil(g, 9);
+    expect(g.phase).toBe("victory");
+  });
+  it("Ishiro's Hill is lost if Lord Ishiro falls, and won by holding to round 11", () => {
+    let g = startBattle(makeGame(5962), "auto");
+    const ishiro = g.units.find((u) => u.ally && u.type === "king");
+    expect(ishiro).toBeTruthy();
+    expect(g.units.some((u) => u.ally && u.type === "samurai")).toBe(true);
+    fell(g, ishiro);
+    expect(g.phase).toBe("defeat");
+    g = startBattle(makeGame(5962), "auto");
+    holdUntil(g, 11);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Castle of Lord Kagemori ends when he falls", () => {
+    const g = startBattle(makeGame(5963), "auto");
+    const kagemori = foes(g).find((u) => u.type === "king");
+    expect(foes(g).filter((u) => u.type === "samurai").length).toBeGreaterThan(3);
+    fell(g, kagemori);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Shrine Pass is won by reaching the shrine", () => {
+    const g = startBattle(makeGame(5971), "auto");
+    const shrine = tag(g, 6)[0];
+    reach(g, mine(g)[0], shrine.a);
+    expect(g.phase).toBe("victory");
+  });
+});
