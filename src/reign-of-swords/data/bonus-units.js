@@ -176,7 +176,7 @@ export const BONUS_COST = {
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the two heavyweights count as elites.
 export const BONUS_ELITE = { sentinel: true, battlemage: true };
 
-// Sprite strips: cut from the supplied art sheet by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
+// Sprite strips: cut from the supplied art sheets by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
 // one attack (frame 0 a ready pose), `hitFrame` the frame the blow lands or the shot leaves on.
 const strip = (frames, hitFrame) => ({ frames, frameW: 88, frameH: 88, hitFrame });
 // a unit with a projectile plays the same strip for its shot and for its hand-to-hand blow
@@ -233,19 +233,17 @@ export const BONUS_TYPES = {
     kind: "ranged",
     ability: "Chain Lightning — strikes its target, then leaps to up to two adjacent enemies at half strength.",
   },
-  // (stand-in art until the Samurai / Gladiator sheet is imported: Swordsmen and Greatswordsmen with their team
-  // colours swapped — tools/ros/bonus/import_sheet.py STANDINS — so these are those units' frame numbers)
   gladiator: {
     name: "Gladiators",
     sprite: "gladiator",
-    ...strip(5, 3),
+    ...strip(7, 5),
     kind: "melee",
     ability: "Whirl — its blow spins on through every other enemy standing next to it.",
   },
   samurai: {
     name: "Samurai",
     sprite: "samurai",
-    ...strip(7, 4),
+    ...strip(6, 4),
     kind: "melee",
     ability:
       "Lesser Shroud — a swordsman with a Shaman's aura: allies within 2 tiles gain +15, enemies within 2 lose 15.",

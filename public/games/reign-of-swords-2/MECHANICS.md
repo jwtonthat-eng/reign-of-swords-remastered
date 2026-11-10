@@ -632,7 +632,7 @@ kept apart from the original data so that everything else stays checkable agains
   5931-5933), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
-  the code. Their sprites are cut from an art sheet supplied for this project
+  the code. Their sprites are cut from art sheets supplied for this project
   (`tools/ros/bonus/art/`, sliced and given team colours by `import_sheet.py`); the six ability icons were drawn
   for it (`draw_units.py`).
 - **Story.** They follow Episode II's last line (the letters naming Tilicia, Isoluccia and the "Battlemage"). The

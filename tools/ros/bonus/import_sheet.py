@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The bonus units' sprites, cut from the supplied art sheet (tools/ros/bonus/art/bonus-units-sheet.jpg).
+"""The bonus units' sprites, cut from the supplied art sheets (tools/ros/bonus/art/*.jpg).
 
 The sheet shows each unit as a row of poses on a flat green ground: a standing pose, walk frames, attack frames.
 This tool cuts every pose out (the ground is flood-filled away from the edges of its cell, so greens inside a figure
@@ -22,7 +22,8 @@ from collections import deque
 from PIL import Image, ImageDraw
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
-SHEET = os.path.join(ROOT, "tools", "ros", "bonus", "art", "bonus-units-sheet.jpg")
+ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
+SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -69,27 +70,22 @@ UNITS = {
                   (1343, 1476), (1506, 1636), (1677, 1807)],
         "stand": 0, "walk": None, "attack": [3, 4, 5, 6, 7, 8, 9, 10], "height": 72, "team": True,
     },
+    # the second sheet draws each unit three times over; one row of each is used
+    "gladiator": {
+        "sheet": "second",
+        "rows": (776, 940),
+        "cells": [(26, 126), (174, 274), (314, 415), (446, 549), (588, 684), (739, 834), (880, 992), (1036, 1175),
+                  (1186, 1330), (1340, 1485), (1504, 1646), (1655, 1811), (1838, 1985)],
+        "stand": 0, "walk": [1, 2, 3, 4], "attack": [6, 7, 8, 10, 11, 12, 5], "height": 62, "team": True,
+    },
+    "samurai": {
+        "sheet": "second",
+        "rows": (26, 190),
+        "cells": [(21, 113), (168, 266), (310, 409), (442, 541), (582, 680), (740, 882), (892, 1044), (1059, 1228),
+                  (1321, 1431), (1512, 1671), (1722, 1824)],
+        "stand": 0, "walk": [1, 2, 3, 4], "attack": [5, 6, 7, 8, 9, 10], "height": 64, "team": True,
+    },
 }
-
-
-# STAND-INS: the Gladiators and the Samurai wait for their own sheet. Until it is imported they wear an original
-# unit's art with its two team-colour ramps swapped (data/bonus-units.js uses that unit's frame numbers).
-STANDINS = {"gladiator": "swordsmen", "samurai": "greatswordsmen"}
-SWAP = {**dict(zip(GREEN, BLUE)), **dict(zip(BLUE, GREEN))}
-
-
-def standin(source):
-    out = []
-    for folder in ("", "stand", "walk"):
-        image = Image.open(os.path.join(SPRITES, folder, source + ".png")).convert("RGBA")
-        px = image.load()
-        for y in range(image.height):
-            for x in range(image.width):
-                r, g, b, a = px[x, y]
-                if a and (r, g, b) in SWAP:
-                    px[x, y] = SWAP[(r, g, b)] + (a,)
-        out.append(image)
-    return out
 
 
 def cut(sheet, box):
@@ -214,10 +210,10 @@ def preview(built, path):
 
 
 def main():
-    sheet = Image.open(SHEET).convert("RGB")
+    sheets = {name: Image.open(os.path.join(ART, file)).convert("RGB") for name, file in SHEETS.items()}
     built = {}
     for key in UNITS:
-        strip, stand, walk = build(sheet, key)
+        strip, stand, walk = build(sheets[UNITS[key].get("sheet", "first")], key)
         strip.save(os.path.join(SPRITES, key + ".png"))
         stand.save(os.path.join(SPRITES, "stand", key + ".png"))
         walk_path = os.path.join(SPRITES, "walk", key + ".png")
@@ -227,12 +223,6 @@ def main():
             os.remove(walk_path)
         built[key] = (strip, stand, walk)
         print("%-13s attack %d frames  stand %dx%d" % (key, strip.width // FRAME, stand.width, stand.height))
-    for key, source in STANDINS.items():
-        strip, stand, walk = standin(source)
-        strip.save(os.path.join(SPRITES, key + ".png"))
-        stand.save(os.path.join(SPRITES, "stand", key + ".png"))
-        walk.save(os.path.join(SPRITES, "walk", key + ".png"))
-        print("%-13s stand-in: %s with its team colours swapped" % (key, source))
     preview(built, os.path.join(ROOT, "docs", "images", "bonus-units.png"))
 
 
