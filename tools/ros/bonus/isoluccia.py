@@ -492,7 +492,7 @@ cc.....DDDDDDD.....ee
             {
                 "when": ("round", 3),
                 "cam": (1, 8),
-                "spawn": [("swordsmen", "c", "E"), ("halberdiers", "d", "E"), ("crossbowmen", "p", "E")],
+                "spawn": [("swordsmen", "c", "E"), ("halberdiers", "d", "E"), ("crossbowmen", "p", "E"), ("swordsmen", "o", "E")],
                 "say": [("officer", "A column at the west gate!")],
             },
             {
@@ -520,7 +520,7 @@ cc.....DDDDDDD.....ee
             {
                 "when": ("round", 11),
                 "cam": (1, 8),
-                "spawn": [("swordsmen", "c", "E"), ("marines", "e", "E"), ("halberdiers", "d", "E")],
+                "spawn": [("swordsmen", "c", "E"), ("marines", "e", "E"), ("halberdiers", "d", "E"), ("swordsmen", "i", "E")],
                 "say": [("officer", "They are throwing in everything they have left, Commander!")],
             },
             {
