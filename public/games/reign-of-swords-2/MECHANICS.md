@@ -680,7 +680,9 @@ kept apart from the original data so that everything else stays checkable agains
   collectibles with the file's. *With the veteran army* (for testing): marks every battle of every campaign won, the
   bonus ones included, so all are open to replay, with 8 of every unit and collectible.
 - **The page.** The standalone site gives the game the whole window: the page never scrolls, the campaign screen's
-  map and army panel scroll on their own, and the battle board is sized to the window height.
+  map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
+  battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the
+  muster roster) in a side column on the right. Phones keep their own layout.
 
 ### Not reproduced
 

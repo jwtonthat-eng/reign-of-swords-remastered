@@ -12,6 +12,7 @@
 @import "./styles/army.css"; /* camp / army panel, upgrade tree, skill chips, Merchant, icons */
 @import "./styles/codex.css"; /* Story & Assets codex, mechanics reference, dialogue threads */
 @import "./styles/banners.css"; /* wave + turn banners, group crests, mid-battle dialogue */
+@import "./styles/desktop.css"; /* desktop battle: the board fills the window, the controls stand beside it */
 @import "./styles/mobile.css"; /* phones and short landscape screens: the full-screen battle */
 @import "./styles/medals.css"; /* raid Major-Victory tracker, medal rows and cards */
 @import "./styles/phone.css"; /* phone battle polish, phone menus, phone landscape */

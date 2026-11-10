@@ -790,7 +790,9 @@ class Game {
     // only fall back to half the viewport if the stage hasn't been measured yet (rect.height 0 on first mount).
     const availH = mobile
       ? Math.round(rect.height) || Math.round((window.innerHeight || 800) * 0.5)
-      : clamp((window.innerHeight || 800) - 510, 240, 530); // (510 = the battle's own bars and panel: the page is one window tall, src/app.css)
+      : frame && frame.height
+        ? Math.max(200, frame.height) // the two-column desktop battle: the board column is as tall as the window
+        : clamp((window.innerHeight || 800) - 510, 240, 530); // (the stacked layout: 510 = the bars and panel around the board)
     // Tile sized so ~N columns fill the available width. Desktop targets ~15 cols; on a phone we target fewer so
     // tiles (and tap targets) stay large — the camera pans/zooms to reveal wider maps.
     this.tile = mobile
@@ -827,6 +829,18 @@ class Game {
     const cs = getComputedStyle(column),
       ss = getComputedStyle(stage);
     const border = px(ss.borderLeftWidth) + px(ss.borderRightWidth);
+    // The desktop battle is a two-column grid (styles/desktop.css): the board has the first column, whose resolved
+    // width is the first grid track, and the whole height of the frame.
+    if (cs.display === "grid") {
+      const track = px((cs.gridTemplateColumns || "").split(" ")[0]);
+      const height =
+        column.clientHeight -
+        px(cs.paddingTop) -
+        px(cs.paddingBottom) -
+        px(ss.borderTopWidth) -
+        px(ss.borderBottomWidth);
+      if (track > 0 && height > 0) return { room: track - border, border, height };
+    }
     const room = column.clientWidth - px(cs.paddingLeft) - px(cs.paddingRight) - border;
     return room > 0 ? { room, border } : null;
   }

@@ -221,3 +221,16 @@ body {
     min-height: min(660px, calc(100dvh - 110px));
   }
 }
+/* The game may use the whole width of the window (its menus keep their own widths; the desktop battle spreads out),
+   and the collapsed dev pill sits in the corner of the top row instead of taking a row of its own. */
+.game-fit .wrap {
+  max-width: none;
+  padding: 0 12px;
+}
+.game-fit .ros-admin-collapsed {
+  position: fixed;
+  top: 2px;
+  left: 10px;
+  margin: 0;
+  z-index: 6;
+}
