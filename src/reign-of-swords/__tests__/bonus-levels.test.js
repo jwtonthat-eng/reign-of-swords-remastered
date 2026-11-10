@@ -9,11 +9,11 @@ const mine = (g) => g.units.filter((u) => !u.dead && u.team === "blue" && !u.all
 const foes = (g) => g.units.filter((u) => !u.dead && u.team === "red");
 
 describe("bonus campaigns: loading", () => {
-  it("adds 18 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
+  it("adds 28 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
     const maps = missionList();
     const bonus = maps.filter((m) => m.mapId >= 5900 && m.mapId < 6000);
-    expect(bonus.filter((m) => m.group === "story").length).toBe(12);
-    expect(bonus.filter((m) => m.group === "siege").length).toBe(6);
+    expect(bonus.filter((m) => m.group === "story").length).toBe(18); // 6 + 6 + 3 + 3
+    expect(bonus.filter((m) => m.group === "siege").length).toBe(10); // 3 + 3 + 2 + 2
     expect(maps.some((m) => m.mapId === 5432)).toBe(true);
   });
 });

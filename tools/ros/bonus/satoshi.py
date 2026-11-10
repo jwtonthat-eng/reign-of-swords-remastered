@@ -88,7 +88,6 @@ f.........==..........
                 "spawn": [
                     ("samurai", (10, 0), "E"),
                     ("samurai", (11, 0), "E"),
-                    ("samurai", (10, 1), "E"),
                     ("horsebowmen", (9, 1), "E"),
                     ("horsebowmen", (12, 1), "E"),
                 ],
@@ -185,6 +184,7 @@ LEVELS.append(
                     ("samurai", (21, 7), "E"),
                     ("samurai", (20, 7), "E"),
                     ("samurai", (21, 6), "E"),
+                    ("samurai", (21, 9), "E"),
                     ("swordsmen", (21, 8), "E"),
                     ("swordsmen", (20, 8), "E"),
                     ("horsebowmen", (20, 6), "E"),
@@ -363,7 +363,9 @@ LEVELS.append(
                 "cam": (0, 13),
                 "spawn": [
                     ("horsebowmen", (0, 13), "E"),
+                    ("horsebowmen", (1, 13), "E"),
                     ("horsebowmen", (23, 13), "E"),
+                    ("horsebowmen", (22, 13), "E"),
                 ],
                 "say": [("daimyo", "Every man of these isles who can ride is coming to my horn, Emperor's hound.")],
             },
@@ -416,7 +418,7 @@ LEVELS.append(
         "units": """
 ....................
 .......1............
-......aq.a.a........
+....a.aq.a.a........
 ......ssss..........
 ......sss..a........
 ....................
@@ -533,7 +535,6 @@ LEVELS.append(
                     ("samurai", (18, 13), "E"),
                     ("samurai", (18, 14), "E"),
                     ("swordsmen", (17, 13), "E"),
-                    ("swordsmen", (17, 14), "E"),
                 ],
                 "say": [("officer_alarm", "A boat on the beach behind us, Commander! More of them are wading ashore.")],
             },
