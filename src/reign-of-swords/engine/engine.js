@@ -797,7 +797,11 @@ class Game {
     // tiles (and tap targets) stay large — the camera pans/zooms to reveal wider maps.
     this.tile = mobile
       ? clamp(Math.round(availW / Math.min(this.cols, 10)), 40, 64)
-      : clamp(Math.round(availW / Math.min(this.cols, 15)), 34, 56);
+      : frame && frame.height
+        ? // the two-column desktop battle: tiles shrink until the WHOLE map fits its column (never below 34px, where
+          // units get hard to read — a bigger map then scrolls), and a small map grows to fill it (up to 56px)
+          clamp(Math.floor(Math.min(availW / this.cols, availH / this.rows)), 34, 56)
+        : clamp(Math.round(availW / Math.min(this.cols, 15)), 34, 56);
     this.world = { w: this.tile * this.cols, h: this.tile * this.rows };
     const viewW = Math.min(availW, this.world.w);
     const viewH = Math.min(availH, this.world.h);

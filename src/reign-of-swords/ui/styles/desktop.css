@@ -92,7 +92,9 @@
     position: sticky;
     top: 0;
     z-index: 2;
-    background: var(--parch);
-    padding-bottom: 6px;
+    background: #e3d0a2; /* opaque parchment: the roster scrolls under it */
+    margin: -8px -8px 6px;
+    padding: 8px;
+    box-shadow: 0 3px 6px rgba(74, 54, 32, 0.25);
   }
 }
