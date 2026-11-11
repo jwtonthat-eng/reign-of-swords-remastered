@@ -739,7 +739,10 @@ kept apart from the original data so that everything else stays checkable agains
   (Amphibious waives the wall-walk step rule). Gangplanks and the stem stay open deck.
 - **Unit arena and stress run** (`npm run e2e:arena`, `npm run e2e:stress`). Balance tools, not game content: the
   arena fights equal-points squads of each unit against a basket of fourteen original units on an emptied Open
-  Field, from both sides and over several dice seeds, and scores the share of points left; the stress run plays the
+  Field, from both sides and over several dice seeds, and scores the share of points left. It also fights three
+  battle types with a 1500-point squad of the unit: the open field against a mounted army, holding the west castle
+  of the Obbsin battlefield against a storming party with Catapults (Autopilot "Hold the fort"), and standing behind a
+  rank of Pikemen with Archers behind it while the block advances on a mixed army (Autopilot "Advance as one"); the stress run plays the
   bonus battles at random with the player's army swapped for the bonus units, under the fuzzer's invariants.
   The bonus units' costs and the Battlemage's rating were set from the arena so that each scores near the original
   unit it sits beside (Battlemage and Dragon Rider near the Hero).
