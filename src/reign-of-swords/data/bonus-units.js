@@ -18,7 +18,10 @@ export const BONUS_ORDER = [
   "gladiator", // the Mirror Sea
   "samurai", // Satoshi
   "dragonrider", // the Mirror Sea
+  "beastmaster", // the Mirror Sea (the second naval campaign)
 ];
+// Units a bonus unit calls onto the field: never deployed or owned (the Beast Master's Hounds).
+export const BONUS_SUMMONS = ["hounds"];
 
 // New weapon ids (the originals end at 34). `row` = the ORIGINAL weapon whose damage row it copies.
 export const BONUS_WEAPONS = {
@@ -79,6 +82,20 @@ export const BONUS_WEAPONS = {
     tags: [13], // Burst (a fire weapon: double damage to Flammable war engines)
     desc: "Dragonfire is a breath of flame: it burns its target, then the two tiles beyond it in a line, and is ruinous to war engines and walls.",
   },
+  43: {
+    name: "Whip",
+    row: 3, // Spear
+    range: [1, 1],
+    tags: [],
+    desc: "A Whip delivers decent damage against all but the heaviest armor.",
+  },
+  44: {
+    name: "Fangs",
+    row: 4, // Antlers (the Stag's)
+    range: [1, 1],
+    tags: [],
+    desc: "The Hounds' Fangs tear at lightly armoured troops, and do little to heavy plate.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
 export const MAGIC_WEAPONS = [25, 26, 27, 36];
@@ -100,6 +117,8 @@ export const BONUS_AL = {
   gladiator: 1,
   samurai: 2,
   dragonrider: 0,
+  beastmaster: 2,
+  hounds: 1,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -143,6 +162,8 @@ export const BONUS_COMBAT = {
     abilities: [7],
     amphibious: true,
     terrainRange: true,
+    grapple: 6, // once a battle: swing to a free tile within this many tiles, in place of its move
+    breach: true, // its blows ignore the cover of walls, towers, gates and palisades
   },
   pavisiers: {
     move: 4,
@@ -168,7 +189,19 @@ export const BONUS_COMBAT = {
     chain: true,
     teleport: true,
   },
-  gladiator: { move: 4, weapon: 40, weapon2: 0, armour: 6, rating: 3, rf: 90, abilities: [], whirl: true },
+  // armourBonus: taken off the weapon x armour cell of every blow against it (set in the arena so that Gladiators
+  // beat Greatswordsmen point for point)
+  gladiator: {
+    move: 4,
+    weapon: 40,
+    weapon2: 0,
+    armour: 10,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    whirl: true,
+    armourBonus: 10,
+  },
   // a swordsman who is also a lesser Shaman: the Spirit Shroud aura (flag `shroud`), reaching 2 tiles instead of 4.
   // dmgBonus / armourBonus: +10 on the weapon x armour cell of every blow it deals, -10 on every blow it takes.
   samurai: {
@@ -202,6 +235,20 @@ export const BONUS_COMBAT = {
     dragonfire: true,
     twinAttack: true,
   },
+  // conjures: what its Conjure calls (in place of the Conjurer's Sapper / Bodyguard) — up to two, leashed as theirs
+  beastmaster: {
+    move: 4,
+    weapon: 43,
+    weapon2: 0,
+    armour: 1,
+    rating: 1,
+    rf: 60,
+    abilities: [],
+    conjure: true,
+    conjures: "hounds",
+  },
+  // the Stag one tier down: a point less movement, a rating tier lower, and no Charge
+  hounds: { move: 7, weapon: 44, weapon2: 0, armour: 4, rating: 2, rf: 75, abilities: [], summoned: true },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -213,6 +260,8 @@ export const BONUS_COURAGE = {
   gladiator: 3,
   samurai: 4,
   dragonrider: 5,
+  beastmaster: 3,
+  hounds: 3,
 };
 export const BONUS_COST = {
   cragsmen: 175,
@@ -221,9 +270,11 @@ export const BONUS_COST = {
   marines: 125,
   pavisiers: 200,
   battlemage: 750,
-  gladiator: 150,
+  gladiator: 175,
   samurai: 250,
   dragonrider: 750,
+  beastmaster: 250,
+  hounds: 0, // called by the Beast Master, never deployed
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
 export const BONUS_ELITE = { battlemage: true, dragonrider: true };
@@ -270,7 +321,7 @@ export const BONUS_TYPES = {
     kind: "ranged",
     projectile: "bullet",
     ability:
-      "Amphibious — wades through deep water at double cost; cannot attack while standing in it. Boarding Musket: 2–3 tiles.",
+      "Amphibious — wades through deep water at double cost; cannot attack while standing in it. Boarding Musket: 2–3 tiles. Grapple — once a battle, swings to a free tile up to 6 away. Breach — ignores the cover of fortifications.",
   },
   pavisiers: {
     name: "Pavisiers",
@@ -321,6 +372,21 @@ export const BONUS_TYPES = {
     ability:
       "Dragonfire — hurls a gout of flame at 3–8 tiles like a cannon shot, and may still move; a flier in Relic Armour.",
   },
+  beastmaster: {
+    name: "Beast Master",
+    sprite: "beastmaster",
+    ...strip(5, 3),
+    kind: "melee",
+    ability:
+      "Call Hounds — whistles up to two packs of Hounds to its side, each leashed within range 8. Fights with a Whip.",
+  },
+  hounds: {
+    name: "Hounds",
+    sprite: "hounds",
+    ...strip(4, 2),
+    kind: "melee",
+    ability: "Called by a Beast Master: fast, leashed within 8 tiles of it, and gone if it falls.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -342,6 +408,24 @@ export const BONUS_SKILLS = [
     n: "Unyielding",
     icon: "skill_unyielding",
     d: "Living stone: a Priest's Heal does nothing for it and quicksand neither stops nor hurts it. Craftsmen can Repair it like a war engine.",
+  },
+  {
+    flag: "grapple",
+    n: "Grapple",
+    icon: "skill_climb",
+    d: "Once a battle, in place of its move, it throws a grapple and swings to any free tile within 6 — over water, walls and enemies, onto a rampart if it likes. It may still strike with its sword afterwards.",
+  },
+  {
+    flag: "breach",
+    n: "Breach",
+    icon: "skill_amphibious",
+    d: "Its blows and shots ignore the cover of fortifications: walls, towers, gates and palisades protect nobody from it.",
+  },
+  {
+    flag: "conjures",
+    n: "Call Hounds",
+    icon: "skill_conjure",
+    d: "Calls a pack of Hounds onto a tile beside it — up to two at once, each leashed within range 8 and unable to act the turn it arrives. They are gone if the Beast Master falls.",
   },
   {
     flag: "amphibious",
@@ -414,9 +498,10 @@ export const BONUS_UPGRADES = [
   { from: "footmen", to: "marines", need: "Spirit", gate: 5923 }, // Isoluccia 3, Free Company
   { from: "crossbowmen", to: "pavisiers", need: "Armor", gate: 5924 }, // Isoluccia 4, The Harbour Chain
   { from: "wizards", to: "battlemage", need: "Medal", gate: 5926 }, // Isoluccia 6, Reign of the Battlemage
-  { from: "halberdiers", to: "gladiator", need: "Weapons", gate: 5942 }, // Mirror Sea 2
+  { from: "halberdiers", to: "gladiator", need: "Weapons", gate: 5942 }, // Mare Nostra 2
   { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
-  { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mirror Sea 3, The Admiral's Deck
+  { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
+  { from: "militiamen", to: "beastmaster", need: "Medal", gate: 5982 }, // the Mirror Sea 2
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
@@ -439,7 +524,7 @@ export const BONUS_META = {
   marines: {
     role: "Shore Raider",
     kit: "⚔ Boarding Musket / Short Sword · 🛡 Light Armor & Shield",
-    note: "Isoluccian marines who wade through deep water to shoot from where no one else can reach.",
+    note: "Isoluccian marines who wade through deep water to shoot from where no one else can reach. Once a battle they grapple across up to 6 tiles, and no wall gives cover against them.",
   },
   pavisiers: {
     role: "Shielded Crossbow",
@@ -465,6 +550,11 @@ export const BONUS_META = {
     role: "Flying Terror",
     kit: "⚔ Dragonfire / Lance · 🛡 Relic Armor",
     note: "A lancer on a sea-dragon of Mare Nostra. It flies over anything, breathes fire like a cannon shot at long range, and fights in the air like a Hero.",
+  },
+  beastmaster: {
+    role: "Hound Handler",
+    kit: "⚔ Whip · 🛡 Light Armor",
+    note: "Kennel-masters of the Mirror Sea corsairs. A Beast Master whistles up to two packs of war Hounds to its side — fast, savage, a little less than a Stag — leashed within 8 tiles and gone if their master falls.",
   },
 };
 // Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi

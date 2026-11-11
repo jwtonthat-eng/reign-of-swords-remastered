@@ -643,7 +643,10 @@ for (const k in UNIT_TYPES) {
   // BONUS abilities (ours — rules/bonus.js): one trait flag per bonus unit.
   for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
     T[flag] = !!c[flag];
-  for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack"]) T[flag] = !!c[flag];
+  for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
+  T.grapple = c.grapple || 0; // Marines: the reach of their once-a-battle Grapple
+  T.conjures = c.conjures || null; // Beast Master: what its Conjure calls (Hounds)
+  if (c.summoned) T.summoned = true; // Hounds: leashed, never deployed
   if (c.teleport) T.teleport = true; // the Battlemage moves as the Wizard does
   if (c.fly) T.fly = true; // the Dragon Rider
   T.regen = c.regen || 0; // HP mended at the start of its turn (Spellwardens)

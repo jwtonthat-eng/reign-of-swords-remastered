@@ -17,6 +17,7 @@
    Casting is a full action (the unit is spent), exactly like the AI branches.
    ============================================================ */
 import { manhattan } from "../util/util.js";
+import { moveType } from "./terrain.js";
 import { UNIT_TYPES } from "../data/game-data.js";
 
 export const AbilityMethods = {
@@ -59,7 +60,44 @@ export const AbilityMethods = {
         max: 1,
         desc: "Tap a neighbouring tile: the three sand tiles on that side turn to quicksand for 4 rounds. A unit that steps in is stopped there and takes 5 damage. Fliers and Sirens are immune.",
       });
-    if (unit.T.conjure) {
+    // BONUS — Grapple (Marines): once a battle, in place of the move
+    if (unit.T.grapple) {
+      const spent = !!unit._grappled,
+        moved = this._movedThisTurn(unit);
+      out.push({
+        id: "grapple",
+        name: "Grapple",
+        icon: "skill_climb",
+        min: 1,
+        max: unit.T.grapple,
+        count: spent ? "0/1" : "1/1",
+        countTitle: "grapples left this battle",
+        countNote: "used",
+        disabled: spent || moved,
+        desc: spent
+          ? "Already used — Marines carry one grapple a battle."
+          : moved
+            ? "The grapple takes the place of the move: it cannot be thrown after moving."
+            : "Swing to any free tile within 6 — over water, walls and enemies (once per battle, in place of the move).",
+      });
+    }
+    // BONUS — the Beast Master's Conjure calls Hounds (one button; the rest is the Conjurer's rule)
+    if (unit.T.conjures) {
+      const kids = this.units.filter((o) => !o.dead && o._conjuredBy === unit.id).length,
+        full = kids >= 2;
+      out.push({
+        id: "conjure_" + unit.T.conjures,
+        name: "Call Hounds",
+        icon: "skill_conjure",
+        min: 1,
+        max: 1,
+        count: kids + "/2",
+        disabled: full,
+        desc: full
+          ? "Limit reached — this Beast Master already has two packs of Hounds. One must fall before it can call another."
+          : "Call a pack of Hounds onto an adjacent free tile (max 2 standing, leashed within 8 tiles; they are gone if the Beast Master falls).",
+      });
+    } else if (unit.T.conjure) {
       const kids = this.units.filter((o) => !o.dead && o._conjuredBy === unit.id).length;
       // At the cap (help 584: "Only two conjured minions can be summoned at any one time") the buttons STAY in the row,
       // disabled and marked, instead of silently vanishing — so it's clear why the Conjurer can't summon.
@@ -179,13 +217,17 @@ export const AbilityMethods = {
       // a tile beside the Siren, or the Siren itself (its default side) — Unit::setAttackTarget takes nothing farther
       if (this._castQuicksand(sel, tx, ty)) return true;
     }
+    if (id === "grapple" && this._grappleTile(sel, tx, ty)) {
+      this._castGrapple(sel, tx, ty);
+      return true;
+    }
     if (
-      (id === "conjure_sapper" || id === "conjure_bodyguard") &&
+      (id === "conjure_sapper" || id === "conjure_bodyguard" || id === "conjure_hounds") &&
       Math.max(Math.abs(tx - sel.tx), Math.abs(ty - sel.ty)) === 1 &&
       !this.unitAt(tx, ty) &&
       this.terrainAt(tx, ty).passable
     ) {
-      this._castConjure(sel, id === "conjure_sapper" ? "sapper" : "bodyguard", tx, ty);
+      this._castConjure(sel, id.slice(8), tx, ty);
       return true;
     }
     this.notify("That is not a valid target for this skill.");
@@ -321,6 +363,31 @@ export const AbilityMethods = {
     });
     return true;
   },
+  // BONUS — Grapple (Marines): a free tile it could stand on (no step rule: a rampart will do), within its grapple's
+  // reach, and not deep water.
+  _grappleTile(u, tx, ty) {
+    const dist = Math.abs(tx - u.tx) + Math.abs(ty - u.ty);
+    return (
+      !!u.T.grapple &&
+      !u._grappled &&
+      !this._movedThisTurn(u) &&
+      dist >= 1 &&
+      dist <= u.T.grapple &&
+      this.inBounds(tx, ty) &&
+      !this.unitAt(tx, ty) &&
+      moveType(this.tileAt(tx, ty)) !== 19 &&
+      this.moveCost(u, tx, ty) < 99
+    );
+  },
+  // The swing is the unit's move for the turn (it cannot be undone); what a move leaves it — its sword — it keeps.
+  _castGrapple(u, tx, ty) {
+    u._grappled = true; // once per battle
+    u._movedPrev = u._movedTurn;
+    u._movedTurn = this.turn;
+    this.reach = null;
+    this.targets = null;
+    this._teleportMove(u, { tx, ty }, () => this._afterPlayerMove(u));
+  },
   _castConjure(u, type, tx, ty) {
     if (!UNIT_TYPES[type]) return;
     this._castAnim(
@@ -404,7 +471,11 @@ export const AbilityMethods = {
         )
           push(x, y);
       }
-    } else if (id === "conjure_sapper" || id === "conjure_bodyguard") {
+    } else if (id === "grapple") {
+      for (let dy = -unit.T.grapple; dy <= unit.T.grapple; dy++)
+        for (let dx = -unit.T.grapple; dx <= unit.T.grapple; dx++)
+          if (this._grappleTile(unit, unit.tx + dx, unit.ty + dy)) push(unit.tx + dx, unit.ty + dy);
+    } else if (id.startsWith("conjure_")) {
       for (const [dx, dy] of AROUND) {
         const x = unit.tx + dx,
           y = unit.ty + dy;

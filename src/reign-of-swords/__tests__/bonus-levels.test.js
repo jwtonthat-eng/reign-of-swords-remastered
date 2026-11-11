@@ -9,11 +9,11 @@ const mine = (g) => g.units.filter((u) => !u.dead && u.team === "blue" && !u.all
 const foes = (g) => g.units.filter((u) => !u.dead && u.team === "red");
 
 describe("bonus campaigns: loading", () => {
-  it("adds 28 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
+  it("adds 33 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
     const maps = missionList();
     const bonus = maps.filter((m) => m.mapId >= 5900 && m.mapId < 6000);
-    expect(bonus.filter((m) => m.group === "story").length).toBe(18); // 6 + 6 + 3 + 3
-    expect(bonus.filter((m) => m.group === "siege").length).toBe(10); // 3 + 3 + 2 + 2
+    expect(bonus.filter((m) => m.group === "story").length).toBe(21); // 6 + 6 + 3 + 3 + 3
+    expect(bonus.filter((m) => m.group === "siege").length).toBe(12); // 3 + 3 + 2 + 2 + 2
     expect(maps.some((m) => m.mapId === 5432)).toBe(true);
   });
 });
@@ -180,7 +180,7 @@ describe("Isoluccia: scripted endings", () => {
   });
 });
 
-describe("The Mirror Sea and Satoshi: scripted endings", () => {
+describe("Mare Nostra, Satoshi and the Mirror Sea: scripted endings", () => {
   it("The Admiral's Deck is fought on ships and ends when Admiral Corvane falls", () => {
     const g = startBattle(makeGame(5943), "auto");
     const corvane = foes(g).find((u) => u.type === "king");
@@ -189,6 +189,14 @@ describe("The Mirror Sea and Satoshi: scripted endings", () => {
     // every unit stands on a deck: no one starts in the sea
     for (const u of g.units) expect(g.terrainAt(u.tx, u.ty).passable, u.type).toBe(true);
     fell(g, corvane);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Reaver-King is fought from ship to islet and ends when Skarl falls", () => {
+    const g = startBattle(makeGame(5983), "auto");
+    const skarl = foes(g).find((u) => u.type === "king");
+    expect(foes(g).some((u) => u.type === "beastmaster")).toBe(true);
+    for (const u of g.units) expect(g.terrainAt(u.tx, u.ty).passable, u.type).toBe(true);
+    fell(g, skarl);
     expect(g.phase).toBe("victory");
   });
   it("Blockade Runner is held until round 9", () => {

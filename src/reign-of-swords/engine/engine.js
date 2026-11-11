@@ -30,7 +30,7 @@ import { LoopMethods } from "./loop.js";
 import { ScenarioRunner } from "./script.js";
 import { AbilityMethods } from "../rules/abilities.js";
 import { DebugMethods } from "./debug.js";
-import { BONUS_ORDER } from "../data/bonus-units.js";
+import { BONUS_ORDER, BONUS_SUMMONS } from "../data/bonus-units.js";
 import { UNIT_TYPES, TINCTURE_RGB, FX_TYPES, DEPLOY_COST, UNIT_RAMPS } from "../data/game-data.js";
 import { DEPLOY_ELITE, DEPLOY_ORDER, DEPLOY_ROSTER, fallbackMission, buildMissions } from "../data/missions.js";
 export { ASSET_V, UNIT_TYPES }; // re-exported for the React layer (ReignShell imports them from here)
@@ -139,6 +139,7 @@ const STAND_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_SUMMONS,
   ...BONUS_ORDER, // the bonus units (cut from the supplied art sheet — tools/ros/bonus/import_sheet.py; the Battlemage, like the Wizard, has no walk sheet)
 ];
 // WALKING animation: each unit has its own 4-frame walk cycle (android walk sheets, 256x72 = 4 frames @ 64x72),
@@ -177,6 +178,7 @@ const WALK_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_SUMMONS,
   ...BONUS_ORDER, // the bonus units (cut from the supplied art sheet — tools/ros/bonus/import_sheet.py; the Battlemage, like the Wizard, has no walk sheet)
 ];
 // (WALK_FRAMES/WALK_W/WALK_H — the walk-strip frame dimensions — live in render/render.js, their only consumer.)

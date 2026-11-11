@@ -708,7 +708,9 @@ export class AiMethods {
       }
       if (spot && UNIT_TYPES.sapper && UNIT_TYPES.bodyguard) {
         this.game.reach = reach;
-        const summonType = children.length === 1 && children[0].type === "bodyguard" ? "sapper" : "bodyguard";
+        const summonType =
+          u.T.conjures || // BONUS: the Beast Master calls Hounds
+          (children.length === 1 && children[0].type === "bodyguard" ? "sapper" : "bodyguard");
         const cast = () => {
           const minion = this.game._makeUnit(summonType, u.team, spot[0], spot[1], false);
           minion.group = u.group;

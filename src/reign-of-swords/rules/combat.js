@@ -330,7 +330,11 @@ export class CombatMethods {
     if (base <= 0) return 0;
     // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
     base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (defender.T.armourBonus || 0));
-    const tileDef = Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
+    // BONUS — Breach (Marines): the cover of a fortification (palisade, rampart, gate, tower, wall — terrain types
+    // 6, 8, 10, 12, 14, 16) counts for nothing against them
+    const fortified =
+      attacker.T.breach && [6, 8, 10, 12, 14, 16].includes(moveType(this.tileAt(defender.tx, defender.ty)));
+    const tileDef = fortified ? 100 : Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
     let cover = tileDef - (defender.T.formation && !siegeShot ? 10 * this.formationAllies(defender) : 0);
     if (siegeShot && tileDef <= 80) cover += Math.trunc((100 - tileDef) / 2);
     let rating = (attacker.T.rf || 75) + this.ratingAura(attacker);

@@ -137,6 +137,8 @@ export const UNIT_CATEGORY = {
   gladiator: "Infantry",
   samurai: "Infantry",
   dragonrider: "Flying",
+  beastmaster: "Casters",
+  hounds: "Infantry",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

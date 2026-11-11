@@ -38,7 +38,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("nine units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("ten units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -49,6 +49,7 @@ describe("bonus units: the data", () => {
       "gladiator",
       "samurai",
       "dragonrider",
+      "beastmaster",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -92,6 +93,7 @@ describe("bonus units: upgrade paths", () => {
       ["halberdiers", "gladiator", "Weapons"],
       ["swordsmen", "samurai", "Spirit"],
       ["griffon", "dragonrider", "Medal"],
+      ["militiamen", "beastmaster", "Medal"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -562,5 +564,104 @@ describe("after the arena: the computer's Dragon Rider, and ship bulwarks", () =
     expect(g.moveCost(horse, 9, 2, 9, 3)).toBe(99);
     expect(g.moveCost(marines, 8, 2, 8, 1)).toBe(1);
     expect(g.moveCost(foot, 8, 2, 8, 1)).toBe(99); // nobody else comes over the side
+  });
+});
+
+describe("Marines: Grapple and Breach", () => {
+  it("once a battle the Grapple swings them up to 6 tiles, over water onto a rampart, in place of the move", () => {
+    const g = startBattle(makeGame(5941));
+    only(g);
+    const marines = spawn(g, "marines", "blue", 8, 9); // on your own deck, the enemy hull's south rail 3 tiles north
+    g.selected = marines;
+    expect(g._abilitySkills(marines).find((s) => s.id === "grapple")).toMatchObject({ disabled: false, count: "1/1" });
+    expect(g._grappleTile(marines, 8, 15)).toBe(false); // out of the map / too far
+    expect(g._grappleTile(marines, 9, 7)).toBe(false); // open sea
+    expect(moveType(g.tileAt(9, 6))).toBe(14); // the bulwark of the hull opposite
+    expect(g._grappleTile(marines, 9, 6)).toBe(true);
+    g._castGrapple(marines, 9, 6);
+    settle(g);
+    expect([marines.tx, marines.ty]).toEqual([9, 6]);
+    expect(marines._grappled).toBe(true);
+    expect(g._movedThisTurn(marines)).toBe(true);
+    marines.acted = false; // (the swing was its move; its turn ended with no foe beside it)
+    expect(g._abilitySkills(marines).find((s) => s.id === "grapple").disabled).toBe(true);
+    expect(g._grappleTile(marines, 9, 5)).toBe(false);
+  });
+  it("Breach: a wall gives no cover against Marines, though it does against anyone else", () => {
+    const g = startBattle(makeGame(5941));
+    only(g);
+    const onWall = spawn(g, "footmen", "red", 8, 2),
+      onDeck = spawn(g, "footmen", "red", 10, 4);
+    const marines = spawn(g, "marines", "blue", 8, 4),
+      archers = spawn(g, "archers", "blue", 10, 6);
+    expect(moveType(g.tileAt(8, 2))).toBe(14);
+    expect(UNIT_TYPES.marines.breach).toBe(true);
+    const move = (u, x, y) => Object.assign(u, { tx: x, ty: y });
+    const wallHit = g.computeDamage(marines, onWall);
+    move(marines, 10, 2);
+    expect(wallHit).toBe(g.computeDamage(marines, onDeck)); // the same 2 tiles away, cover or none
+    move(archers, 8, 4);
+    const covered = g.computeDamage(archers, onWall);
+    move(archers, 10, 2);
+    expect(covered).toBeLessThan(g.computeDamage(archers, onDeck));
+  });
+});
+
+describe("Gladiators and the Beast Master", () => {
+  it("Gladiators cost 175 and take less from every blow than Greatswordsmen do", () => {
+    expect(DEPLOY_COST.gladiator).toBe(175);
+    const g = startBattle(makeGame(5204));
+    only(g);
+    const glad = spawn(g, "gladiator", "blue", 10, 10),
+      great = spawn(g, "greatswordsmen", "blue", 14, 10);
+    for (const type of ["swordsmen", "halberdiers", "greatswordsmen", "knights"]) {
+      const foe = spawn(g, type, "red", 10, 11);
+      const onGlad = g.computeDamage(foe, glad);
+      Object.assign(foe, { tx: 14, ty: 11 });
+      expect(onGlad).toBeLessThan(g.computeDamage(foe, great));
+      foe.dead = true;
+    }
+  });
+  it("a 250-point Beast Master, upgraded from Militia with a Medal, calls up to two packs of leashed Hounds", () => {
+    expect(DEPLOY_COST.beastmaster).toBe(250);
+    expect(DEPLOY_ELITE.beastmaster).toBeFalsy();
+    expect(UPGRADE_FROM.beastmaster).toEqual({ from: "militiamen", need: "Medal" });
+    expect(upgradeGate("beastmaster", true)).toBe(5982);
+    const hounds = UNIT_TYPES.hounds,
+      stag = UNIT_TYPES.stag;
+    expect(hounds.summoned).toBe(true);
+    expect(DEPLOY_ORDER).not.toContain("hounds");
+    expect(hounds.move).toBeLessThan(stag.move); // a little less than a Stag all round
+    expect(hounds.rf).toBeLessThan(stag.rf);
+    expect(hounds.hasCharge).toBe(false);
+    const g = startBattle(makeGame(5204));
+    only(g);
+    const master = spawn(g, "beastmaster", "blue", 10, 10);
+    g.selected = master;
+    const skills = g._abilitySkills(master).filter((s) => s.id.startsWith("conjure"));
+    expect(skills.map((s) => s.id)).toEqual(["conjure_hounds"]);
+    g._castConjure(master, "hounds", 11, 10);
+    settle(g);
+    master.acted = false;
+    g._castConjure(master, "hounds", 9, 10);
+    settle(g);
+    const packs = g.units.filter((u) => !u.dead && u.type === "hounds");
+    expect(packs.length).toBe(2);
+    expect(packs.every((u) => u._conjuredBy === master.id && u.acted)).toBe(true);
+    master.acted = false;
+    expect(g._abilitySkills(master).find((s) => s.id === "conjure_hounds").disabled).toBe(true);
+    g._killConjuredChildren(master); // what the Beast Master's death does
+    expect(g.units.filter((u) => !u.dead && u.type === "hounds").length).toBe(0);
+  });
+  it("the computer's Beast Master calls Hounds, not the Conjurer's minions", () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    const gi = g.mission.groupOrder.find((x) => x.side === "enemy").gi;
+    const master = spawn(g, "beastmaster", "red", 12, 12, { group: gi });
+    spawn(g, "footmen", "blue", 12, 4);
+    nextRound(g);
+    const called = g.units.filter((u) => !u.dead && u._conjuredBy === master.id);
+    expect(called.length).toBe(1);
+    expect(called[0].type).toBe("hounds");
   });
 });

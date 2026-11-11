@@ -1,438 +1,381 @@
-"""The Mirror Sea — three story battles and two raids fought ship to ship in Mare Nostra (ours; see build_bonus.py).
+"""The Mirror Sea — three story battles and two raids fought ship to ship on the northern sea the map names (ours;
+see build_bonus.py). It follows Mare Nostra (mare_nostra.py): Corvane's last captains have sold themselves to
+Reaver-King Skarl, whose Beast Masters loose war hounds across the planks.
 
-Every map is open sea with hulls laid on it: "b" deck, "m" a mast, "c" a cabin. Ships are joined by gangplanks (one or
-two "b" tiles) or lie hull to hull. Only Marines leave the decks.
+Every map is open sea with hulls laid on it: "b" deck, "m" a mast, "c" a cabin (here often a kennel). Ships are
+joined by one-tile gangplanks; the builder edges every other deck tile that meets the sea with a wooden bulwark.
 """
 from build_bonus import U
 
 LEVELS = []
 ARMY = "Carrone Army"
-FLEET = "Corvane's Fleet"
-COMPANY = "Free Company"
+REAVERS = "Skarl's Reavers"
 
-# ---------------------------------------------------------------- 1. Grapples Away (first boarding action)
+# ---------------------------------------------------------------- 1. The Line of Hulls (a running fight, hull to hull)
 LEVELS.append(
     {
-        "id": 5941,
+        "id": 5981,
         "group": "story",
-        "name": "Grapples Away",
-        "objective": "Board the picket ship and its cutter. Eliminate all enemies.",
-        "turn_limit": 30,
-        "budget": 2750,
-        "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
+        "name": "The Line of Hulls",
+        "objective": "Fight from hull to hull along the reaver line. Eliminate all enemies.",
+        "turn_limit": 32,
+        "budget": 5000,
+        "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~bbbbbbbb~~~~bbbbbbbb~~~
+~~bbbmbbbbbb~~bbbbbbmbbb~~
+~~bbbbbbbbbbbbbbbbbbbbbb~~
+~~bbbbbbbbbb~~bbbbbbbbbb~~
+~~~bbbbbbbb~~~~bbbbbbbb~~~
+~~~~~b~~~~~~~~~~~~~~b~~~~~
+~~~~~b~~~~~~~~~~~~~~b~~~~~
+~~~bbbbbbbb~~~~bbbbbbbb~~~
+~~bbbbbbbbbb~~bbbbbbbbbb~~
+~~bbbmbbbbbb~~bbbbbbmbccb~
+~~bbbbbbbbbb~~bbbbbbbbbb~~
+~~~bbbbbbbb~~~~bbbbbbbb~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~bbbbbbbbbb~~~~~~b~~~
-~~~~~bbbbbbbbbbbbb~~~bbb~~
-~~~~ccbbmbbbbmbbbbbbbbmb~~
-~~~~~bbbbbbbbbbbbb~~~bbb~~
-~~~~~~bbbbbbbbbb~~~~~bbb~~
-~~~~~~~~b~~~~b~~~~~~~bcb~~
-~~~~~~bbbbbbbbbb~~~~~bbb~~
-~~~~~bbbbbbbbbbbb~~~~~b~~~
-~~~~bbbbmbbbbmbbccb~~~~~~~
-~~~~~bbbbbbbbbbbb~~~~~~~~~
-~~~~~~bbbbbbbbbb~~~~~~~~~~
-~~-~~~~~~~~~~~~~~~~~~--~~~
 """,
         "units": """
 ..........................
+....x..x..........a..a....
+...g..f.g.......s..p.s....
+....f.g..........p...B....
+...g...f.........s..s.....
 ..........................
-.......x.gx..x............
-.....m..s.....s..m...a.a..
-......m...h..........pp...
-.....m..g.h.sg...m....B...
-.......gfss..fg...........
 ..........................
-......M........M..........
-........DDDDDD............
-....DDDD.DDDD.DD..D.......
-.....DDDDDDDDDDDD.........
-......M........M..........
+..........................
+................h..k.h....
+...DDDDDDDD....k..w..k.n..
+...DD.DDDDD...n..h........
+...DDDDDDDD.....k..h......
+..........................
 ..........................
 """,
         "legend": {
-            "M": U("marines", "A", group=1),
-            "g": U("gladiator", "E", group=2, hold=True),
-            "f": U("footmen", "E", group=3, hold=True),
-            "h": U("halberdiers", "E", group=4, hold=True),
-            "x": U("crossbowmen", "E", group=5, hold=True),
+            "g": U("gladiator", "E", group=1, hold=True),
+            "f": U("footmen", "E", group=2, hold=True),
+            "x": U("crossbowmen", "E", group=3, hold=True),
+            "s": U("swordsmen", "E", group=4, hold=True),
+            "p": U("pavisiers", "E", group=5, hold=True),
             "a": U("archers", "E", group=6, hold=True),
             "B": U("ballistae", "E", group=7, hold=True),
-            "m": U("marines", "E"),
-            "s": U("swordsmen", "E", group=8, hold=True),
-            "p": U("pavisiers", "E", group=9, hold=True),
+            "h": U("halberdiers", "E", group=8, hold=True),
+            "k": U("gladiator", "E", group=9, hold=True),
+            "w": U("greatswordsmen", "E", group=9, hold=True),
+            "n": U("marines", "E"),
         },
-        "camera": (11, 5),
+        "camera": (6, 6),
         "intro": [
-            ("bellaro", "Grapples are fast, Commander. Two planks across, and not a breath of wind to part us."),
-            ("officer", "Those are no sailors on her deck. Net and trident, sword and buckler. Arena men."),
-            ("advisor", "Gladiators, Varius. Crowd one and his blade finds every man around him. Come at them one rank at a time."),
+            ("officer", "Four hulls moored in a ring, Commander, and we hold only this one. The next lies across that plank."),
+            ("advisor", "One plank on to each, and no way back but the way we came. Take them in turn, Varius. Their last ship lies under our own stern, and her Marines will not wait for us to walk round."),
         ],
         "brief": [
-            ("bellaro", "There she lies, Commander. One of Corvane's pickets, with a cutter in tow, and the sea like glass."),
-            ("advisor", "No wind, no oars worth the name. A sea battle here is a land battle on planks. We know how to fight those."),
+            ("officer", "The portage is behind us, Commander. Every hull we own came over the Tilician hills on rollers, and here is the Mirror Sea."),
+            ("advisor", "And here are the reavers. Four ships roped stem to stern across the strait, like a boom. We go through them or we go home."),
         ],
         "victory": [
-            ("officer", "The picket is ours, Commander, and the cutter with her."),
-            ("bellaro", "Her log says the Admiral is moving a convoy through the calm. Three hulls lashed together, low in the water."),
-            ("advisor", "Then that is where his fighters will be. And his silver."),
+            ("officer", "The line is broken, Commander. All four hulls are ours."),
+            ("advisor", "There was a cage on the last one, Varius. Iron, man-high, and chewed from the inside. Whatever they kept in it, they took it with them."),
         ],
-        "defeat": [("officer_hurt", "They have cut the grapples, Commander. We are adrift.")],
+        "defeat": [("officer_hurt", "They have thrown us back across the plank, Commander. The strait is still shut.")],
         "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1}},
     }
 )
 
-# ---------------------------------------------------------------- 2. The Lashed Convoy
+# ---------------------------------------------------------------- 2. The Kennel Ship (Beast Masters and their hounds)
 LEVELS.append(
     {
-        "id": 5942,
+        "id": 5982,
         "group": "story",
-        "name": "The Lashed Convoy",
-        "objective": "Take the three lashed hulls of the convoy. Eliminate all enemies.",
-        "turn_limit": 36,
-        "budget": 4000,
-        "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
-        "terrain": """
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~bbb~~~~~~~~~~~~
-~~~~bb~~~~bbbbb~~~~~~~~~~~
-~~~bbbb~~~bbmbb~~~~bb~~~~~
-~~~bmbb~~~bbbbbbbbbbbb~~~~
-~~~bbbbbbbbbbbb~~~bbmb~~~~
-~~~bbbb~~~bbmbb~~~bbbb~~~~
-~~~bbbb~~~bbbbb~~~bbbb~~~~
-~~~bmbb~~~bbbbb~~~bbbb~~~~
-~~~bbbb~~~bbbbbbbbbbmb~~~~
-~~~bbbbbbbbbmbb~~~bbbb~~~~
-~~~bbbb~~~bbbbb~~~bbbb~~~~
-~~~bccb~~~bcccb~~~bccb~~~~
-~~~~bb~~~~bbbbb~~~~bb~~~~~
-~~~~~b~~~~~bbb~~~~~~~~~~~~
-~~~~~b~~~~~~b~~~~~~~~~~~~~
-~~~~~bbbbbbbbbbbbb~~~~~~~~
-~~~~bbbmbbbbbbmbbbb~~~~~~~
-~~~~bbbbbbbbbbbbbcc~~~~~~~
-~~~~~bbbbbbbbbbbbb~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~--~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-""",
-        "units": """
-..........................
-..........................
-....yy.....a.a............
-...m..m............bb.....
-..................n..n....
-....f......x.x............
-...................ss.....
-....ff.....sB......ss.....
-..........t...t...........
-....g......hGh............
-...................kk.....
-....gg.....G.G............
-....................k.....
-............G.............
-...........v.v............
-..........................
-..........................
-....DDD.DDDDDD.DDDD.......
-....DDDDDDDDDDDDD.........
-......M....M....M.........
-..........................
-..........................
-""",
-        "legend": {
-            "M": U("marines", "A", group=1),
-            "m": U("marines", "E"),
-            "n": U("marines", "E"),
-            "f": U("footmen", "E", group=2, hold=True),
-            "g": U("gladiator", "E", group=3, hold=True),
-            "a": U("archers", "E", group=4, hold=True),
-            "x": U("crossbowmen", "E", group=5, hold=True),
-            "B": U("ballistae", "E", group=6, hold=True),
-            "h": U("halberdiers", "E", group=7, hold=True),
-            "G": U("gladiator", "E", group=8, hold=True),
-            "s": U("swordsmen", "E", group=9, hold=True),
-            "k": U("gladiator", "E", group=10, hold=True),
-            "y": U("crossbowmen", "E", group=11, hold=True),
-            "b": U("archers", "E", group=12, hold=True),
-            "t": U("swordsmen", "E", group=13, hold=True),
-            "v": U("pavisiers", "E", group=14, hold=True),
-        },
-        "camera": (12, 9),
-        "intro": [
-            ("officer", "Three hulls lashed beam to beam, Commander, and planks between them like streets."),
-            ("gladiator", "Come aboard, soldiers of the Empire. The sand is wet today, but the crowd is the same."),
-            ("advisor", "Two planks lead from our deck, Varius. Whatever crosses them fights alone until the next man is over. Let Bellaro's marines take the long way round."),
-        ],
-        "brief": [
-            ("bellaro", "The convoy, Commander. Corvane emptied the arenas of six cities to guard it."),
-            ("advisor", "Men who fight for a crowd fight to be seen. Give them nothing to play to."),
-        ],
-        "victory": [
-            ("gladiator", "Well fought. We were sold to the Admiral by the season. The season is over."),
-            ("officer", "Commander, a good number of the arena men are asking for our colors."),
-            ("advisor", "Take them, Varius. I would sooner have that sword arm beside me than across a plank."),
-            ("bellaro", "And the convoy's master has talked. Corvane's flagship lies a day's drift to the east."),
-        ],
-        "defeat": [("officer_hurt", "We never got off our own deck, Commander.")],
-        "reward": {"units": {"gladiator": 2}, "spoils": {"Beasts": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 3. The Admiral's Deck
-LEVELS.append(
-    {
-        "id": 5943,
-        "group": "story",
-        "name": "The Admiral's Deck",
-        "objective": "Board the flagship and defeat Admiral Corvane.",
+        "name": "The Kennel Ship",
+        "objective": "Board the kennel ship. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 4500,
-        "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
+        "budget": 3500,
+        "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~bbbbbbbbbb~~~~~~~~~
-~~~~b~~~bbbbbbbbbbbb~~~b~~~~
-~~~bbbbccbmbbbmbbbmbbbbbb~~~
-~~~bmb~~bbbbbbbbbbbb~~bmb~~~
-~~~bbb~~~bbbbbbbbbb~~~bbb~~~
-~~~bbb~~~~~b~~~~b~~~~~bbb~~~
-~~~bbb~~~~~b~~~~b~~~~~bbb~~~
-~~~bmb~~~bbbbbbbbbb~~~bmb~~~
-~~~bbb~~bbbbbbbbbbbb~~bbb~~~
-~~~bbbbbbbbmbbbbmbbbbbbbb~~~
-~~~bcb~~bbbbbbbbbbbb~~bcb~~~
-~~~~b~~~~bbbbbbbccb~~~~b~~~~
-~~~~~~~~~~~~~-~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~bbbbbbbbbbbbbbbb~~~~~
+~~~~bbcbbcbbbbbbcbbcbb~~~~
+~~~bbbbbbbmbbbbmbbbbbbb~~~
+~~~bbbbbbbbbbbbbbbbbbbb~~~
+~~~~bbbbbbbbbbbbbbbbbb~~~~
+~~~~~~b~~~~~b~~~~~~b~~~~~~
+~~~~~~b~~~~~b~~~~~~b~~~~~~
+~~~~bbbbbbbbbbbbbbbbbb~~~~
+~~~bbbbbmbbbbbbbbmbbbbb~~~
+~~~bbbbbbbbbbbbbbbbbbccb~~
+~~~~bbbbbbbbbbbbbbbbbb~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 """,
         "units": """
-............................
-............................
-...........x.....x..........
-....m....x........xn...o....
-........Kp..h...h...........
-...m.m..pR.g.g.g......o.o...
-....B......g.h..g......b....
-............................
-............................
-...w.w...M........M...e.e...
-....w.......DDDDDD..........
-.......DDDD.DDDD.DDDD.......
-........DDDDDDDDDDDD........
-..........M....M............
-............................
-............................
+..........................
+......x...x....x...x......
+.....g..Z...ff...Z..g.....
+....H..H....s.....H..H....
+.....g....s..s......g.....
+......h.....h......h......
+..........................
+..........................
+.....DDDDDDDDDDDDDDDD.....
+....DDDD.DDDDDDDD.DDDD....
+....DDDDDDDDDDDDDDDD......
+..........................
+..........................
 """,
         "legend": {
-            "M": U("marines", "A", group=1),
-            "K": U("king", "E", group=2, hold=True, name="corvane"),
+            "Z": U("beastmaster", "E", group=1, hold=True, name="master"),
+            "H": U("hounds", "E", group=2),
             "g": U("gladiator", "E", group=3, hold=True),
-            "h": U("halberdiers", "E", group=2, hold=True),
-            "x": U("crossbowmen", "E", group=4, hold=True),
-            "B": U("ballistae", "E", group=5, hold=True),
-            "b": U("ballistae", "E", group=6, hold=True),
-            "w": U("swordsmen", "E", group=7),
-            "e": U("swordsmen", "E", group=8),
-            "m": U("marines", "E"),
-            "n": U("marines", "E"),
-            "o": U("marines", "E"),
-            "p": U("pavisiers", "E", group=2, hold=True),
-            # the Admiral's own Dragon Rider: it leaves its perch when the flagship is boarded
-            "R": U("dragonrider", "E", group=2, hold=True),
+            "f": U("footmen", "E", group=4, hold=True),
+            "s": U("swordsmen", "E", group=5, hold=True),
+            "h": U("halberdiers", "E", group=6, hold=True),
+            "x": U("crossbowmen", "E", group=7, hold=True),
         },
-        "camera": (13, 4),
+        "camera": (12, 3),
         "intro": [
-            ("admiral", "Commander Varius. You have come a long way to drown. The Doge is dead, but his fleet is mine, and the sea lanes with it."),
-            ("bellaro", "His escorts lie either side of us, Commander. Planks to both, and two more straight onto the flagship."),
-            ("advisor", "Four ways across and none of them wide. The Admiral stands at the stern. Take him and the fleet strikes its colors."),
+            ("officer_alarm", "Dogs, Commander! Big as ponies, and loose on her deck!"),
+            ("advisor", "War hounds, and the men with the whips are their Beast Masters. Each keeps a pair at heel and whistles up another when one falls. Kill the handler, Varius, and the kennel stays shut."),
         ],
         "events": [
             {
-                "when": ("kill", "corvane"),
-                "say": [("admiral_hurt", "Strike... strike the colors. The calm has beaten me, not you.")],
+                "when": ("kill", "master"),
+                "say": [("officer", "Both handlers are down, Commander! The hounds have no one to answer to.")],
+            },
+        ],
+        "brief": [
+            ("officer", "We have found what was in the cage, Commander. A hulk with kennels the length of her deck, and she is coming alongside."),
+            ("advisor", "Skarl breeds them on the islands. He does not waste Marines on a boarding when a pack will do it for meat. Three planks, and they will come down all three."),
+        ],
+        "victory": [
+            ("officer", "The kennel ship is taken, Commander. The handlers' whips and whistles with her."),
+            ("advisor", "There are whelps below, Varius, not yet blooded, and our militia are farm boys who grew up with dogs. Give me a season and a Medal to pin on the best of them, and the Empire will have Beast Masters of its own."),
+        ],
+        "defeat": [("officer_hurt", "The pack has the deck, Commander. We cannot hold the planks.")],
+        "reward": {"units": {"militiamen": 2}, "spoils": {"Beasts": 2}},
+    }
+)
+
+# ---------------------------------------------------------------- 3. The Reaver-King (the flagship moored at his islet)
+LEVELS.append(
+    {
+        "id": 5983,
+        "group": "story",
+        "name": "The Reaver-King",
+        "objective": "Cross the flagship to the islet and defeat Reaver-King Skarl.",
+        "turn_limit": 34,
+        "budget": 3250,
+        "sides": {"P": ARMY, "E": REAVERS},
+        "terrain": """
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~--------~~~
+~~~bbbbbbbbbbbb~~-.......-~~
+~~bbbbmbbbbmbbbb~-..r.h...-~
+~~bbbbbbbbbbbbbbbb........-~
+~~bbbbbbbbbbbbbb~-...h..r.-~
+~~~bbbbbbbbbbbb~~-.......-~~
+~~~~~b~~~~~~b~~~~--------~~~
+~~~~~b~~~~~~b~~~~~~~~~~~~~~~
+~~~bbbbbbbbbbbb~~~~~~~~~~~~~
+~~bbbbmbbbbmbbbb~~~~~~~~~~~~
+~~bbbbbbbbbbbbccb~~~~~~~~~~~
+~~~bbbbbbbbbbbb~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+""",
+        "units": """
+............................
+............................
+....x...x..x.......c..c.....
+...g...Z..........H.....K...
+....g..H..s...p....w.w.w....
+...g......s..h....H.Z....c..
+.....h......h...............
+............................
+............................
+....DDDDDDDDDD..............
+...DDD.DDDD.DDD.............
+...DDDDDDDDDDD..............
+............................
+............................
+""",
+        "legend": {
+            "K": U("king", "E", group=1, hold=True, name="skarl"),
+            "w": U("greatswordsmen", "E", group=1, hold=True),
+            "c": U("cragsmen", "E", group=2, hold=True),
+            "Z": U("beastmaster", "E", group=3, hold=True),
+            "H": U("hounds", "E", group=4),
+            "g": U("gladiator", "E", group=5, hold=True),
+            "s": U("swordsmen", "E", group=6, hold=True),
+            "p": U("pavisiers", "E", group=7, hold=True),
+            "h": U("halberdiers", "E", group=8, hold=True),
+            "x": U("crossbowmen", "E", group=9, hold=True),
+        },
+        "camera": (21, 4),
+        "intro": [
+            ("skarl", "So the Emperor carries his boats over mountains now. You should have left them there, Commander. My dogs have not eaten since the kennel ship."),
+            ("officer", "His flagship lies between us and that islet, Commander. Two planks up to her deck, and one off her bow to the sand."),
+            ("advisor", "The shallows round the islet will bear a man, Varius, but slowly. Skarl stands by his hall. When he falls, this sea is quiet again."),
+        ],
+        "events": [
+            {
+                "when": ("kill", "skarl"),
+                "say": [("skarl_hurt", "Call them off... The sea was mine before your Empire had a name. It will be someone's after.")],
                 "end": "victory",
             },
         ],
         "brief": [
-            ("bellaro", "The flagship, Commander, with an escort on each beam. He has nowhere to run without a wind."),
-            ("advisor", "Nor have we. Whoever holds these decks at sunset holds Mare Nostra."),
+            ("officer", "Skarl's own anchorage, Commander. A spit of sand, a hall, and his flagship moored across the only approach."),
+            ("advisor", "Every reaver on the Mirror Sea answers to him and to nothing else. Take the man and the fleet is only boats."),
         ],
         "victory": [
-            ("officer", "The fleet has struck, Commander. The sea lanes are open."),
-            ("bellaro", "You will want to see the Admiral's chart room. He was not only starving the Empire."),
-            ("advisor", "Letters, Varius. Corvane was selling what the Doge learned from the Battlemage. Runes, rites, all of it."),
-            ("advisor", "The buyer is a warlord in the isles of Satoshi, far to the east. It seems our voyage is not over."),
+            ("officer", "The Reaver-King is fallen, Commander. His captains are rowing for the far shore."),
+            ("advisor", "The Rukiev coast can fish again, Varius, and so can we. Two seas in one year. The Emperor will run out of water to send you to."),
         ],
-        "defeat": [("officer_hurt", "The flagship has thrown us back, Commander. Our own deck is burning.")],
-        "reward": {"units": {"dragonrider": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
+        "defeat": [("officer_hurt", "We never reached the sand, Commander. The flagship has thrown us back.")],
+        "reward": {"units": {"marines": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
     }
 )
 
-# ---------------------------------------------------------------- Raid 1. Blockade Runner (hold for 8 turns)
+# ---------------------------------------------------------------- Raid 1. The Fire Ship (reach her tiller in time)
 LEVELS.append(
     {
-        "id": 5951,
+        "id": 5991,
         "group": "siege",
-        "name": "Blockade Runner",
-        "objective": "Hold your deck for 8 turns against the boarders.",
-        "turn_limit": 12,
-        "budget": 3000,
-        "win_switch": False,
-        "sides": {"P": ARMY, "E": FLEET},
+        "name": "The Fire Ship",
+        "objective": "Reach the fire ship's tiller before turn 13, or eliminate all enemies.",
+        "turn_limit": 14,
+        "budget": 4750,
+        "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~bbbbbbbbbb~~~~~~~
-~~~~~~bbbmbbbbmbbb~~~~~~
-~~~~~~~bbbbbbbbbb~~~~~~~
-~~~~~~~~b~~~~~~b~~~~~~~~
-~~~~~~~bbbbbbbbbb~~~~~~~
-~~~~~~bbbbbbbbbbbb~~~~~~
-~~~~~bbbmbbbbbbmbccb~~~~
-~~~~~~bbbbbbbbbbbb~~~~~~
-~~~~~~~bbbbbbbbbb~~~~~~~
-~~~~~~~~~b~~~~b~~~~~~~~~
-~~~~~~~bbbbbbbbbb~~~~~~~
-~~~~~~bbbmbbbbmbbb~~~~~~
-~~~~~~~bbbbbbbbbb~~~~~~~
+~~~bbbbbb~~~~~bbbbbbb~~~
+~~bbbbbbbb~~~bbbbbbbbb~~
+~~bbbbbbbbbbbbbbbmbbbbb~
+~~bbbmbbbb~~~bbbbbbbbbb~
+~~bbbbbbbb~~~bbbbbbbccb~
+~~bbbmbbbb~~~bbbbbbbbbb~
+~~bbbbbbbbbbbbbbbmbbbbb~
+~~bbbbbbbb~~~bbbbbbbbb~~
+~~~bbbbbb~~~~~bbbbbbb~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~
 """,
         "units": """
 ........................
-.........e..e...........
-......a.f.ggg..f.a......
-.........y..y...........
+...............x...x....
+..............g..f...g..
+.............h....s.....
+...DD.DDD.....g..p......
+...DDDDDD......f..B...1.
+...DD.DDD.....g..p......
+.............h....s.....
+..............g..f...g..
+...............x...x....
 ........................
-........................
-.......DDDDDDDDDD.......
-.........DDDDDD.........
-.......DDDDDDDDDD.......
-........................
-........................
-.........s.gs...........
-......d.c.x..x.c.d......
-..........h..h..........
-........................
+""",
+        "legend": {
+            "g": U("swordsmen", "E", group=1, hold=True),
+            "f": U("footmen", "E", group=2, hold=True),
+            "h": U("halberdiers", "E", group=3, hold=True),
+            "s": U("swordsmen", "E", group=4, hold=True),
+            "p": U("pavisiers", "E", group=5, hold=True),
+            "x": U("crossbowmen", "E", group=6, hold=True),
+            "B": U("ballistae", "E", group=7, hold=True),
+        },
+        "camera": (17, 5),
+        "intro": [
+            ("officer_alarm", "She is packed to the rail with pitch, Commander, and drifting down on the grain fleet!"),
+            ("advisor", "Her crew mean to light her and swim. Get one man to the tiller behind her cabin, Varius, and we can put her on the rocks instead."),
+        ],
+        "events": [
+            {
+                "when": ("reach", "1"),
+                "say": [("officer", "We have the tiller, Commander! She is turning for the rocks.")],
+                "end": "victory",
+            },
+            {
+                "when": ("round", 13),
+                "say": [("officer_hurt", "She is alight, Commander, and among the grain ships.")],
+                "end": "defeat",
+            },
+        ],
+        "victory": [("officer", "The fire ship is aground and burning alone, Commander.")],
+        "defeat": [("officer_hurt", "The grain fleet is burning, Commander.")],
+        "reward": {"units": {"footmen": 1}, "spoils": {"Armor": 1, "Lore": 1}},
+    }
+)
+
+# ---------------------------------------------------------------- Raid 2. Wolf Pack (three cutters round your ship)
+LEVELS.append(
+    {
+        "id": 5992,
+        "group": "siege",
+        "name": "Wolf Pack",
+        "objective": "Three reaver cutters have you grappled. Eliminate all enemies.",
+        "turn_limit": 30,
+        "budget": 3600,
+        "sides": {"P": ARMY, "E": REAVERS},
+        "terrain": """
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~bbbbbbb~~~~~~bbbbbbb~~~
+~~bbbmbbbbb~~~~bbbbbmbbb~~
+~~~bbbbbbb~~~~~~bbbbbbb~~~
+~~~~~~b~~~~~~~~~~~~b~~~~~~
+~~~~~bbbbbbbbbbbbbbbb~~~~~
+~~~~bbbbmbbbbbbbbmbbbb~~~~
+~~~~bbbbbbbbbbbbbbbbccb~~~
+~~~~~bbbbbbbbbbbbbbbb~~~~~
+~~~~~~~~~~~~b~~~~~~~~~~~~~
+~~~~~~~~~bbbbbbb~~~~~~~~~~
+~~~~~~~~bbbbmbbbb~~~~~~~~~
+~~~~~~~~~bbbbbbb~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+""",
+        "units": """
+..........................
+....x..x.........x..x.....
+...g..H.g.......g.H..g....
+....f.1f.........f.2f.....
+..........................
+......DDDDDDDDDDDDDD......
+.....DDD.DDDDDDDD.DDD.....
+.....DDDDDDDDDDDDDD.......
+..........................
+..........................
+..........s.H.s...........
+.........m.....m..........
+..........x...x...........
+..........................
 """,
         "legend": {
             "g": U("gladiator", "E", group=1),
-            "s": U("swordsmen", "E", group=2),
+            "f": U("footmen", "E", group=2),
             "x": U("crossbowmen", "E", group=3, hold=True),
+            "H": U("hounds", "E", group=4),
+            "s": U("swordsmen", "E", group=5),
+            "m": U("marines", "E"),
         },
-        "camera": (11, 7),
+        "camera": (12, 6),
         "intro": [
-            ("officer", "Two galleys alongside, Commander, one on each beam. They have us grappled."),
-            ("advisor", "The current will carry us past the blockade in eight turns. Hold the deck until then, Varius. Watch the planks, and watch the water."),
+            ("officer_alarm", "Cutters, Commander! Two on the bow and one astern, and hounds on every one of them!"),
+            ("advisor", "They hunt as the dogs do, Varius. Three planks, three packs. Hold two and break the third."),
         ],
         "events": [
             {
-                "when": ("round", 2),
-                "cam": (11, 2),
-                "spawn": [("marines", "a", "E"), ("footmen", "f", "E"), ("gladiator", "e", "E")],
-                "say": [("officer_alarm", "Marines over the side to the north!")],
-            },
-            {
                 "when": ("round", 3),
-                "cam": (11, 12),
-                "spawn": [("gladiator", "c", "E"), ("marines", "d", "E"), ("swordsmen", "h", "E")],
-            },
-            {
-                "when": ("round", 4),
-                "cam": (11, 2),
-                "spawn": [("marines", "a", "E"), ("crossbowmen", "y", "E"), ("gladiator", "c", "E")],
+                "cam": (6, 3),
+                "spawn": [("hounds", "1", "E"), ("marines", "2", "E")],
+                "say": [("officer_alarm", "More of them up from below, Commander!")],
             },
             {
                 "when": ("round", 5),
-                "cam": (11, 2),
-                "spawn": [("gladiator", "e", "E"), ("marines", "d", "E"), ("footmen", "f", "E")],
-                "say": [("officer", "More arena men on the north galley, Commander!")],
-            },
-            {
-                "when": ("round", 6),
-                "cam": (11, 12),
-                "spawn": [("swordsmen", "h", "E"), ("gladiator", "c", "E"), ("marines", "a", "E")],
-            },
-            {
-                "when": ("round", 7),
-                "cam": (11, 2),
-                "spawn": [("footmen", "f", "E"), ("marines", "d", "E"), ("gladiator", "e", "E"), ("gladiator", "c", "E")],
-            },
-            {
-                "when": ("round", 9),
-                "say": [("officer", "We are through the blockade, Commander! They are cutting their own grapples!")],
-                "end": "victory",
+                "cam": (19, 3),
+                "spawn": [("hounds", "2", "E"), ("gladiator", "1", "E")],
             },
         ],
-        "victory": [("officer", "We ran the blockade, Commander. The grain ships can follow.")],
-        "defeat": [("officer_hurt", "They have the deck, Commander.")],
-        "reward": {"units": {"footmen": 1}, "spoils": {"Armor": 1, "Spirit": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- Raid 2. Prize Convoy
-LEVELS.append(
-    {
-        "id": 5952,
-        "group": "siege",
-        "name": "Prize Convoy",
-        "objective": "Take both prize hulls. Eliminate all enemies.",
-        "turn_limit": 30,
-        "budget": 4250,
-        "sides": {"P": ARMY, "E": FLEET},
-        "terrain": """
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~~~~~~~~~-~~~~~~~~~~~~~
-~~~bbbbbbbbb~~~~bbbbbbbbb~~~
-~~bbbmbbbbbbbbbbbbbbbbmbbb~~
-~~bccbbbbmbbb~~bbbmbbbbccb~~
-~~~bbbbbbbbb~~~~bbbbbbbbb~~~
-~~~~~~~~~b~~~~~~~~b~~~~~~~~~
-~~~~~~~~~b~~~~~~~~b~~~~~~~~~
-~~~~~~~~bbbbbbbbbbbb~~~~~~~~
-~~~~~~~bbbmbbbbbbmbbb~~~~~~~
-~~~~~~~bbbbbbbbbbbccb~~~~~~~
-~~~~~~~~bbbbbbbbbbbb~~~~~~~~
-~~~~-~~~~~~~~~~~~~~~~~~-~~~~
-""",
-        "units": """
-............................
-............................
-....x..x..x......a..a.......
-..m....g.gf.....s....k.B.n..
-......g.g..w...p..k.k..s....
-...m..w.g.f.....s..s..s..n..
-............................
-............................
-........DDDDDDDDDDDD........
-.......DDD.DDDDDD.DDD.......
-............................
-............................
-............................
-""",
-        "legend": {
-            "x": U("crossbowmen", "E", group=1, hold=True),
-            "g": U("gladiator", "E", group=2, hold=True),
-            "f": U("footmen", "E", group=3, hold=True),
-            "a": U("archers", "E", group=4, hold=True),
-            "k": U("gladiator", "E", group=5, hold=True),
-            "s": U("swordsmen", "E", group=6, hold=True),
-            "B": U("ballistae", "E", group=7, hold=True),
-            "m": U("marines", "E"),
-            "n": U("marines", "E"),
-            "w": U("swordsmen", "E", group=8, hold=True),
-            "p": U("pavisiers", "E", group=9, hold=True),
-        },
-        "camera": (13, 4),
-        "intro": [
-            ("officer", "Two prizes under tow, Commander, and prize crews of arena men aboard both."),
-            ("advisor", "One plank to each hull. Split the army or take them in turn, Varius, but mind the swimmers."),
-        ],
-        "victory": [("officer", "Both prizes are ours, Commander. The cargo is Imperial grain. It can go home.")],
-        "defeat": [("officer_hurt", "We are driven back to our own deck, Commander.")],
-        "reward": {"units": {"crossbowmen": 1}, "spoils": {"Weapons": 1, "Lore": 1}},
+        "victory": [("officer", "All three cutters are ours, Commander. The pack is broken.")],
+        "defeat": [("officer_hurt", "They are over the rail on every side, Commander.")],
+        "reward": {"units": {"swordsmen": 1}, "spoils": {"Weapons": 1, "Beasts": 1}},
     }
 )
 
@@ -440,18 +383,18 @@ KINGDOM = {
     "id": "mirror-sea",
     "short": "Mirror Sea",
     "name": "The Mirror Sea",
-    "order": 13,
+    "order": 15,
     "theme": "sand",
-    "unlock_after": ["Isoluccia"],
-    "heraldry": {"E": ("argent", "sable", 20, 5), "A": ("cyan", "azure", 8, 3)},
+    "unlock_after": ["Mare Nostra"],
+    "heraldry": {"E": ("sable", "gules", 27, 5)},
     "brief": [
         (
             "emperor",
-            "Commander Varius, the Doge is fallen but his fleet is not. Admiral Corvane has taken it out into the becalmed heart of Mare Nostra, the water our sailors call the Mirror Sea, and no grain ship has reached Carrone in a month.",
+            "Commander Varius, you have given me back Mare Nostra, and I must ask for a second sea. The captains who would not strike with Admiral Corvane have gone north, to the Mirror Sea, and taken service with a pirate who calls himself Reaver-King Skarl.",
         ),
         (
             "emperor",
-            "He has filled his decks with the arena gladiators of the island cities. Captain Bellaro and his Free Company will sail with you. Find the Admiral, board him, and open my sea lanes.",
+            "He burns the Rukiev fishing towns and sets beasts on those who run. There is no channel between the two seas. Your ships will be hauled over the Tilician hills. Find this king of reavers and end him.",
         ),
     ],
     "levels": LEVELS,

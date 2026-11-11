@@ -23,7 +23,8 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
-SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg"}  # a unit's "sheet" (default first)
+SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg",
+          "beasts": "beastmaster-hounds-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -96,6 +97,22 @@ UNITS = {
         "anchors": [185, 215, 690, 1370, 1770],
         "stand": 0, "walk": None, "attack": [1, 2, 1, 1, 3, 4, 1], "height": 84, "team": "blue",
         "frame": (176, 128), "lift": 10,
+    },
+    # the Beast Master and its Hounds: stand, stand, run, run, then the whip (raise, coil, wind, crack) / the pack's
+    # run, leap, snarl and bite
+    "beastmaster": {
+        "sheet": "beasts",
+        "rows": (195, 455),
+        "cells": [(21, 141), (183, 308), (357, 553), (594, 778), (810, 1028), (1065, 1258), (1303, 1485),
+                  (1525, 1817), (1865, 2015), (2060, 2225), (2253, 2489)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [4, 5, 6, 7, 8], "height": 62, "team": True,
+    },
+    "hounds": {
+        "sheet": "beasts",
+        "rows": (933, 1107),
+        "cells": [(12, 162), (184, 336), (363, 590), (615, 847), (871, 1106), (1137, 1378), (1398, 1586),
+                  (1606, 1850), (1877, 2065), (2096, 2334)],
+        "stand": 0, "walk": [2, 3, 4, 3], "attack": [4, 5, 7, 6], "height": 36, "team": True,
     },
 }
 

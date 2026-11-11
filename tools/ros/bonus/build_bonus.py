@@ -58,6 +58,9 @@ SPEAKERS = {
     "daimyo_hurt": ("Lord Kagemori", "foe", "face065"),
     "ishiro": ("Lord Ishiro", "you", "face079"),
     "ishiro_grim": ("Lord Ishiro", "you", "face081"),
+    # the Mirror Sea (the northern one)
+    "skarl": ("Reaver-King Skarl", "foe", "face069"),
+    "skarl_hurt": ("Reaver-King Skarl", "foe", "face071"),
 }
 
 
@@ -116,7 +119,7 @@ THEMES = {
         "barricade": [18],
         "portal": [215],
         "fountain": [214],
-        # SHIPS (the Mirror Sea): there is no ship art, so a hull is laid in the paving tiles on open water —
+        # SHIPS (Mare Nostra and the Mirror Sea): there is no ship art, so a hull is laid in the paving tiles on open water —
         # "b" plain deck, "m" a mast (the obelisk on its paved plinth), "c" a cabin (the house on paving: it
         # heals and gives cover, like any house). The sea keeps its open-water tiles beside them.
         "hull": [191, 197, 188, 194],  # the bulwark with the sea to the north, east, south, west of it
@@ -244,10 +247,10 @@ OP_SPAWN, OP_SCREEN, OP_CAMERA, OP_COUNTER, OP_SETFLAG = 0, 1, 2, 9, 10
 MOVE_CLASS = {
     "cavalry": 3, "knights": 3, "king": 3, "raiders": 3, "horsebowmen": 3,
     "catapult": 4, "trebuchet": 4, "cannon": 4, "ballistae": 4,
-    "griffon": 0, "dragonrider": 0,
+    "griffon": 0, "dragonrider": 0, "hounds": 1,
     "footmen": 2, "swordsmen": 2, "greatswordsmen": 2, "pikemen": 2, "halberdiers": 2, "crossbowmen": 2,
     "musketeers": 2, "conjurer": 2, "bodyguard": 2, "bloodgorgers": 2,
-    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2,
+    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "beastmaster": 2,
 }
 CROSSES = {"cragsmen": 21, "marines": 19}  # Climb / Amphibious
 
@@ -630,10 +633,11 @@ def main():
     sys.path.insert(0, HERE)
     import tilicia
     import isoluccia
+    import mare_nostra
     import mirror_sea
     import satoshi
 
-    data = build([tilicia.KINGDOM, isoluccia.KINGDOM, mirror_sea.KINGDOM, satoshi.KINGDOM])
+    data = build([tilicia.KINGDOM, isoluccia.KINGDOM, mare_nostra.KINGDOM, satoshi.KINGDOM, mirror_sea.KINGDOM])
     stats = ", ".join("%d %s" % (sum(1 for l in data["levels"] if l["group"] == g), g) for g in ("story", "siege"))
     if "--check" in sys.argv:
         print("ok:", stats)

@@ -92,7 +92,8 @@ export const KINGDOM_POS_EP2 = {
   // the two BONUS kingdoms (ours): on the names the Episode II map already prints
   tilicia: { left: "87.5%", top: "44%" },
   isoluccia: { left: "75%", top: "64%" },
-  "mirror-sea": { left: "57%", top: "72%" }, // in Mare Nostra (user decision; the map prints "Mirror Sea" further north-east)
+  "mare-nostra": { left: "57%", top: "72%" }, // in Mare Nostra, by its sea serpent
+  "mirror-sea": { left: "80%", top: "31%" }, // on the northern sea the map names, under its label
   satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
@@ -541,6 +542,18 @@ for (const k of BONUS_ORDER)
     bonus: true,
     ...BONUS_META[k],
   };
+// the Beast Master's Hounds: called, never owned (as the Conjurer's Sapper and Bodyguard)
+UNIT_META.hounds = {
+  name: UNIT_TYPES.hounds.name,
+  cost: 0,
+  role: "War Hounds",
+  kit: "⚔ Fangs · 🛡 Nature's Cloak",
+  upgrades: null,
+  ep2: true,
+  bonus: true,
+  conjured: true,
+  note: "A pack of corsair war hounds, called by a Beast Master: fast and savage, a little less than a Stag. Leashed within 8 tiles of their master, and gone if it falls.",
+};
 for (const { from, to, need } of BONUS_UPGRADES)
   UNIT_META[from].upgrades = [...(UNIT_META[from].upgrades || []), { to, need, ep2: true, bonus: true }];
 // The bonus campaigns open once Episode II is finished: Oasis Standoff (5432), Abbisin's last battle, is won.
@@ -584,7 +597,7 @@ export const ARMY_GROUPS = [
     id: "caster",
     label: "Casters",
     icon: "class_caster",
-    units: ["shamans", "druids", "priests", "wizards", "dunesirens", "conjurer", "battlemage"],
+    units: ["shamans", "druids", "priests", "wizards", "dunesirens", "conjurer", "battlemage", "beastmaster"],
   },
   {
     id: "siege",
@@ -1312,6 +1325,7 @@ export const TREE_COL = {
   gladiator: 3,
   samurai: 3,
   dragonrider: 4,
+  beastmaster: 1,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1351,6 +1365,7 @@ export const TREE_ROW = {
   gladiator: 12,
   samurai: 13,
   dragonrider: 3,
+  beastmaster: 15,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

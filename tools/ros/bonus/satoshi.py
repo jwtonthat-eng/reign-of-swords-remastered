@@ -549,7 +549,7 @@ KINGDOM = {
     "name": "The Isles of Satoshi",
     "order": 14,
     "theme": "green",
-    "unlock_after": ["The Mirror Sea"],
+    "unlock_after": ["Mare Nostra"],
     "heraldry": {"E": ("gules", "sable", 33, 5), "A": ("argent", "gules", 14, 3)},
     "brief": [
         (
