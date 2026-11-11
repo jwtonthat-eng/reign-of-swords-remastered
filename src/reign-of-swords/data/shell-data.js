@@ -1329,10 +1329,10 @@ export const TREE_COL = {
   samurai: 3,
   dragonrider: 4,
   beastmaster: 1,
-  sohei: 3,
+  sohei: 2,
   shinobi: 3,
   oni: 4,
-  tengu: 4,
+  tengu: 2,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1373,10 +1373,10 @@ export const TREE_ROW = {
   samurai: 13,
   dragonrider: 3,
   beastmaster: 15,
-  sohei: 14,
+  sohei: 15,
   shinobi: 15,
   oni: 0,
-  tengu: 4,
+  tengu: 16,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

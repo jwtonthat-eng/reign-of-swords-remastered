@@ -642,10 +642,10 @@ export const BONUS_UPGRADES = [
   { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
   { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
   { from: "militiamen", to: "beastmaster", need: "Medal", gate: 5982 }, // the Mirror Sea 2
-  { from: "priests", to: "sohei", need: "Weapons", gate: 5961 }, // Satoshi 1
+  { from: "shamans", to: "sohei", need: "Armor", gate: 5961 }, // Satoshi 1 (Armor: the one slot Shamans leave empty)
   { from: "rangers", to: "shinobi", need: "Lore", gate: 5962 }, // Satoshi 2
   { from: "greatswordsmen", to: "oni", need: "Spirit", gate: 5963 }, // Satoshi 3
-  { from: "griffon", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
+  { from: "beastmaster", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.

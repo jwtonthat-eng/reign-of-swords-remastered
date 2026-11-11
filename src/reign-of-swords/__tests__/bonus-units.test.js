@@ -98,10 +98,10 @@ describe("bonus units: upgrade paths", () => {
       ["swordsmen", "samurai", "Spirit"],
       ["griffon", "dragonrider", "Medal"],
       ["militiamen", "beastmaster", "Medal"],
-      ["priests", "sohei", "Weapons"],
+      ["shamans", "sohei", "Armor"],
       ["rangers", "shinobi", "Lore"],
       ["greatswordsmen", "oni", "Spirit"],
-      ["griffon", "tengu", "Spirit"],
+      ["beastmaster", "tengu", "Spirit"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;

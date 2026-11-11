@@ -678,6 +678,8 @@ kept apart from the original data so that everything else stays checkable agains
   half the blow. *Gale* (Tengu): its melee target is moved one tile straight back if that tile is free and ground it
   could stand on (war engines never), before the counter-attack is judged, so a thrown foe does not strike back.
   Gladiators now wear the Heavy & Shield column with a further 10 off every cell (the Samurai's rule), at 175.
+  Upgrades of the Satoshi four: Shamans + Armor to Sohei, Rangers + Lore to Shinobi, Greatswordsmen + Spirit to
+  Oni, and Beast Master + Spirit to Tengu (the only bonus unit upgraded from another bonus unit).
   DELIBERATE FIX found with the Shinobi: a move cut short beside a hidden foe no longer stops on a tile another unit
   holds (a flier over a friend); it stops on the next free tile.
 - **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
