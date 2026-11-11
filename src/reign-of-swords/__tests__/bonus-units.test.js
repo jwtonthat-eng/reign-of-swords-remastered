@@ -220,7 +220,7 @@ describe("Pavise (Pavisiers)", () => {
 });
 
 describe("Chain Lightning (Battlemage)", () => {
-  it("hits the target in full, then leaps to up to two adjacent enemies at half strength — never to friends", () => {
+  it("hits the target in full, then leaps on through up to four enemies within 2 tiles of the last — never friends", () => {
     const g = field();
     const mage = spawn(g, "battlemage", "blue", 5, 5),
       target = spawn(g, "footmen", "red", 9, 5),
@@ -229,21 +229,31 @@ describe("Chain Lightning (Battlemage)", () => {
       c = spawn(g, "footmen", "red", 9, 4),
       friend = spawn(g, "footmen", "blue", 8, 5),
       away = spawn(g, "footmen", "red", 12, 5);
-    c.hp = 100;
-    a.hp = 60; // the weakest neighbours are struck first
+    a.hp = 60; // the nearest unstruck enemy takes each leap; the weakest on a tie
     b.hp = 70;
     const full = g.computeDamage(mage, target);
     expect(g._weaponAt(mage, 4)).toBe(36);
+    expect(full).toBeGreaterThan(g.computeDamage(mage, target, { weapon: 25 })); // +10 on the Fireball's row
     g.resolveDamage(mage, target, {});
     settle(g);
     for (let i = 0; i < 40; i++) g.update(0.05);
     expect(100 - target.hp).toBe(full);
-    expect(60 - a.hp).toBeGreaterThan(0);
-    expect(60 - a.hp).toBeLessThan(full);
-    expect(70 - b.hp).toBeGreaterThan(0);
-    expect(c.hp).toBe(100); // only two leaps
+    // target → a (beside it, weakest) → b (2 from a, weaker than c) → c (2 from b) → nothing within 2 of c
+    const lost = [60 - a.hp, 70 - b.hp, 100 - c.hp];
+    expect(lost.every((n) => n > 0 && n < full)).toBe(true);
+    expect(lost[0]).toBeGreaterThanOrEqual(lost[1]);
     expect(friend.hp).toBe(100);
-    expect(away.hp).toBe(100);
+    expect(away.hp).toBe(100); // 4 tiles from the last unit struck
+  });
+  it("the chain runs out after four leaps", () => {
+    const g = field();
+    const mage = spawn(g, "battlemage", "blue", 5, 5);
+    const line = [9, 10, 11, 12, 13, 14].map((x) => spawn(g, "footmen", "red", x, 5));
+    g.resolveDamage(mage, line[0], {});
+    settle(g);
+    for (let i = 0; i < 60; i++) g.update(0.05);
+    expect(line.map((u) => u.hp < 100)).toEqual([true, true, true, true, true, false]);
+    expect(100 - line[4].hp).toBeLessThan(100 - line[1].hp);
   });
   it("up close the Battlemage swings its Runesword, with no leap", () => {
     const g = field();

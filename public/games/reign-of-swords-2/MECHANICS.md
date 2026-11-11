@@ -699,7 +699,11 @@ kept apart from the original data so that everything else stays checkable agains
   to quicksand, mended by Craftsmen like a war engine. *Pavise*: Pavisiers that end a turn without moving are planted
   (as are those that have not had a turn yet); while planted, they and a friendly unit next to them and farther from
   the shooter take half ranged damage, the same halving as a Priest's Shield, and the two do not stack. *Chain
-  Lightning*: after the bolt lands it leaps to up to two enemies next to the target, weakest first, at half strength.
+  Lightning*: the bolt and every leap add 10 to the Fireball row's cell. After the bolt lands it leaps up to four
+  times, each leap from the unit last struck to the nearest enemy not yet struck within 2 tiles of it (the weakest on
+  a tie; hidden units and friends are passed over), at 50%, 40%, 30% and 20% of a full bolt on that unit. (First
+  built as two leaps at half strength onto enemies beside the target; lengthened and strengthened by user decision.
+  In the unit arena this puts the Battlemage well above every other unit for its points.)
   The AI needs no new behaviour: all six act through the movement costs, target lists and damage it already reads.
 - **Upgrades.** Each unit hangs off an original unit in a collectible slot that unit leaves empty, and waits on a
   bonus battle like Episode II's own units: Archers to Cragsmen (Armor, Ostrak's Bargain), Swordsmen to Spellwardens

@@ -41,7 +41,7 @@ export const BONUS_WEAPONS = {
     row: 25, // Fireball
     range: [2, 7],
     tags: [8], // Shoot and Move
-    desc: "Chain Lightning strikes its target, then leaps to up to two enemies standing next to it at half strength.",
+    desc: "Chain Lightning strikes its target, then leaps on through up to four more enemies, each within 2 tiles of the last, weakening as it goes.",
   },
   37: {
     name: "Mace",
@@ -141,6 +141,11 @@ export const MAGIC_WEAPONS = [25, 26, 27, 36];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
 export const BONUS_RANGED = [35, 36, 39, 42, 46];
 export const CHAIN_WEAPON = 36;
+// Chain Lightning: added to the weapon x armour cell of every bolt and leap, and the share of the bolt each leap
+// carries (four leaps, each from the unit last struck to the nearest unstruck enemy within CHAIN_REACH tiles)
+export const CHAIN_BONUS = 10;
+export const CHAIN_SHARE = [0.5, 0.4, 0.3, 0.2];
+export const CHAIN_REACH = 2;
 // Dragonfire, and the share of the blow the first and second tile BEYOND its target take
 export const DRAGONFIRE_WEAPON = 42;
 export const BREATH_SHARE = [0.6, 0.35];
@@ -406,7 +411,8 @@ export const BONUS_TYPES = {
     sprite: "battlemage",
     ...strip(8, 3),
     kind: "ranged",
-    ability: "Chain Lightning — strikes its target, then leaps to up to two adjacent enemies at half strength.",
+    ability:
+      "Chain Lightning — strikes its target, then leaps on through up to four more enemies, weakening as it goes.",
   },
   gladiator: {
     name: "Gladiators",
