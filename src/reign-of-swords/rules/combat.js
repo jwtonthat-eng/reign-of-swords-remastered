@@ -24,7 +24,7 @@ import {
   FLASK_WEAPON,
   ACID,
   BONUS_RANGED,
-  DRAGONFIRE_WEAPON,
+  BEAM_WEAPONS,
   BREATH_SHARE,
 } from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
@@ -350,6 +350,10 @@ export class CombatMethods {
     if (opts.brace) base += 30; // Ep1: a braced Pike Wall's first strike
     if (base <= 0) return 0;
     if (dist > 1 && this._planted(attacker)) base += 10; // BONUS: a planted Pavisier's braced shot
+    if (weapon === 61) base += attacker.T.sunbeam || 0; // BONUS: the Sun Priest's Sunbeam
+    // BONUS: Pounce — a Jaguar Warrior striking out of woods, tall grass, scrub or rocks
+    if (attacker.T.pounce && dist === 1 && [3, 4, 22, 27, 28].includes(moveType(this.tileAt(attacker.tx, attacker.ty))))
+      base += attacker.T.pounce;
     if (weapon === CHAIN_WEAPON) base += CHAIN_BONUS; // BONUS: the Battlemage's bolt, and each of its leaps
     // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
     base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (defender.T.armourBonus || 0));
@@ -357,7 +361,8 @@ export class CombatMethods {
     // 6, 8, 10, 12, 14, 16) counts for nothing against them
     const fortified =
       attacker.T.breach && [6, 8, 10, 12, 14, 16].includes(moveType(this.tileAt(defender.tx, defender.ty)));
-    const tileDef = fortified ? 100 : Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
+    const open = fortified || (attacker.T.eagleEye && dist > 1); // BONUS: Eagle Eye — no cover turns an Eagle Warrior's dart
+    const tileDef = open ? 100 : Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
     let cover = tileDef - (defender.T.formation && !siegeShot ? 10 * this.formationAllies(defender) : 0);
     if (siegeShot && tileDef <= 80) cover += Math.trunc((100 - tileDef) / 2);
     let rating = (attacker.T.rf || 75) + this.ratingAura(attacker);
@@ -371,6 +376,7 @@ export class CombatMethods {
     } else if (this._siegeArmored(defender))
       dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
     else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
+    if (attacker._blind) dmg = Math.trunc(dmg / 2); // BONUS: blinded by a Sun Priest's Eclipse
     if (defender.T.stoneskin) dmg = Math.min(dmg, toHp256(defender.T.stoneskin)); // BONUS: the Golem's Stoneskin
     return Math.max(0, dmg);
   }
@@ -1280,7 +1286,7 @@ export class CombatMethods {
     this._resolvePierce(attacker, defender, opts, wMain);
     // BONUS: Dragonfire burns on through the two tiles beyond its target, in the line the Ballistae's bolt would take
     // (60% then 35%), on whoever stands there and on any structure
-    if (wMain === DRAGONFIRE_WEAPON) {
+    if (BEAM_WEAPONS.includes(wMain)) {
       const line = this._ballistaStep(attacker, defender.tx, defender.ty);
       for (let k = 1; line && k <= 2; k++) {
         const x = defender.tx + line.fx * k,
@@ -1327,7 +1333,7 @@ export class CombatMethods {
       }
     }
     // A wizard jabbing point-blank uses its Wand (weapon 7) — a plain melee hit, no spell splash.
-    if (attacker.T.splash && !((attacker.T.canLightning || attacker.T.flask) && manhattan(attacker, defender) <= 1))
+    if (attacker.T.splash && !((attacker.T.canLightning || attacker.T.bonus) && manhattan(attacker, defender) <= 1))
       this._resolveSplash(attacker, defender, opts, wMain);
   }
 

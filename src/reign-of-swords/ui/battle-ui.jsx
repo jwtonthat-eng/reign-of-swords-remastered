@@ -150,6 +150,10 @@ export const UNIT_CATEGORY = {
   efreet: "Flying",
   naga: "Infantry",
   skeleton: "Infantry",
+  jaguar: "Infantry",
+  eagle: "Missile",
+  sunpriest: "Casters",
+  serpent: "Flying",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

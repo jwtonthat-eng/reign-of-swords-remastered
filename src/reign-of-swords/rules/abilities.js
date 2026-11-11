@@ -60,6 +60,25 @@ export const AbilityMethods = {
         max: 1,
         desc: "Tap a neighbouring tile: the three sand tiles on that side turn to quicksand for 4 rounds. A unit that steps in is stopped there and takes 5 damage. Fliers and Sirens are immune.",
       });
+    // BONUS — the Sun Priest's two cast spells (its third, Sunbeam, is its attack)
+    if (unit.T.sunPriest) {
+      out.push({
+        id: "dawn",
+        name: "Dawn",
+        icon: "skill_nullify",
+        min: 0,
+        max: 0,
+        desc: "Every friendly unit within 2 tiles (the Sun Priest too) mends 15 HP. War engines and Stone Sentinels do not.",
+      });
+      out.push({
+        id: "eclipse",
+        name: "Eclipse",
+        icon: "skill_chain",
+        min: 1,
+        max: 5,
+        desc: "Blind a foe within 5 tiles: it strikes at half strength until its next turn ends.",
+      });
+    }
     // BONUS — Grapple (Marines): once a battle, in place of the move
     if (unit.T.grapple) {
       const spent = !!unit._grappled,
@@ -163,6 +182,10 @@ export const AbilityMethods = {
       this._castDetonate(sel);
       return true;
     }
+    if (id === "dawn") {
+      this._castDawn(sel);
+      return true;
+    }
     if (id === "absorb") {
       this._castAbsorb(sel);
       return true;
@@ -216,6 +239,13 @@ export const AbilityMethods = {
     if (id === "quicksand" && dist <= 1) {
       // a tile beside the Siren, or the Siren itself (its default side) — Unit::setAttackTarget takes nothing farther
       if (this._castQuicksand(sel, tx, ty)) return true;
+    }
+    if (id === "eclipse") {
+      const foe = this.unitAt(tx, ty);
+      if (foe && !foe.dead && foe.team !== sel.team && dist <= 5 && !this._isHidden(foe)) {
+        this._castEclipse(sel, foe);
+        return true;
+      }
     }
     if (id === "grapple" && this._grappleTile(sel, tx, ty)) {
       this._castGrapple(sel, tx, ty);
@@ -363,6 +393,43 @@ export const AbilityMethods = {
     });
     return true;
   },
+  // BONUS — the Sun Priest. Dawn: friends within 2 tiles mend 15 HP (what a Priest cannot heal, it cannot either).
+  _castDawn(u) {
+    this._castAnim(u, null, () => this._dawn(u), "heal");
+  },
+  _dawn(u) {
+    for (const a of this.units) {
+      if (a.dead || a.team !== u.team || a.T.al === 4 || a.T.unyielding || a.hp >= 100) continue;
+      if (Math.abs(a.tx - u.tx) + Math.abs(a.ty - u.ty) > 2) continue;
+      const gained = this._healTick(a, 15);
+      this.spawnFx("spark", a.px + this.tile / 2, a.py + this.tile * 0.42, {});
+      this.floaters.push({
+        x: a.px + this.tile / 2,
+        y: a.py,
+        t: 0,
+        life: 0.9,
+        vy: -22,
+        text: "+" + gained,
+        heal: true,
+      });
+    }
+  },
+  // Eclipse: the foe strikes at half strength (rules/combat _damage256) until its own next turn ends (grid _endTurnHide).
+  _castEclipse(u, foe) {
+    this._castAnim(u, foe, () => this._eclipse(foe), "cast");
+  },
+  _eclipse(foe) {
+    foe._blind = true;
+    this.floaters.push({
+      x: foe.px + this.tile / 2,
+      y: foe.py - 8,
+      t: 0,
+      life: 1,
+      vy: -14,
+      text: "Blinded",
+      crit: true,
+    });
+  },
   // BONUS — Grapple (Marines): a free tile it could stand on (no step rule: a rampart will do), within its grapple's
   // reach, and not deep water.
   _grappleTile(u, tx, ty) {
@@ -471,6 +538,15 @@ export const AbilityMethods = {
         )
           push(x, y);
       }
+    } else if (id === "eclipse") {
+      for (const e of this.units)
+        if (
+          !e.dead &&
+          e.team !== unit.team &&
+          !this._isHidden(e) &&
+          Math.abs(e.tx - unit.tx) + Math.abs(e.ty - unit.ty) <= 5
+        )
+          push(e.tx, e.ty);
     } else if (id === "grapple") {
       for (let dy = -unit.T.grapple; dy <= unit.T.grapple; dy++)
         for (let dx = -unit.T.grapple; dx <= unit.T.grapple; dx++)

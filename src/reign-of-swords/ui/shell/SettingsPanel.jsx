@@ -7,6 +7,9 @@ import { ReportBugGroup } from "./ReportBug.jsx";
 
 // ARMY TRANSFER (ours — the originals are separate apps): export this episode's army and collectibles to a file, import
 // the other episode's within data/save-transfer.js's limits. `transfer` = { ep2, onExport, onImport }.
+// The website offers Episode II only (src/site.js), so IN EPISODE II the group is the export alone — "Army file", the
+// file Resume Episode II reads back — with no import from Episode I and no mention of it. Episode I's own panel (not
+// reachable from the page; the tests still run it) keeps both halves.
 function ArmyTransfer({ transfer }) {
   const [status, setStatus] = useState(null);
   const other = transfer.ep2 ? "Episode I" : "Episode II";
@@ -20,7 +23,12 @@ function ArmyTransfer({ transfer }) {
     link.click();
     link.remove();
     setTimeout(() => URL.revokeObjectURL(url), 0);
-    setStatus({ ok: true, text: tr("Army saved to a file — import it in {ep}'s Settings.", { ep: tr(other) }) });
+    setStatus({
+      ok: true,
+      text: transfer.ep2
+        ? tr("Army saved to a file.")
+        : tr("Army saved to a file — import it in {ep}'s Settings.", { ep: tr(other) }),
+    });
   };
   const importFile = async (e) => {
     const file = e.target.files && e.target.files[0];
@@ -49,22 +57,33 @@ function ArmyTransfer({ transfer }) {
   const L = TRANSFER_LIMITS;
   return (
     <div className="ros-settings-group">
-      <div className="ros-settings-label">{tr("Army transfer")}</div>
+      <div className="ros-settings-label">{transfer.ep2 ? tr("Army file") : tr("Army transfer")}</div>
       <div className="ros-settings-row">
         <button className="btn-run ros-settings-opt" onClick={exportFile}>
           {"⤓ " + tr("Export army")}
         </button>
-        <label className="btn-run ros-settings-opt ros-settings-file" htmlFor="ros-army-import">
-          {"⤒ " + tr("Import from {ep}", { ep: tr(other) })}
-        </label>
-        <input id="ros-army-import" type="file" accept=".json,application/json" hidden onChange={importFile} />
-      </div>
-      <p className="ros-settings-note">
-        {tr(
-          "Carry part of your army to the other episode: export it here, then import the file in the other episode's Settings. Up to {pu} of each unit and {u} in all come across, and up to {ps} of each collectible ({m} Medal). Episode II's own units reach Episode I as the unit they are upgraded from. Battles won stay behind; importing again replaces the last import.",
-          { pu: L.perUnit, u: L.units, ps: L.perSpoil, m: L.medals },
+        {!transfer.ep2 && (
+          <>
+            <label className="btn-run ros-settings-opt ros-settings-file" htmlFor="ros-army-import">
+              {"⤒ " + tr("Import from {ep}", { ep: tr(other) })}
+            </label>
+            <input id="ros-army-import" type="file" accept=".json,application/json" hidden onChange={importFile} />
+          </>
         )}
-      </p>
+      </div>
+      {transfer.ep2 && (
+        <p className="ros-settings-note">
+          {tr("Save your army and collectibles to a file: Resume Episode II, below, reads it back in.")}
+        </p>
+      )}
+      {!transfer.ep2 && (
+        <p className="ros-settings-note">
+          {tr(
+            "Carry part of your army to the other episode: export it here, then import the file in the other episode's Settings. Up to {pu} of each unit and {u} in all come across, and up to {ps} of each collectible ({m} Medal). Episode II's own units reach Episode I as the unit they are upgraded from. Battles won stay behind; importing again replaces the last import.",
+            { pu: L.perUnit, u: L.units, ps: L.perSpoil, m: L.medals },
+          )}
+        </p>
+      )}
       {status && (
         <p className={"ros-settings-note ros-transfer-status" + (status.ok ? "" : " bad")} role="status">
           {status.text}

@@ -29,6 +29,10 @@ export const BONUS_ORDER = [
   "efreet",
   "naga",
   "skeleton",
+  "jaguar", // Tezcal
+  "eagle",
+  "sunpriest",
+  "serpent",
 ];
 // Units a bonus unit calls onto the field: never deployed or owned (the Beast Master's Hounds).
 export const BONUS_SUMMONS = ["hounds", "imp"];
@@ -183,7 +187,8 @@ export const BONUS_WEAPONS = {
     row: 25, // Fireball
     range: [2, 4],
     tags: [13], // a fire weapon: double damage to Flammable war engines
-    desc: "A Flame Jet is a gout of fire at short range, ruinous to war engines.",
+    blast: [100, 60],
+    desc: "A Flame Jet is a gout of fire at short range that bursts like a Fireball, ruinous to war engines.",
   },
   56: {
     name: "Burning Hands",
@@ -206,11 +211,46 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "A Rusted Sword still cuts: good damage against all but the heaviest armors.",
   },
+  59: {
+    name: "Macuahuitl",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Macuahuitl is a wooden club edged with obsidian: good damage against all armor types, but less effective against the heaviest armors.",
+  },
+  60: {
+    name: "Atlatl Dart",
+    row: 3, // Spear (as the Javelin)
+    range: [2, 3],
+    tags: [8], // Shoot and Move
+    desc: "An Atlatl Dart is flung from a spear-thrower: decent damage at a short distance against all but the heaviest armor, and no cover turns it.",
+  },
+  61: {
+    name: "Sunbeam",
+    row: 25, // Fireball
+    range: [2, 7],
+    tags: [13], // a fire weapon
+    desc: "A Sunbeam is a lance of fire: far stronger than a Fireball on its target, and it burns on through the two tiles beyond.",
+  },
+  62: {
+    name: "Obsidian Knife",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "An Obsidian Knife is a last resort: weak against everything but the unarmoured.",
+  },
+  63: {
+    name: "Gale",
+    row: 26, // Lightning Storm
+    range: [2, 4],
+    tags: [8], // Shoot and Move
+    desc: "The Feathered Serpent's Gale is a blast of wind at short range: steady damage against every armor.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
-export const MAGIC_WEAPONS = [25, 26, 27, 36];
+export const MAGIC_WEAPONS = [25, 26, 27, 36, 61];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
-export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55];
+export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63];
 // the Alchemist's flask, and the acid it leaves: HP a turn, for how many of the victim's turns
 export const FLASK_WEAPON = 50;
 export const ACID = { damage: 5, turns: 3 };
@@ -222,6 +262,8 @@ export const CHAIN_SHARE = [0.5, 0.4, 0.3, 0.2];
 export const CHAIN_REACH = 2;
 // Dragonfire, and the share of the blow the first and second tile BEYOND its target take
 export const DRAGONFIRE_WEAPON = 42;
+// the weapons that burn on in a line beyond their target: Dragonfire and the Sun Priest's Sunbeam
+export const BEAM_WEAPONS = [42, 61];
 export const BREATH_SHARE = [0.6, 0.35];
 
 // Movement class (0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 war engine), as data/combat-data UNIT_AL.
@@ -248,6 +290,10 @@ export const BONUS_AL = {
   efreet: 0,
   naga: 1,
   skeleton: 2,
+  jaguar: 1,
+  eagle: 1,
+  sunpriest: 2,
+  serpent: 0,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -284,10 +330,10 @@ export const BONUS_COMBAT = {
   marines: {
     move: 4,
     weapon: 39,
-    weapon2: 8,
+    weapon2: 5,
     armour: 6,
-    rating: 2,
-    rf: 75,
+    rating: 3,
+    rf: 90,
     abilities: [7],
     amphibious: true,
     terrainRange: true,
@@ -379,7 +425,7 @@ export const BONUS_COMBAT = {
   // the Stag one tier down: a point less movement, a rating tier lower, and no Charge
   hounds: { move: 7, weapon: 44, weapon2: 0, armour: 4, rating: 2, rf: 75, abilities: [], summoned: true },
   // SATOSHI's second wave. sutra: the HP every friend beside it mends at the start of its turn.
-  sohei: { move: 4, weapon: 45, weapon2: 0, armour: 9, rating: 4, rf: 100, abilities: [4], sutra: 10 },
+  sohei: { move: 4, weapon: 45, weapon2: 0, armour: 9, rating: 4, rf: 100, abilities: [4], sutra: 10, dmgBonus: 5 },
   // shadowStep: hides on ANY ground (not only in cover) when it ends a turn unattacking, and its blows from hiding land
   // as an ambush (+30 on the cell, like a charge)
   shinobi: { move: 5, weapon: 46, weapon2: 47, armour: 3, rating: 3, rf: 90, abilities: [16], shadowStep: true },
@@ -396,7 +442,19 @@ export const BONUS_COMBAT = {
     armourName: "Oni Hide",
   },
   // gale: the foe it strikes is thrown one tile back (and so cannot strike back), when there is room behind it
-  tengu: { move: 7, weapon: 49, weapon2: 0, armour: 7, rating: 4, rf: 100, abilities: [], fly: true, gale: true },
+  tengu: {
+    move: 7,
+    weapon: 49,
+    weapon2: 0,
+    armour: 7,
+    rating: 5,
+    rf: 115,
+    abilities: [],
+    fly: true,
+    gale: true,
+    dmgBonus: 20,
+    armourBonus: 10,
+  },
   // THE LABORATORY AND ITS CREATURES. The Alchemist throws flasks (flask: a Fireball-shaped burst that leaves acid),
   // heals (the Priest's Heal, 30 HP at 2 tiles) and summons Imps (the Conjurer's rule).
   alchemist: {
@@ -434,27 +492,93 @@ export const BONUS_COMBAT = {
     weapon: 55,
     weapon2: 56,
     armour: 7,
-    rating: 4,
-    rf: 100,
+    rating: 5,
+    rf: 115,
     abilities: [14],
     fly: true,
-    burn: 10,
+    burn: 20,
     armourName: "Living Flame",
+    armourBonus: 10,
   },
   // constrict: the foe it strikes cannot move on its next turn
   naga: {
     move: 5,
     weapon: 57,
     weapon2: 0,
-    armour: 5,
-    rating: 4,
-    rf: 100,
+    armour: 10,
+    rating: 5,
+    rf: 115,
     abilities: [],
     amphibious: true,
     constrict: true,
+    armourBonus: 10,
+    dmgBonus: 10,
+    whirl: true,
   },
   // undying: the first time it is struck down it rises again with this many HP
-  skeleton: { move: 4, weapon: 58, weapon2: 0, armour: 1, rating: 2, rf: 75, abilities: [4], undying: 40 },
+  skeleton: {
+    move: 4,
+    weapon: 58,
+    weapon2: 0,
+    armour: 10,
+    rating: 5,
+    rf: 115,
+    abilities: [4],
+    undying: 100,
+    dmgBonus: 10,
+    armourBonus: 10,
+  },
+  // TEZCAL. forestWalk: woods cost 1 to cross. pounce: +20 on the cell when it strikes from woods, tall grass, scrub
+  // or rocks. eagleEye: its darts ignore the cover of the target's tile.
+  jaguar: {
+    move: 5,
+    weapon: 59,
+    weapon2: 0,
+    armour: 6,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    forestWalk: true,
+    pounce: 20,
+    armourBonus: 5,
+  },
+  eagle: {
+    move: 5,
+    weapon: 60,
+    weapon2: 59,
+    armour: 3,
+    rating: 2,
+    rf: 75,
+    abilities: [8],
+    forestWalk: true,
+    eagleEye: true,
+  },
+  // sunPriest: the caster of Dawn (friends within 2 tiles mend 15) and Eclipse (a foe within 5 strikes at half
+  // strength through its next turn); sunbeam: +N on the cell of its Sunbeam
+  sunpriest: {
+    move: 4,
+    weapon: 61,
+    weapon2: 62,
+    armour: 9,
+    rating: 4,
+    rf: 100,
+    abilities: [],
+    sunPriest: true,
+    sunbeam: 30,
+  },
+  // tailwind: friends beside it move this many tiles further
+  serpent: {
+    move: 7,
+    weapon: 63,
+    weapon2: 44,
+    armour: 7,
+    rating: 4,
+    rf: 100,
+    abilities: [8],
+    fly: true,
+    tailwind: 1,
+    dmgBonus: 10,
+  },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -479,12 +603,16 @@ export const BONUS_COURAGE = {
   efreet: 5,
   naga: 3,
   skeleton: 5,
+  jaguar: 3,
+  eagle: 3,
+  sunpriest: 4,
+  serpent: 4,
 };
 export const BONUS_COST = {
   cragsmen: 175,
   spellwardens: 225,
   sentinel: 300,
-  marines: 125,
+  marines: 150,
   pavisiers: 200,
   battlemage: 750,
   gladiator: 175,
@@ -495,17 +623,21 @@ export const BONUS_COST = {
   sohei: 175,
   shinobi: 225,
   oni: 350,
-  tengu: 225,
+  tengu: 325,
   alchemist: 250,
   imp: 0, // summoned by the Alchemist
   golem: 400,
   unicorn: 275,
-  efreet: 300,
-  naga: 150,
-  skeleton: 100,
+  efreet: 350,
+  naga: 300,
+  skeleton: 500,
+  jaguar: 150,
+  eagle: 175,
+  sunpriest: 400,
+  serpent: 300,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
-export const BONUS_ELITE = { battlemage: true, dragonrider: true };
+export const BONUS_ELITE = { battlemage: true, dragonrider: true, sunpriest: true };
 
 // Sprite strips: cut from the supplied art sheets by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
 // one attack (frame 0 a ready pose), `hitFrame` the frame the blow lands or the shot leaves on.
@@ -724,7 +856,9 @@ export const BONUS_TYPES = {
     kind: "ranged",
     projectile: "ball",
     magic: true,
-    ability: "Burning Aura — enemies beside it lose 10 HP each turn. Flame Jet at 2–4 tiles. Fear. Flies.",
+    splash: true,
+    ability:
+      "Burning Aura — enemies beside it lose 20 HP each turn. Flame Jet at 2–4 tiles, bursting like a Fireball. Fear. Flies.",
   },
   naga: {
     name: "Naga",
@@ -739,6 +873,70 @@ export const BONUS_TYPES = {
     ...strip(4, 2),
     kind: "melee",
     ability: "Rise Again — the first time it is struck down it rises with 40 HP. Fearless.",
+  },
+  jaguar: {
+    name: "Jaguar Warriors",
+    sprite: "jaguar",
+    frames: 4,
+    frameW: 112,
+    frameH: 88,
+    hitFrame: 2,
+    kind: "melee",
+    ability:
+      "Jungle Stride — crosses woods as open ground. Pounce — strikes harder from woods, tall grass, scrub or rocks.",
+  },
+  eagle: {
+    name: "Eagle Warriors",
+    sprite: "eagle",
+    frames: 4,
+    frameW: 104,
+    frameH: 88,
+    hitFrame: 1,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 1,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "bolt",
+    ability:
+      "Jungle Stride — crosses woods as open ground. Eagle Eye — its darts ignore cover. Atlatl Darts at 2–3 tiles, and may still move.",
+  },
+  sunpriest: {
+    name: "Sun Priest",
+    sprite: "sunpriest",
+    frames: 4,
+    frameW: 96,
+    frameH: 88,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    ability:
+      "Sun Magic — Sunbeam (a lance of fire on one foe), Dawn (heals friends within 2 tiles), Eclipse (blinds a foe).",
+  },
+  serpent: {
+    name: "Feathered Serpent",
+    sprite: "serpent",
+    frames: 4,
+    frameW: 144,
+    frameH: 104,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotSpell: "ice",
+    ability: "Tailwind — friends beside it move 1 further. Gale at 2–4 tiles, and may still move. Flies.",
   },
 };
 
@@ -767,6 +965,36 @@ export const BONUS_SKILLS = [
     n: "Unyielding",
     icon: "skill_unyielding",
     d: "Living stone: a Priest's Heal does nothing for it and quicksand neither stops nor hurts it. Craftsmen can Repair it like a war engine.",
+  },
+  {
+    flag: "forestWalk",
+    n: "Jungle Stride",
+    icon: "skill_climb",
+    d: "Crosses woods at 1 movement a tile, as if they were open ground.",
+  },
+  {
+    flag: "pounce",
+    n: "Pounce",
+    icon: "skill_first",
+    d: "A blow struck from woods, tall grass, scrub or rocks is 20 stronger on the weapon and armour table.",
+  },
+  {
+    flag: "eagleEye",
+    n: "Eagle Eye",
+    icon: "skill_chain",
+    d: "Its darts ignore the cover of the ground its target stands on: woods, houses, walls and towers protect nobody from them.",
+  },
+  {
+    flag: "sunPriest",
+    n: "Sun Magic",
+    icon: "skill_nullify",
+    d: "Three spells. Sunbeam: a lance of fire at 2 to 7 tiles, 30 stronger than a Fireball's cell, that burns on through the two tiles beyond its target (60% then 35%, friend or foe). Dawn: every friendly unit within 2 tiles mends 15 HP. Eclipse: a foe within 5 tiles is blinded and strikes at half strength until its next turn ends.",
+  },
+  {
+    flag: "tailwind",
+    n: "Tailwind",
+    icon: "skill_charge",
+    d: "Friendly units standing beside it move 1 tile further.",
   },
   {
     flag: "flask",
@@ -933,10 +1161,15 @@ export const BONUS_UPGRADES = [
   { from: "beastmaster", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
   { from: "priests", to: "alchemist", need: "Lore", gate: 5925 }, // Isoluccia 5, The Arsenal
   { from: "sentinel", to: "golem", need: "Armor", gate: 5905 }, // Tilicia 5, The Sleepers Wake
-  { from: "knights", to: "unicorn", need: "Spirit", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
-  { from: "dunesirens", to: "efreet", need: "Lore", gate: 5983 }, // the Mirror Sea 3, The Reaver-King
-  { from: "marines", to: "naga", need: "Beasts", gate: 5981 }, // the Mirror Sea 1, The Line of Hulls
-  { from: "conjurer", to: "skeleton", need: "Spirit", gate: 5903 }, // Tilicia 3, The Sealed Vale
+  // the Beast Master's tree (user decision): its creatures are all made from a Beast Master
+  { from: "beastmaster", to: "unicorn", need: "Lore", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
+  { from: "beastmaster", to: "efreet", need: "Weapons", gate: 5983 }, // the Mirror Sea 3, The Reaver-King
+  { from: "beastmaster", to: "naga", need: "Beasts", gate: 5981 }, // the Mirror Sea 1, The Line of Hulls
+  { from: "beastmaster", to: "skeleton", need: "Armor", gate: 5903 }, // Tilicia 3, The Sealed Vale
+  { from: "pikemen", to: "jaguar", need: "Beasts", gate: 5994 }, // Tezcal 1
+  { from: "archers", to: "eagle", need: "Lore", gate: 5995 }, // Tezcal 2
+  { from: "cavalry", to: "serpent", need: "Spirit", gate: 5996 }, // Tezcal 3
+  { from: "priests", to: "sunpriest", need: "Medal", gate: 5996 }, // Tezcal 3
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
@@ -1040,6 +1273,26 @@ export const BONUS_META = {
     role: "Undead Warrior",
     kit: "⚔ Rusted Sword · 🛡 Shield",
     note: "The dead of old battlefields, raised by a Conjurer. Cheap, fearless, and each one has to be put down twice.",
+  },
+  jaguar: {
+    role: "Jungle Shock Troop",
+    kit: "⚔ Macuahuitl · 🛡 Light Armor & Shield",
+    note: "Warriors of Tezcal in jaguar skins. They run through woods as others run on a road, and strike hardest out of cover.",
+  },
+  eagle: {
+    role: "Jungle Skirmisher",
+    kit: "⚔ Atlatl Dart / Macuahuitl · 🛡 Light Armor",
+    note: "Warriors of Tezcal in eagle feathers. Their darts find a foe behind any cover, they move after they throw, and they fight better up close than any other skirmisher.",
+  },
+  sunpriest: {
+    role: "Priest of the Sun",
+    kit: "⚔ Sunbeam / Obsidian Knife · 🛡 Minor Ward",
+    note: "A high priest of Tezcal, the Wizard's equal with spells of his own: Sunbeam burns one foe, Dawn mends the friends around him, and Eclipse blinds an enemy for a turn.",
+  },
+  serpent: {
+    role: "Winged Serpent",
+    kit: "⚔ Gale / Fangs · 🛡 Feathered Hide",
+    note: "A feathered serpent of the high temples: the horse-archer of the air. It throws a gale and flies on, and friends beside it are carried a tile further.",
   },
 };
 // Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi

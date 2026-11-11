@@ -8,7 +8,8 @@
 //
 // Beyond the duels it fights three BATTLE TYPES with a squad of about 1500 points of the unit: on the open field
 // against a mounted army (cavalry), holding a castle against a storming party with Catapults (castle), and standing
-// behind a rank of Pikemen with Archers behind it while the block advances on a mixed army (line).
+// behind a rank of Pikemen with Archers behind it while the block advances on a mixed army (line). And the UPGRADE
+// rule: six of a unit against six of the unit it is upgraded from, one for one — an upgrade must win (upgrade).
 //
 //   npm run e2e:arena                      every bonus unit and every basket unit
 //   ROS_ARENA_TYPES=castle,line …          only these battle types (open, cavalry, castle, line)
@@ -20,15 +21,15 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { loadEpisode, makeGame, startBattle, only, spawn, step } from "../__tests__/battle.js";
 import { DEPLOY_COST } from "../data/game-data.js";
-import { BONUS_ORDER } from "../data/bonus-units.js";
+import { BONUS_ORDER, BONUS_UPGRADES } from "../data/bonus-units.js";
 import { seedBattle } from "../engine/sim.js";
 import { moveType } from "../rules/terrain.js";
 
 const ON = process.env.ROS_ARENA === "1";
 // which battle types to run: open (the duels), cavalry, castle, line — all of them by default
-const WANTED = (process.env.ROS_ARENA_TYPES || "open,cavalry,castle,line").split(",");
+const WANTED = (process.env.ROS_ARENA_TYPES || "open,cavalry,castle,line,upgrade").split(",");
 const OPEN = WANTED.includes("open"),
-  TYPES = ["cavalry", "castle", "line"].filter((t) => WANTED.includes(t));
+  TYPES = ["cavalry", "castle", "line", "upgrade"].filter((t) => WANTED.includes(t));
 export const BASKET = [
   "footmen",
   "swordsmen",
@@ -193,6 +194,16 @@ const MIXED = [
   ["cavalry", 0.3],
   ["archers", 0.3],
 ];
+// UPGRADE — the rule that an upgrade is worth making: six of the unit against six of the unit it is upgraded from,
+// one for one whatever they cost, from both sides. null for a unit that is nobody's upgrade.
+const BASE_OF = Object.fromEntries(BONUS_UPGRADES.map((u) => [u.to, u.from]));
+function upgradeFight(unit, seed, asBlue) {
+  const base = BASE_OF[unit];
+  if (!base) return null;
+  const [blue, red] = asBlue ? [unit, base] : [base, unit];
+  const r = fight(blue, red, 6, 6, seed);
+  return asBlue ? r.blueLeft - r.redLeft : r.redLeft - r.blueLeft;
+}
 function lineFight(unit, seed) {
   const squad = Array(squadOf(unit)).fill(unit),
     ranks = Math.ceil(squad.length / 6);
@@ -246,13 +257,15 @@ it.skipIf(!ON)("unit arena", async () => {
       cavalry: (seed) => [cavalryFight(unit, seed, true), cavalryFight(unit, seed + 1000, false)],
       castle: (seed) => [castleFight(unit, seed), castleFight(unit, seed + 500)],
       line: (seed) => [lineFight(unit, seed), lineFight(unit, seed + 500)],
+      upgrade: (seed) => [upgradeFight(unit, seed, true), upgradeFight(unit, seed + 1000, false)],
     };
     for (const scenario of TYPES) {
-      const margins = SEEDS.flatMap((seed) => run[scenario](seed));
+      const margins = SEEDS.flatMap((seed) => run[scenario](seed)).filter((m) => m != null);
+      if (!margins.length) continue;
       rows.push({
         scenario,
         unit,
-        foe: scenario,
+        foe: scenario === "upgrade" ? BASE_OF[unit] : scenario,
         margin: margins.reduce((a, b) => a + b, 0) / margins.length,
         wins: margins.filter((m) => m > 0.05).length,
         fights: margins.length,
@@ -267,17 +280,20 @@ it.skipIf(!ON)("unit arena", async () => {
     const of = (scenario) => rows.filter((r) => r.unit === unit && r.scenario === scenario).map((r) => r.margin);
     const mean = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : null);
     const cells = ["open", "cavalry", "castle", "line"].map((scenario) => mean(of(scenario)));
-    return { unit, cells, all: mean(cells.filter((c) => c != null)) };
+    return { unit, cells, all: mean(cells.filter((c) => c != null)), base: BASE_OF[unit], beats: mean(of("upgrade")) };
   });
   const show = (n) => (n == null ? "" : (n > 0 ? "+" : "") + n.toFixed(2));
   writeFileSync(
     out.replace(/\.json$/, "") + ".md",
     [
-      "| Unit | Points | All | Duels | Cavalry | Castle | Spear line |",
-      "|---|---|---|---|---|---|---|",
+      "| Unit | Points | All | Duels | Cavalry | Castle | Spear line | Upgraded from | One for one |",
+      "|---|---|---|---|---|---|---|---|---|",
       ...table
         .sort((a, b) => b.all - a.all)
-        .map((t) => `| ${t.unit} | ${DEPLOY_COST[t.unit]} | ${show(t.all)} | ${t.cells.map(show).join(" | ")} |`),
+        .map(
+          (t) =>
+            `| ${t.unit} | ${DEPLOY_COST[t.unit]} | ${show(t.all)} | ${t.cells.map(show).join(" | ")} | ${t.base || ""} | ${show(t.beats)} |`,
+        ),
     ].join("\n") + "\n",
   );
 });

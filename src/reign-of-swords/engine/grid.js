@@ -271,6 +271,7 @@ export class GridMethods {
     // deep water (type 19), at 2 a tile — the two terrain types no other ground unit may enter.
     const crossed = moveType(this.tileAt(tx, ty));
     if ((crossed === 21 && u.T.climb) || (crossed === 19 && u.T.amphibious)) return 2;
+    if ((crossed === 4 || crossed === 28) && u.T.forestWalk) return 1; // BONUS: Jungle Stride (Jaguar and Eagle Warriors)
     // Movement CATEGORY (real 5010 `al`): 0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 siege. Fall back to a
     // sensible class if a unit somehow lacks it (shifted druid-forms carry their beast's T, which has al set).
     const moveClass =
@@ -434,7 +435,15 @@ export class GridMethods {
   }
   moveOf(u) {
     if (u._held) return 0; // BONUS: held in a Naga's coils
-    const move = u._paceMove || u.T.move || 4;
+    // BONUS: Tailwind — a friendly Feathered Serpent beside it carries it a tile further
+    const wind = this.units.reduce(
+      (best, o) =>
+        !o.dead && o !== u && o.team === u.team && o.T.tailwind && Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) === 1
+          ? Math.max(best, o.T.tailwind)
+          : best,
+      0,
+    );
+    const move = (u._paceMove || u.T.move || 4) + wind;
     return u.slowed ? Math.trunc((move * 3) / 4) : move;
   } // _paceMove: a grouped AI Hero marches at its group's pace (ai/grouplogic.js)   // Ice Field: move × 3 / 4 (Unit::onTick @0x78f5c)
   // Where unit `u` can move this turn: { dist, from, stops } — the cost to each tile, the step it came from (for
@@ -801,6 +810,7 @@ export class GridMethods {
     for (const u of units) {
       if (u.T.shadowStep) u._ambushReady = false;
       if (u._held) u._held = false; // a Naga's hold lasts the one turn
+      if (u._blind) u._blind = false; // …and a Sun Priest's Eclipse
       if (u.dead || !this._canHideUnit(u)) continue;
       this._setHidden(u, !u.attackedTurn && this._canHide(u));
     }

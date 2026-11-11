@@ -38,7 +38,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("twenty units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("twenty-four units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -60,6 +60,10 @@ describe("bonus units: the data", () => {
       "efreet",
       "naga",
       "skeleton",
+      "jaguar",
+      "eagle",
+      "sunpriest",
+      "serpent",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -110,10 +114,14 @@ describe("bonus units: upgrade paths", () => {
       ["beastmaster", "tengu", "Spirit"],
       ["priests", "alchemist", "Lore"],
       ["sentinel", "golem", "Armor"],
-      ["knights", "unicorn", "Spirit"],
-      ["dunesirens", "efreet", "Lore"],
-      ["marines", "naga", "Beasts"],
-      ["conjurer", "skeleton", "Spirit"],
+      ["beastmaster", "unicorn", "Lore"],
+      ["beastmaster", "efreet", "Weapons"],
+      ["beastmaster", "naga", "Beasts"],
+      ["beastmaster", "skeleton", "Armor"],
+      ["pikemen", "jaguar", "Beasts"],
+      ["archers", "eagle", "Lore"],
+      ["cavalry", "serpent", "Spirit"],
+      ["priests", "sunpriest", "Medal"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -405,7 +413,7 @@ describe("the units as retuned", () => {
       spawn(g, "footmen", "red", x, y);
     expect(g.computeReach(sword).stops.has("4,2")).toBe(false); // a walker is boxed in
   });
-  it("Marines: a Boarding Musket at 2–3 from open ground, 2 from rough ground, a Short Sword up close", () => {
+  it("Marines: a Boarding Musket at 2–3 from open ground, 2 from rough ground, a Sword up close", () => {
     const g = startBattle(makeGame(5430)); // Dune with a View: sand, scrub and boulders
     only(g);
     let open = null,
@@ -421,10 +429,11 @@ describe("the units as retuned", () => {
       at2 = spawn(g, "footmen", "red", open[0] + 2, open[1]),
       at3 = spawn(g, "footmen", "red", open[0] + 3, open[1]);
     expect(g._weaponAt(marine, 3)).toBe(39);
-    expect(g._weaponAt(marine, 1)).toBe(8);
+    expect(g._weaponAt(marine, 1)).toBe(5);
     expect(g.targetsFrom(marine, open[0], open[1], false)).toEqual(expect.arrayContaining([at2, at3]));
     expect(g.targetsFrom(marine, open[0], open[1], true)).toEqual([]); // Move or Shoot
-    expect(g.computeDamage(marine, at3)).toBe(
+    // the Musket's row, a rating tier above the Musketeers since the upgrade retune
+    expect(g.computeDamage(marine, at3)).toBeGreaterThan(
       g.computeDamage(spawn(g, "musketeers", "blue", open[0], open[1] + 0), at3),
     );
     // from rough ground the same two foes: only the one 2 away
@@ -773,7 +782,7 @@ describe("Satoshi's second wave: Sohei, Shinobi, Oni, Tengu", () => {
     expect(UNIT_TYPES.tengu.fly && UNIT_TYPES.tengu.al === 0).toBe(true);
   });
   it("each has its price, its upgrade and its Satoshi battle", () => {
-    expect([DEPLOY_COST.sohei, DEPLOY_COST.shinobi, DEPLOY_COST.oni, DEPLOY_COST.tengu]).toEqual([175, 225, 350, 225]);
+    expect([DEPLOY_COST.sohei, DEPLOY_COST.shinobi, DEPLOY_COST.oni, DEPLOY_COST.tengu]).toEqual([175, 225, 350, 325]);
     expect(upgradeGate("sohei", true)).toBe(5961);
     expect(upgradeGate("shinobi", true)).toBe(5962);
     expect(upgradeGate("oni", true)).toBe(5963);
@@ -860,7 +869,7 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
     expect(near._acid).toBeNull();
     expect(UNIT_TYPES.unicorn.fly).toBe(true);
   });
-  it("Burning Aura: an enemy beside an Efreet loses 10 HP as its turn begins; its friends do not", () => {
+  it("Burning Aura: an enemy beside an Efreet loses 20 HP as its turn begins; its friends do not", () => {
     const g = field();
     spawn(g, "efreet", "blue", 10, 10);
     const foe = spawn(g, "footmen", "red", 11, 10),
@@ -868,7 +877,7 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
       friend = spawn(g, "footmen", "blue", 10, 11);
     g.healOnKeeps("red");
     g.healOnKeeps("blue");
-    expect([foe.hp, farFoe.hp, friend.hp]).toEqual([90, 100, 100]);
+    expect([foe.hp, farFoe.hp, friend.hp]).toEqual([80, 100, 100]);
   });
   it("Constrict: the foe a Naga strikes cannot move on its next turn, and is free again after it", () => {
     const g = field();
@@ -882,19 +891,19 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
     expect(g.moveOf(foe)).toBe(4);
     expect(UNIT_TYPES.naga.amphibious).toBe(true);
   });
-  it("Rise Again: a Skeleton struck down gets up once with 40 HP, and stays down the second time", () => {
+  it("Rise Again: a Skeleton struck down gets up once at full strength, and stays down the second time", () => {
     const g = field();
     const skeleton = spawn(g, "skeleton", "blue", 10, 10),
       foe = spawn(g, "knights", "red", 11, 10);
     g._applyHit(skeleton, foe, 150, false);
-    expect([skeleton.dead, skeleton.hp]).toEqual([false, 40]);
+    expect([skeleton.dead, skeleton.hp]).toEqual([false, 100]);
     g._applyHit(skeleton, foe, 150, false);
     expect(skeleton.dead).toBe(true);
   });
   it("each has its price, its upgrade and the battle that opens it", () => {
     const cost = (k) => DEPLOY_COST[k];
     expect(["alchemist", "golem", "unicorn", "efreet", "naga", "skeleton"].map(cost)).toEqual([
-      250, 400, 275, 300, 150, 100,
+      250, 400, 275, 350, 300, 500,
     ]);
     for (const [unit, gate] of [
       ["alchemist", 5925],
@@ -927,5 +936,115 @@ describe("Stone Sentinel and Golem: Bulwark", () => {
     expect(UNIT_TYPES.sentinel.lastStrike).toBe(false); // it no longer strikes last
     expect(UNIT_TYPES.golem.bulwark).toBe(true);
     expect(DEPLOY_COST.sentinel).toBe(300);
+  });
+});
+
+describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathered Serpent", () => {
+  const field = () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    return g;
+  };
+  const woods = (g) => {
+    for (let y = 0; y < g.rows; y++)
+      for (let x = 1; x < g.cols - 1; x++)
+        if ([4, 28].includes(moveType(g.tileAt(x, y))) && ![3, 4, 22, 27, 28].includes(moveType(g.tileAt(x + 1, y))))
+          return [x, y];
+    return null;
+  };
+  it("Jungle Stride: Jaguar and Eagle Warriors cross woods at 1 a tile; Pounce strikes harder from cover", () => {
+    const g = startBattle(makeGame(5961)); // The Paddy Road: woods beside the road
+    only(g);
+    const spot = woods(g);
+    expect(spot).toBeTruthy();
+    const [x, y] = spot;
+    const jaguar = spawn(g, "jaguar", "blue", x, y),
+      eagle = spawn(g, "eagle", "blue", 0, 0),
+      footmen = spawn(g, "footmen", "blue", 1, 0);
+    expect(g.moveCost(jaguar, x, y)).toBe(1);
+    expect(g.moveCost(eagle, x, y)).toBe(1);
+    expect(g.moveCost(footmen, x, y)).toBeGreaterThan(1);
+    const foe = spawn(g, "footmen", "red", x + 1, y);
+    const fromWoods = g.computeDamage(jaguar, foe);
+    Object.assign(jaguar, { tx: x + 2, ty: y }); // the same foe from the far side
+    if (![3, 4, 22, 27, 28].includes(moveType(g.tileAt(x + 2, y))))
+      expect(fromWoods).toBeGreaterThan(g.computeDamage(jaguar, foe));
+    expect(UNIT_TYPES.jaguar.pounce).toBe(20);
+    expect(UNIT_TYPES.jaguar.forestWalk && UNIT_TYPES.eagle.forestWalk).toBe(true);
+  });
+  it("Eagle Eye: an Eagle Warrior's dart ignores its target's cover; a Cragsman's javelin does not", () => {
+    const g = startBattle(makeGame(5941)); // a ship: the bulwark is cover
+    only(g);
+    const onWall = spawn(g, "footmen", "red", 8, 2),
+      onDeck = spawn(g, "footmen", "red", 10, 4);
+    const eagle = spawn(g, "eagle", "blue", 8, 4),
+      crag = spawn(g, "cragsmen", "blue", 6, 4);
+    const move = (u, tx, ty) => Object.assign(u, { tx, ty });
+    const covered = g.computeDamage(eagle, onWall);
+    move(eagle, 10, 2);
+    expect(covered).toBe(g.computeDamage(eagle, onDeck));
+    move(crag, 8, 4);
+    move(eagle, 0, 0);
+    const cragCovered = g.computeDamage(crag, onWall);
+    move(crag, 10, 2);
+    expect(cragCovered).toBeLessThan(g.computeDamage(crag, onDeck));
+    expect(g._weaponAt(eagle, 1)).toBe(59); // a Macuahuitl up close, where the Cragsman has a Spear
+  });
+  it("Sun Priest: Sunbeam burns on in a line; Dawn mends friends within 2 tiles; Eclipse halves a foe's blows", () => {
+    const g = field();
+    const priest = spawn(g, "sunpriest", "blue", 5, 10),
+      target = spawn(g, "footmen", "red", 9, 10),
+      behind = spawn(g, "footmen", "red", 10, 10),
+      beside = spawn(g, "footmen", "red", 9, 11);
+    expect(g._weaponAt(priest, 4)).toBe(61);
+    expect(g.computeDamage(priest, target)).toBeGreaterThan(g.computeDamage(priest, target, { weapon: 25 }));
+    g.resolveDamage(priest, target, {});
+    expect(target.hp).toBeLessThan(100);
+    expect(behind.hp).toBeLessThan(100); // the beam goes on
+    expect(beside.hp).toBe(100); // no burst
+    const skills = g._abilitySkills(priest).map((s) => s.id);
+    expect(skills).toEqual(expect.arrayContaining(["dawn", "eclipse"]));
+    const near = spawn(g, "footmen", "blue", 5, 12),
+      far = spawn(g, "footmen", "blue", 5, 14);
+    near.hp = 50;
+    far.hp = 50;
+    priest.hp = 60;
+    g._dawn(priest);
+    expect([near.hp, far.hp, priest.hp]).toEqual([65, 50, 75]);
+    const knight = spawn(g, "knights", "red", 7, 10),
+      victim = spawn(g, "footmen", "blue", 7, 11);
+    const full = g.computeDamage(knight, victim);
+    g._eclipse(knight);
+    expect(g.computeDamage(knight, victim)).toBeLessThanOrEqual(Math.ceil(full / 2));
+    g._endTurnHide([knight]);
+    expect(g.computeDamage(knight, victim)).toBe(full);
+    expect(DEPLOY_ELITE.sunpriest).toBe(true);
+  });
+  it("Feathered Serpent: a flier that shoots and moves; Tailwind carries the friends beside it a tile further", () => {
+    const g = field();
+    spawn(g, "serpent", "blue", 10, 10);
+    const beside = spawn(g, "footmen", "blue", 11, 10),
+      apart = spawn(g, "footmen", "blue", 14, 10);
+    expect(g.moveOf(beside)).toBe(g.moveOf(apart) + 1);
+    const T = UNIT_TYPES.serpent;
+    expect(T.fly && T.al === 0 && T.shootMove).toBe(true);
+    expect([T.minRange, T.range]).toEqual([1, 4]);
+  });
+  it("the Beast Master's tree: Tengu, Unicorn, Efreet, Naga and Skeletons are all made from a Beast Master", () => {
+    const tree = BONUS_UPGRADES.filter((u) => u.from === "beastmaster").map((u) => [u.to, u.need]);
+    expect(tree).toEqual([
+      ["tengu", "Spirit"],
+      ["unicorn", "Lore"],
+      ["efreet", "Weapons"],
+      ["naga", "Beasts"],
+      ["skeleton", "Armor"],
+    ]);
+    for (const [to] of tree) expect(UPGRADE_FROM[to].from).toBe("beastmaster");
+    const cost = (k) => DEPLOY_COST[k];
+    expect(["jaguar", "eagle", "sunpriest", "serpent"].map(cost)).toEqual([150, 175, 400, 300]);
+    expect(upgradeGate("jaguar", true)).toBe(5994);
+    expect(upgradeGate("eagle", true)).toBe(5995);
+    expect(upgradeGate("serpent", true)).toBe(5996);
+    expect(upgradeGate("sunpriest", true)).toBe(5996);
   });
 });

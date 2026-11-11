@@ -13,7 +13,7 @@
     grid-template-rows: auto minmax(0, 1fr) auto;
     column-gap: 12px;
     max-width: none;
-    height: calc(100dvh - 44px); /* the window, less the episode switch above */
+    height: calc(100dvh - 44px); /* the window, less the page's top band (app.css .game-screen) */
     margin-top: 8px;
     padding: 12px;
     box-sizing: border-box;

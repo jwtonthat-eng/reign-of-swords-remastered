@@ -25,7 +25,8 @@ ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
 ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
 SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg",
           "beasts": "beastmaster-hounds-sheet.jpg", "satoshi": "satoshi-units-sheet.jpg",
-          "alchemy": "alchemy-units-sheet.jpg", "mythic": "mythic-units-sheet.jpg"}  # a unit's "sheet" (default first)
+          "alchemy": "alchemy-units-sheet.jpg", "mythic": "mythic-units-sheet.jpg",
+          "aztec": "aztec-units-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -200,6 +201,39 @@ UNITS = {
         "rows": (1075, 1315),
         "cells": [(20, 153), (187, 320), (403, 539), (568, 713), (802, 947), (974, 1209), (1256, 1429)],
         "stand": 0, "walk": [1, 4, 1, 4], "attack": [0, 4, 5, 4], "height": 62, "team": False,
+    },
+    # The Aztec sheet (Jaguar Warrior, Eagle Warrior, Sun Priest, Feathered Serpent). The Eagle Warrior's two throwing
+    # poses are drawn with their darts in flight beside them ("solo" keeps the figure only).
+    "jaguar": {
+        "sheet": "aztec",
+        "rows": (75, 332),
+        "cells": [(13, 189), (211, 378), (419, 587), (613, 873), (886, 1205), (1240, 1487), (1521, 1685)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [0, 6, 4, 5], "height": 66, "team": False,
+        "frame": (112, 88),
+    },
+    "eagle": {
+        "sheet": "aztec",
+        "rows": (429, 662),
+        "cells": [(28, 185), (219, 375), (417, 598), (612, 803), (833, 1075), (1160, 1370), (1509, 1688)],
+        "solo": [4, 5],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 1], "height": 70, "team": False,
+        "frame": (104, 88),
+    },
+    "sunpriest": {
+        "sheet": "aztec",
+        "rows": (745, 995),
+        "cells": [(45, 216), (234, 385), (451, 617), (632, 805), (877, 1069), (1072, 1265), (1504, 1656)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 1], "height": 74, "team": False,
+        "frame": (96, 88),
+    },
+    # strip: hover, hover, the gale, hover (no walk sheet: it glides, like the Dragon Rider)
+    "serpent": {
+        "sheet": "aztec",
+        "boxes": [(11, 1072, 218, 1335), (224, 1072, 432, 1335), (464, 1072, 905, 1335), (938, 1072, 1389, 1335),
+                  (1435, 1072, 1666, 1335)],
+        "anchors": [115, 330, 690, 1090, 1550],
+        "stand": 0, "walk": None, "attack": [0, 1, 3, 1], "height": 72, "team": False,
+        "frame": (144, 104), "lift": 0,
     },
 }
 

@@ -61,6 +61,10 @@ SPEAKERS = {
     # the Mirror Sea (the northern one)
     "skarl": ("Reaver-King Skarl", "foe", "face069"),
     "skarl_hurt": ("Reaver-King Skarl", "foe", "face071"),
+    # Tezcal
+    "itzcal": ("Sun-Speaker Itzcal", "foe", "face064"),
+    "itzcal_hurt": ("Sun-Speaker Itzcal", "foe", "face065"),
+    "cuali": ("Eagle Captain Cuali", "you", "face075"),
 }
 
 
@@ -247,10 +251,10 @@ OP_SPAWN, OP_SCREEN, OP_CAMERA, OP_COUNTER, OP_SETFLAG = 0, 1, 2, 9, 10
 MOVE_CLASS = {
     "cavalry": 3, "knights": 3, "king": 3, "raiders": 3, "horsebowmen": 3,
     "catapult": 4, "trebuchet": 4, "cannon": 4, "ballistae": 4,
-    "griffon": 0, "dragonrider": 0, "tengu": 0, "imp": 0, "unicorn": 0, "efreet": 0, "hounds": 1,
+    "griffon": 0, "dragonrider": 0, "tengu": 0, "imp": 0, "unicorn": 0, "efreet": 0, "serpent": 0, "hounds": 1,
     "footmen": 2, "swordsmen": 2, "greatswordsmen": 2, "pikemen": 2, "halberdiers": 2, "crossbowmen": 2,
     "musketeers": 2, "conjurer": 2, "bodyguard": 2, "bloodgorgers": 2,
-    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "sohei": 2, "oni": 2, "alchemist": 2, "golem": 2, "skeleton": 2, "beastmaster": 2,
+    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "sohei": 2, "oni": 2, "alchemist": 2, "golem": 2, "skeleton": 2, "sunpriest": 2, "beastmaster": 2,
 }
 CROSSES = {"cragsmen": 21, "marines": 19, "naga": 19}  # Climb / Amphibious
 
@@ -636,8 +640,11 @@ def main():
     import mare_nostra
     import mirror_sea
     import satoshi
+    import tezcal
 
-    data = build([tilicia.KINGDOM, isoluccia.KINGDOM, mare_nostra.KINGDOM, satoshi.KINGDOM, mirror_sea.KINGDOM])
+    data = build(
+        [tilicia.KINGDOM, isoluccia.KINGDOM, mare_nostra.KINGDOM, satoshi.KINGDOM, mirror_sea.KINGDOM, tezcal.KINGDOM]
+    )
     stats = ", ".join("%d %s" % (sum(1 for l in data["levels"] if l["group"] == g), g) for g in ("story", "siege"))
     if "--check" in sys.argv:
         print("ok:", stats)

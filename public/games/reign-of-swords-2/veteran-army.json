@@ -50,7 +50,11 @@
   "unicorn": 8,
   "efreet": 8,
   "naga": 8,
-  "skeleton": 8
+  "skeleton": 8,
+  "jaguar": 8,
+  "eagle": 8,
+  "sunpriest": 8,
+  "serpent": 8
  },
  "spoils": {
   "Medal": 8,

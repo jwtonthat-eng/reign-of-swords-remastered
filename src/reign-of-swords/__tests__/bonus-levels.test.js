@@ -9,11 +9,11 @@ const mine = (g) => g.units.filter((u) => !u.dead && u.team === "blue" && !u.all
 const foes = (g) => g.units.filter((u) => !u.dead && u.team === "red");
 
 describe("bonus campaigns: loading", () => {
-  it("adds 33 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
+  it("adds 38 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
     const maps = missionList();
     const bonus = maps.filter((m) => m.mapId >= 5900 && m.mapId < 6000);
-    expect(bonus.filter((m) => m.group === "story").length).toBe(21); // 6 + 6 + 3 + 3 + 3
-    expect(bonus.filter((m) => m.group === "siege").length).toBe(12); // 3 + 3 + 2 + 2 + 2
+    expect(bonus.filter((m) => m.group === "story").length).toBe(24); // 6 + 6 + 3 + 3 + 3 + 3
+    expect(bonus.filter((m) => m.group === "siege").length).toBe(14); // 3 + 3 + 2 + 2 + 2 + 2
     expect(maps.some((m) => m.mapId === 5432)).toBe(true);
   });
 });
@@ -226,6 +226,54 @@ describe("Mare Nostra, Satoshi and the Mirror Sea: scripted endings", () => {
     const g = startBattle(makeGame(5971), "auto");
     const shrine = tag(g, 6)[0];
     reach(g, mine(g)[0], shrine.a);
+    expect(g.phase).toBe("victory");
+  });
+});
+
+describe("Tezcal: jungle battles and their scripted endings", () => {
+  it("The Green Road is an ambush: Jaguar Warriors stand in the woods, and more come out behind you on round 3", () => {
+    const g = startBattle(makeGame(5994), "auto");
+    const jaguars = () => foes(g).filter((u) => u.type === "jaguar");
+    expect(jaguars().length).toBeGreaterThanOrEqual(8);
+    const before = g.units.filter((u) => u.type === "jaguar").length;
+    for (let i = 0; i < 2 && g.phase === "player"; i++) nextRound(g);
+    expect(g.turn).toBe(3);
+    expect(g.units.filter((u) => u.type === "jaguar").length).toBe(before + 4);
+    expect(g.units.some((u) => u.wave && u.type === "jaguar" && u.ty > 18)).toBe(true); // south of your muster
+  });
+  it("The Serpent Ford puts Eagle Warriors in the trees over the fords and Feathered Serpents in the air", () => {
+    const g = startBattle(makeGame(5995), "auto");
+    const eagles = foes(g).filter((u) => u.type === "eagle");
+    expect(eagles.length).toBe(4);
+    expect(eagles.every((u) => g.terrainAt(u.tx, u.ty).defBonus > 0)).toBe(true); // in the woods
+    expect(foes(g).filter((u) => u.type === "serpent").length).toBe(2);
+  });
+  it("The Temple of the Sun ends when Sun-Speaker Itzcal falls, with Cuali's eagles on your side", () => {
+    const g = startBattle(makeGame(5996), "auto");
+    const priests = foes(g).filter((u) => u.type === "sunpriest");
+    expect(priests.length).toBe(2); // the Speaker and one priest of his guard
+    const itzcal = priests.find((u) => u.tx === 11 && u.ty === 4); // on the altar stone
+    expect(itzcal).toBeTruthy();
+    expect(g.units.some((u) => u.ally && u.type === "eagle")).toBe(true);
+    fell(
+      g,
+      priests.find((u) => u !== itzcal),
+    );
+    expect(g.phase).not.toBe("victory"); // the guard priest is not the keystone
+    fell(g, itzcal);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Night Hunt is held until round 9", () => {
+    const g = startBattle(makeGame(5997), "auto");
+    holdUntil(g, 9);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Sun Treasury is won by standing on the vault", () => {
+    const g = startBattle(makeGame(5998), "auto");
+    const u = mine(g)[0];
+    put(g, u, 10, 2);
+    g.scenario.onTileReached(u);
+    step(g, 5);
     expect(g.phase).toBe("victory");
   });
 });

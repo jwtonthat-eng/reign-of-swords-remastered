@@ -320,6 +320,11 @@ export default {
   "Main Menu": "Главное меню",
   "Episode II": "Эпизод II",
   "Army transfer": "Перенос армии",
+  // the site offers Episode II only: its Settings keep the export alone (ui/shell/SettingsPanel.jsx)
+  "Army file": "Файл армии",
+  "Army saved to a file.": "Армия сохранена в файл.",
+  "Save your army and collectibles to a file: Resume Episode II, below, reads it back in.":
+    "Сохраните армию и трофеи в файл: пункт «Продолжить Эпизод II» ниже загрузит его обратно.",
   "Export army": "Экспорт армии",
   "Import from {ep}": "Импорт из: {ep}",
   "Army saved to a file — import it in {ep}'s Settings.":

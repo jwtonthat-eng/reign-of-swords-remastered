@@ -167,6 +167,10 @@ const RANK = {
   efreet: 5,
   naga: 3,
   skeleton: 2,
+  jaguar: 3,
+  eagle: 5,
+  sunpriest: 7,
+  serpent: 5,
 };
 const slotRank = (u) => (RANK[u.type] != null ? RANK[u.type] : -1);
 // Row width for one rank category (the C.119 map: ranks 0–6 → category 0, ranks 7–8 → category 1): five exactly →

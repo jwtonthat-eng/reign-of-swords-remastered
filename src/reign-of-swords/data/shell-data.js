@@ -95,6 +95,7 @@ export const KINGDOM_POS_EP2 = {
   "mare-nostra": { left: "57%", top: "72%" }, // in Mare Nostra, by its sea serpent
   "mirror-sea": { left: "80%", top: "31%" }, // on the northern sea the map names, under its label
   satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
+  tezcal: { left: "93%", top: "27%" }, // the land east of the Mirror Sea's shore, between Satoshi and Tilicia
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -597,6 +598,7 @@ export const ARMY_GROUPS = [
       "golem",
       "naga",
       "skeleton",
+      "jaguar",
     ],
   },
   {
@@ -625,6 +627,7 @@ export const ARMY_GROUPS = [
       "battlemage",
       "beastmaster",
       "alchemist",
+      "sunpriest",
     ],
   },
   {
@@ -637,7 +640,7 @@ export const ARMY_GROUPS = [
     id: "fly",
     label: "Flyers",
     icon: "class_fly",
-    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet"],
+    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet", "serpent"],
   },
 ];
 export const ORDER = [
@@ -1365,10 +1368,14 @@ export const TREE_COL = {
   tengu: 2,
   alchemist: 3,
   golem: 4,
-  unicorn: 4,
-  efreet: 3,
-  naga: 3,
-  skeleton: 3,
+  unicorn: 2,
+  efreet: 2,
+  naga: 2,
+  skeleton: 2,
+  jaguar: 4,
+  eagle: 2,
+  sunpriest: 3,
+  serpent: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1415,10 +1422,14 @@ export const TREE_ROW = {
   tengu: 16,
   alchemist: 16,
   golem: 5,
-  unicorn: 6,
-  efreet: 17,
-  naga: 18,
-  skeleton: 19,
+  unicorn: 18,
+  efreet: 19,
+  naga: 20,
+  skeleton: 21,
+  jaguar: 7,
+  eagle: 17,
+  sunpriest: 20,
+  serpent: 21,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

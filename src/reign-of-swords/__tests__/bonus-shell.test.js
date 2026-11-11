@@ -26,15 +26,23 @@ const idx = (id) => camp.kingdoms.findIndex((k) => k.id === id);
 const storyOf = (id) => camp.kingdoms[idx(id)].missions.map((m) => m.mapId);
 
 describe("bonus kingdoms on the campaign map", () => {
-  it("are five extra regions with their story battles and raids, each with a place on the Episode II map", () => {
-    expect(bonus.kingdoms.map((k) => k.id)).toEqual(["tilicia", "isoluccia", "mare-nostra", "satoshi", "mirror-sea"]);
+  it("are six extra regions with their story battles and raids, each with a place on the Episode II map", () => {
+    expect(bonus.kingdoms.map((k) => k.id)).toEqual([
+      "tilicia",
+      "isoluccia",
+      "mare-nostra",
+      "satoshi",
+      "mirror-sea",
+      "tezcal",
+    ]);
     expect(bonus.kingdoms.map((k) => k.name).slice(2)).toEqual([
       "Mare Nostra",
       "The Isles of Satoshi",
       "The Mirror Sea",
+      "The Jungles of Tezcal",
     ]);
     for (const kingdom of bonus.kingdoms) {
-      const small = ["mare-nostra", "satoshi", "mirror-sea"].includes(kingdom.id); // 3 battles and 2 raids each
+      const small = ["mare-nostra", "satoshi", "mirror-sea", "tezcal"].includes(kingdom.id); // 3 battles and 2 raids each
       expect(kingdom.bonus).toBe(true);
       expect(kingdom.missions.length).toBe(small ? 3 : 6);
       expect(kingdomRaids(levels, kingdom).length).toBe(small ? 2 : 3);
@@ -66,6 +74,10 @@ describe("bonus kingdoms on the campaign map", () => {
     const seaDone = new Set([...isolucciaDone, ...storyOf("mare-nostra")]);
     expect(kingdomUnlocked(camp, idx("satoshi"), seaDone)).toBe(true);
     expect(kingdomUnlocked(camp, idx("mirror-sea"), seaDone)).toBe(true);
+    // …and Tezcal after the Mirror Sea
+    expect(kingdomUnlocked(camp, idx("tezcal"), seaDone)).toBe(false);
+    const mirrorDone = new Set([...seaDone, ...storyOf("mirror-sea")]);
+    expect(kingdomUnlocked(camp, idx("tezcal"), mirrorDone)).toBe(true);
   });
   it("their raids open as the story advances, like the Eastern Kingdoms' (raid n after story battle n + 1)", () => {
     const done = progressBefore(original, levels, -1);
@@ -86,6 +98,9 @@ describe("bonus kingdoms on the campaign map", () => {
       [5942, "gladiator"],
       [5962, "samurai"],
       [5943, "dragonrider"],
+      [5994, "jaguar"],
+      [5995, "eagle"],
+      [5996, "serpent"],
     ]) {
       expect(gives(mapId)).toContain(unit);
       expect(unlocksOf(mapId, true)).toContain(unit);
@@ -117,7 +132,7 @@ describe("Resume Episode II (⚙ Settings)", () => {
     for (const k of [...ALL_TYPES, ...EP2_ORDER, ...BONUS_ORDER].filter((u) => u !== "sapper" && u !== "bodyguard"))
       expect(got.units[k], k).toBe(8);
     expect(got.units.sapper).toBeUndefined();
-    expect(Object.keys(got.units).length).toBe(48);
+    expect(Object.keys(got.units).length).toBe(52);
     expect(got.spoils).toEqual({ Medal: 8, Armor: 8, Weapons: 8, Beasts: 8, Spirit: 8, Lore: 8 });
   });
   it("…and resuming with it marks every battle of every campaign won, the bonus ones included", () => {
