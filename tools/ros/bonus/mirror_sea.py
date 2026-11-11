@@ -18,7 +18,7 @@ LEVELS.append(
         "name": "Grapples Away",
         "objective": "Board the picket ship and its cutter. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 2500,
+        "budget": 2750,
         "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -92,7 +92,7 @@ LEVELS.append(
         "name": "The Lashed Convoy",
         "objective": "Take the three lashed hulls of the convoy. Eliminate all enemies.",
         "turn_limit": 36,
-        "budget": 3500,
+        "budget": 4000,
         "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -380,7 +380,7 @@ LEVELS.append(
         "name": "Prize Convoy",
         "objective": "Take both prize hulls. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3500,
+        "budget": 4250,
         "sides": {"P": ARMY, "E": FLEET},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

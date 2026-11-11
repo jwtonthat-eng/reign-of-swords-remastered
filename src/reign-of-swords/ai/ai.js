@@ -1370,6 +1370,17 @@ export class AiMethods {
     this.game._emit();
   }
   _aiActDone(attacker, onDone) {
+    // BONUS — the Dragon Rider has a lance blow and a breath each turn (targetsFrom leaves out the one it has spent):
+    // under the computer it follows one with the other, on the foe it hurts most.
+    if (!attacker.dead && attacker.T.twinAttack) {
+      const foes = this.game.targetsFrom(attacker, attacker.tx, attacker.ty);
+      if (foes.length) {
+        const worth = (foe) => this.game.estimateDamage(attacker, foe) || 0;
+        const foe = foes.reduce((best, next) => (worth(next) > worth(best) ? next : best));
+        this._doAttackAICore(attacker, foe, false, onDone);
+        return;
+      }
+    }
     // The dwell only starts once the settle gate (engine/loop) sees every bolt/FX/shot resolved — then hold a beat so
     // the damage number is read before the camera moves to the next unit.
     if (onDone) {
@@ -1381,6 +1392,9 @@ export class AiMethods {
     }
   }
   _doAttackAICore(attacker, defender, noCounter, onDone) {
+    if (attacker.T.twinAttack)
+      attacker[Math.abs(attacker.tx - defender.tx) + Math.abs(attacker.ty - defender.ty) === 1 ? "_lanced" : "_fired"] =
+        this.game.turn;
     attacker.face = Math.sign(defender.tx - attacker.tx) || 1;
     this.game.anim = {
       type: "attack",

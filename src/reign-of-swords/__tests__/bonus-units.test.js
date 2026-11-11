@@ -530,3 +530,37 @@ describe("Dragon Riders", () => {
     expect(mine.some((u) => u.dead || u.hp < 60)).toBe(true);
   });
 });
+
+describe("after the arena: the computer's Dragon Rider, and ship bulwarks", () => {
+  it("the computer's Dragon Rider follows its lance blow with its breath in the same turn", () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    const gi = g.mission.groupOrder.find((x) => x.side === "enemy").gi;
+    const dragon = spawn(g, "dragonrider", "red", 12, 12, { group: gi });
+    const near = spawn(g, "footmen", "blue", 12, 13),
+      far = spawn(g, "footmen", "blue", 12, 8);
+    nextRound(g);
+    expect(dragon._lanced).toBe(1);
+    expect(dragon._fired).toBe(1);
+    expect(near.hp + far.hp).toBeLessThan(190);
+    expect(near.hp < 100 || near.dead).toBe(true);
+    expect(far.hp < 100 || far.dead).toBe(true);
+  });
+  it("a ship's deck is edged with a wooden bulwark that foot man, horse cannot, and Marines board from the sea", () => {
+    const g = startBattle(makeGame(5941));
+    only(g);
+    const type = (x, y) => moveType(g.tileAt(x, y));
+    // Grapples Away: the big hull's north rail is row 2 (x 6–15); the gangplank at (8, 7) stays open deck
+    expect(type(8, 2)).toBe(14);
+    expect(type(8, 3)).toBe(18);
+    expect(type(8, 7)).toBe(18);
+    const foot = spawn(g, "footmen", "blue", 8, 3),
+      horse = spawn(g, "cavalry", "blue", 9, 3),
+      marines = spawn(g, "marines", "blue", 8, 1);
+    expect(type(8, 1)).toBe(19);
+    expect(g.moveCost(foot, 8, 2, 8, 3)).toBe(1);
+    expect(g.moveCost(horse, 9, 2, 9, 3)).toBe(99);
+    expect(g.moveCost(marines, 8, 2, 8, 1)).toBe(1);
+    expect(g.moveCost(foot, 8, 2, 8, 1)).toBe(99); // nobody else comes over the side
+  });
+});

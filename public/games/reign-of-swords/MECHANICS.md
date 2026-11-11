@@ -648,13 +648,13 @@ kept apart from the original data so that everything else stays checkable agains
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
   |---|---|---|---|---|---|---|
-  | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 150 | Climb, Shoot and Move |
+  | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 175 | Climb, Shoot and Move |
   | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Mending Runes, Formation |
-  | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 350 | Unyielding, Fear, Fearless, Last Strike |
+  | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 250 | Unyielding, Fear, Fearless, Last Strike |
   | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Short Sword | Light & Shield | 2 | 125 | Amphibious, Move or Shoot |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
-  | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
-  | Gladiators | 4, skirmish | Gladius (Sword) | Light & Shield | 3 | 200 | Whirl |
+  | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 3 | 750, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
+  | Gladiators | 4, skirmish | Gladius (Sword) | Light & Shield | 3 | 150 | Whirl |
   | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 250 | Lesser Shroud, Pike Wall |
   | Dragon Riders | 8, flying | Dragonfire 2-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Fire and Lance, First Strike, Fear, Charge |
 
@@ -668,7 +668,7 @@ kept apart from the original data so that everything else stays checkable agains
   target (60% then 35%, friend or foe, structures too) along the line the Ballistae's bolt would take. *Fire and
   Lance*: each turn the Dragon Rider has one breath, one lance blow and its move, in any order. A tap on a foe it can
   reach flies in and strikes with the lance (a charge when the lane allows); the Dragonfire button breathes instead.
-  The computer treats it as a melee unit, so it closes in, and makes one attack a turn. The Battlemage's Teleport is the Wizard's. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
+  The computer treats it as a melee unit, so it closes in, and follows one attack with the other when a foe is in reach of it. The Battlemage's Teleport is the Wizard's. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
   attack from a deep-water tile. *Nullify*: a unit within 2 tiles (Manhattan) of a living Spellwarden of its side
   takes 0 from enemy Fireball, Lightning Storm, Ice Field and Chain Lightning, is not slowed by an enemy Ice Field,
   ignores an enemy Spirit Shroud and is not stopped or hurt by quicksand. *Unyielding*: no Heal from a Priest, immune
@@ -684,7 +684,16 @@ kept apart from the original data so that everything else stays checkable agains
   Halberdiers to Gladiators (Weapons, The Lashed Convoy), Swordsmen to Samurai (Spirit, Ishiro's Hill), Griffon
   Riders to Dragon Riders (Medal, The Admiral's Deck).
 - **Ships.** The Mirror Sea's battles are fought on hulls lashed together. There is no ship art: a hull is the
-  Episode II paving tiles laid on open sea, the obelisk as a mast and the house as a cabin, joined by gangplanks.
+  Episode II paving tiles laid on open sea, the obelisk as a mast and the house as a cabin, joined by gangplanks. Where a deck meets the sea it carries a
+  wooden bulwark (the sand set's timber wall, by user decision): troops man it from the deck and are covered there
+  as on any rampart, horse and war engines keep to the planking, and Marines climb it straight out of the water
+  (Amphibious waives the wall-walk step rule). Gangplanks and the stem stay open deck.
+- **Unit arena and stress run** (`npm run e2e:arena`, `npm run e2e:stress`). Balance tools, not game content: the
+  arena fights equal-points squads of each unit against a basket of fourteen original units on an emptied Open
+  Field, from both sides and over several dice seeds, and scores the share of points left; the stress run plays the
+  bonus battles at random with the player's army swapped for the nine bonus units, under the fuzzer's invariants.
+  The bonus units' costs and the Battlemage's rating were set from the arena so that each scores near the original
+  unit it sits beside (Battlemage and Dragon Rider near the Hero).
 - **Resume Episode II** (Settings, Episode II only). *From an army file*: reads an Episode II army file back in
   without the transfer limits, marks every original Episode II battle and raid won, and replaces the army and
   collectibles with the file's. *With the veteran army* (for testing): marks every battle of every campaign won, the

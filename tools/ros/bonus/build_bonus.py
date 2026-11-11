@@ -119,6 +119,7 @@ THEMES = {
         # SHIPS (the Mirror Sea): there is no ship art, so a hull is laid in the paving tiles on open water —
         # "b" plain deck, "m" a mast (the obelisk on its paved plinth), "c" a cabin (the house on paving: it
         # heals and gives cover, like any house). The sea keeps its open-water tiles beside them.
+        "hull": [191, 197, 188, 194],  # the bulwark with the sea to the north, east, south, west of it
         "mast": [250],
         "cabin": [249],
     },
@@ -190,7 +191,15 @@ def compile_terrain(theme_name, grid, seed):
                 out.append(pick("road"))
             elif ch == "b":
                 if theme_name != "green":
-                    out.append(pick("road"))  # the sand set has no bridge: a paved causeway
+                    # The sand set has no bridge: a paved causeway. A SHIP's deck gets a wooden bulwark where it meets
+                    # the sea (the sand set's timber wall — a rampart: troops man it from the deck and are covered
+                    # there, horse and engines keep to the planking). A deck with water on both sides is a boarding
+                    # plank or the stem, and stays open.
+                    sea = [(at(x + dx, y + dy) or "~") in "~-" for dx, dy in DIRS]  # N E S W
+                    if "hull" not in theme or not any(sea) or (sea[0] and sea[2]) or (sea[1] and sea[3]):
+                        out.append(pick("road"))
+                    else:
+                        out.append(theme["hull"][sea.index(True)])
                 elif (at(x - 1, y) or " ") in "~-" or (at(x + 1, y) or " ") in "~-":
                     # water to the east or west: a deck carrying a north-south road (71 its first tile, then 117)
                     out.append(117 if at(x, y - 1) == "b" else 71)

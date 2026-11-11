@@ -17,7 +17,9 @@
     "coverage": "vitest run --coverage",
     "lint": "eslint src/reign-of-swords",
     "format": "prettier --write \"src/reign-of-swords/**/*.{js,jsx}\"",
-    "e2e:maps": "node tools/ros/e2e-maps.mjs"
+    "e2e:maps": "node tools/ros/e2e-maps.mjs",
+    "e2e:arena": "ROS_ARENA=1 vitest run --config vitest.e2e.config.js arena",
+    "e2e:stress": "ROS_STRESS=1 vitest run --config vitest.e2e.config.js bonus-stress"
   },
   "dependencies": {
     "react": "^19.2.8",

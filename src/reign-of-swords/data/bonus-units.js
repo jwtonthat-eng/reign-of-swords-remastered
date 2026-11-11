@@ -161,8 +161,8 @@ export const BONUS_COMBAT = {
     weapon: 36,
     weapon2: 6,
     armour: 15,
-    rating: 4,
-    rf: 100,
+    rating: 3,
+    rf: 90,
     abilities: [1, 11, 14, 8],
     standard: true,
     chain: true,
@@ -215,13 +215,13 @@ export const BONUS_COURAGE = {
   dragonrider: 5,
 };
 export const BONUS_COST = {
-  cragsmen: 150,
+  cragsmen: 175,
   spellwardens: 225,
-  sentinel: 350,
+  sentinel: 250,
   marines: 125,
   pavisiers: 200,
-  battlemage: 600,
-  gladiator: 200,
+  battlemage: 750,
+  gladiator: 150,
   samurai: 250,
   dragonrider: 750,
 };

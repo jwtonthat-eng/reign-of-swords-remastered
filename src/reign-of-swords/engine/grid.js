@@ -408,7 +408,9 @@ export class GridMethods {
     const tileMove = moveType(this.tileAt(tx, ty)),
       row = moveRow(tileMove);
     if (!row) return 99;
-    if (fx != null && moveClass !== 0 && !this._moveAllowed(fx, fy, tx, ty)) return 99;
+    // BONUS (ours): Marines climb a ship's bulwark straight out of the sea — Amphibious waives the step-link rule there.
+    const boarding = u.T.amphibious && this.inBounds(fx, fy) && moveType(this.tileAt(fx, fy)) === 19;
+    if (fx != null && moveClass !== 0 && !boarding && !this._moveAllowed(fx, fy, tx, ty)) return 99;
     if (tileMove === 16) {
       const occupant = this.unitAt(tx, ty);
       if (occupant && !occupant.dead && occupant.team === u.team) return 1;

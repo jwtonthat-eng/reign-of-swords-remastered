@@ -112,6 +112,8 @@ link above the game, or open <http://localhost:5173/#reign-of-swords-2>.
 | `npm run lint` | ESLint over the game code |
 | `npm run format` | Prettier over the game code |
 | `npm run e2e:maps` | The map runner: whole battles played by the Autopilot (slow) |
+| `npm run e2e:arena` | Unit arena: equal-points squads of every bonus unit against the original units |
+| `npm run e2e:stress` | Random play with an army of bonus units, under the fuzzer's checks |
 
 ## How it is built
 
