@@ -645,7 +645,7 @@ for (const k in UNIT_TYPES) {
     T[flag] = !!c[flag];
   for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
   for (const flag of ["shadowStep", "quake", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
-  for (const flag of ["flask", "constrict"]) T[flag] = !!c[flag]; // Alchemist, Naga
+  for (const flag of ["flask", "constrict", "bulwark"]) T[flag] = !!c[flag]; // Alchemist, Naga
   for (const flag of ["stoneskin", "purity", "burn", "undying"]) T[flag] = c[flag] || 0; // Golem, Unicorn, Efreet, Skeleton
   T.sutra = c.sutra || 0; // Sohei: HP mended by each friend beside it at the start of its turn
   T.grapple = c.grapple || 0; // Marines: the reach of their once-a-battle Grapple

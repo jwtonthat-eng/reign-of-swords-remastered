@@ -281,9 +281,9 @@ LEVELS.append(
             "b": U("horsebowmen", "E", group=4),
             "h": U("halberdiers", "E", group=5, hold=True),
             "t": U("swordsmen", "E", group=6),
-            "w": U("pavisiers", "E", group=7, hold=True),
+            "w": U("crossbowmen", "E", group=7, hold=True),
             "c": U("horsebowmen", "E", group=8),
-            "y": U("pavisiers", "E", group=9, hold=True),
+            "y": U("crossbowmen", "E", group=9, hold=True),
             "u": U("swordsmen", "E", group=10),
         },
         "camera": (8, 23),
@@ -844,7 +844,7 @@ LEVELS.append(
         "name": "Pavise Row",
         "objective": "Break the shield line in the market square. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 4000,
+        "budget": 4750,
         "sides": {"P": ARMY, "E": DOGE},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~

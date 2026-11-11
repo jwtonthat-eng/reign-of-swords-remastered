@@ -92,7 +92,7 @@ LEVELS.append(
         "name": "The Lashed Convoy",
         "objective": "Take the three lashed hulls of the convoy. Eliminate all enemies.",
         "turn_limit": 36,
-        "budget": 5000,
+        "budget": 5500,
         "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

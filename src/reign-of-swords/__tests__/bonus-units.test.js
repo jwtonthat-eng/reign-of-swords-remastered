@@ -84,7 +84,7 @@ describe("bonus units: the data", () => {
     const skill = (k) => unitSkills(k).map((s) => s.n);
     expect(skill("cragsmen")).toContain("Climb");
     expect(skill("spellwardens")).toContain("Nullify");
-    expect(skill("sentinel")).toEqual(expect.arrayContaining(["Unyielding", "Fear", "Last Strike", "Fearless"]));
+    expect(skill("sentinel")).toEqual(expect.arrayContaining(["Unyielding", "Fear", "Bulwark", "Fearless"]));
     expect(skill("marines")).toEqual(expect.arrayContaining(["Amphibious", "Boarding Musket", "Move or Shoot"]));
     expect(skill("pavisiers")).toEqual(expect.arrayContaining(["Pavise", "Formation", "Move or Shoot"]));
     expect(skill("battlemage")).toEqual(expect.arrayContaining(["Chain Lightning", "Battle Standard", "Fear"]));
@@ -199,7 +199,7 @@ describe("Nullify (Spellwardens)", () => {
 });
 
 describe("Pavise (Pavisiers)", () => {
-  it("planted, they and the friendly unit directly behind take half ranged damage; melee is unchanged", () => {
+  it("planted, they and the friendly unit directly behind take half ranged damage; in melee a quarter less", () => {
     const g = field();
     const archer = spawn(g, "archers", "red", 5, 5),
       pav = spawn(g, "pavisiers", "blue", 9, 5),
@@ -217,7 +217,21 @@ describe("Pavise (Pavisiers)", () => {
     const sword = spawn(g, "swordsmen", "red", 9, 4);
     const blow = g.computeDamage(sword, pav);
     pav.planted = false;
-    expect(g.computeDamage(sword, pav)).toBe(blow);
+    const unplanted = g.computeDamage(sword, pav);
+    expect(blow).toBeLessThan(unplanted);
+    expect(blow).toBeGreaterThanOrEqual(Math.floor((unplanted * 3) / 4) - 1);
+  });
+  it("a planted Pavisier's own bolt is braced: 10 stronger on the table than one loosed after a move", () => {
+    const g = field();
+    const pav = spawn(g, "pavisiers", "blue", 9, 5),
+      crossbow = spawn(g, "crossbowmen", "blue", 9, 7),
+      foe = spawn(g, "footmen", "red", 13, 5),
+      foe2 = spawn(g, "footmen", "red", 13, 7);
+    const braced = g.computeDamage(pav, foe);
+    pav.planted = false;
+    const loose = g.computeDamage(pav, foe);
+    expect(braced).toBeGreaterThan(loose);
+    expect(loose).toBe(g.computeDamage(crossbow, foe2)); // unbraced it is a plain Crossbow
   });
   it("is planted by ending a turn without moving", () => {
     const g = field();
@@ -891,5 +905,27 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
       ["skeleton", 5903],
     ])
       expect(upgradeGate(unit, true)).toBe(gate);
+  });
+});
+
+describe("Stone Sentinel and Golem: Bulwark", () => {
+  it("a charge and a flank attack gain nothing against a Bulwark, and a Tengu cannot throw it", () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    const sentinel = spawn(g, "sentinel", "blue", 10, 10),
+      footmen = spawn(g, "footmen", "blue", 10, 14);
+    const knights = spawn(g, "knights", "red", 11, 10),
+      knights2 = spawn(g, "knights", "red", 11, 14);
+    expect(g.computeDamage(knights, sentinel, { charge: true })).toBe(g.computeDamage(knights, sentinel));
+    expect(g.computeDamage(knights2, footmen, { charge: true })).toBeGreaterThan(g.computeDamage(knights2, footmen));
+    const front = g.computeDamage(knights, sentinel);
+    spawn(g, "footmen", "red", 9, 10); // a foe on the far side: a flank for anyone else
+    expect(g.computeDamage(knights, sentinel)).toBe(front);
+    const tengu = spawn(g, "tengu", "red", 10, 9);
+    g.resolveDamage(tengu, sentinel);
+    expect([sentinel.tx, sentinel.ty]).toEqual([10, 10]);
+    expect(UNIT_TYPES.sentinel.lastStrike).toBe(false); // it no longer strikes last
+    expect(UNIT_TYPES.golem.bulwark).toBe(true);
+    expect(DEPLOY_COST.sentinel).toBe(300);
   });
 });

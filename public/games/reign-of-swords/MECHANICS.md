@@ -651,7 +651,7 @@ kept apart from the original data so that everything else stays checkable agains
   |---|---|---|---|---|---|---|
   | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 175 | Climb, Shoot and Move |
   | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Mending Runes, Formation |
-  | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 250 | Unyielding, Fear, Fearless, Last Strike |
+  | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 300 | Bulwark, Unyielding, Fear, Fearless |
   | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Short Sword | Light & Shield | 2 | 125 | Amphibious, Grapple, Breach, Move or Shoot |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
   | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 3 | 750, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
@@ -672,6 +672,11 @@ kept apart from the original data so that everything else stays checkable agains
   | Naga | 5, skirmish | Twin Scimitars (Sword) | Breastplate | 4 | 150 | Constrict, Amphibious |
   | Skeletons | 4, formation | Rusted Sword (Sword) | Shield | 2 | 100 | Rise Again, Fearless |
 
+- **Stone Sentinel and Pavisiers, improved** (user decision, from the arena's battle types). The Sentinel no
+  longer strikes last and has *Bulwark* (the Golem too): a charge adds nothing against it, the flank bonus is not
+  applied against it, and a Tengu's Gale does not move it; it costs 300. A planted *Pavise* now also takes a quarter
+  off every blow hand to hand (not with Siege Armor), and the Pavisiers' own shots from a planted pavise add 10 to
+  the Crossbow's cell.
 - **The laboratory and its creatures** (the third wave; art supplied by the user, its Gryphon Rider row unused).
   *Acid Flask* (Alchemist): a Fireball in everything but colour, the same + cross at 100% / 60% on friend and foe,
   flying and bursting green; every unit it burns (not war engines) carries acid, 5 HP at the start of each of its

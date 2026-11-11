@@ -345,10 +345,11 @@ export class CombatMethods {
     if (siegeShot && defender.T.al === 0) return 0; // Boulder / Cannonball cannot touch a flier (class 0)
     let base = weaponBase(defender, weapon);
     if (isFireWeapon(weapon) && defender.T.flammable) base *= 2;
-    if (opts.charge) base += 30; // the rider's charging flag
+    if (opts.charge && !defender.T.bulwark) base += 30; // the rider's charging flag (BONUS: none against a Bulwark)
     if (attacker._ambushReady && attacker.T.shadowStep) base += 30; // BONUS: a Shinobi striking from hiding
     if (opts.brace) base += 30; // Ep1: a braced Pike Wall's first strike
     if (base <= 0) return 0;
+    if (dist > 1 && this._planted(attacker)) base += 10; // BONUS: a planted Pavisier's braced shot
     if (weapon === CHAIN_WEAPON) base += CHAIN_BONUS; // BONUS: the Battlemage's bolt, and each of its leaps
     // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
     base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (defender.T.armourBonus || 0));
@@ -360,14 +361,16 @@ export class CombatMethods {
     let cover = tileDef - (defender.T.formation && !siegeShot ? 10 * this.formationAllies(defender) : 0);
     if (siegeShot && tileDef <= 80) cover += Math.trunc((100 - tileDef) / 2);
     let rating = (attacker.T.rf || 75) + this.ratingAura(attacker);
-    if (dist === 1) rating += this._flankBonus(attacker, defender); // calcFlankBonuses: +30 opposite, +15 on a side
+    if (dist === 1 && !defender.T.bulwark) rating += this._flankBonus(attacker, defender); // calcFlankBonuses: +30 opposite, +15 on a side
     const skill = (Math.trunc((rating * 256) / 100) * toHp256(clamp(attacker.hp, 0, 100))) >> 8;
     let dmg = (Math.trunc((cover * 256) / 100) * Math.trunc((base * 256) / 100)) >> 8;
     dmg = (dmg * skill) >> 8;
     if (dist > 1) {
       // Map::isUnitShielded — a Priest's Shield; BONUS: a planted Pavise halves a shot the same way (they don't stack)
       if (this._shielded(defender) || this._pavised(defender, attacker)) dmg = Math.trunc(dmg / 2);
-    } else if (this._siegeArmored(defender)) dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
+    } else if (this._siegeArmored(defender))
+      dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
+    else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
     if (defender.T.stoneskin) dmg = Math.min(dmg, toHp256(defender.T.stoneskin)); // BONUS: the Golem's Stoneskin
     return Math.max(0, dmg);
   }
@@ -1314,7 +1317,7 @@ export class CombatMethods {
             this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.5), false, false, wMain);
       // BONUS: Gale — the Tengu's foe is thrown one tile straight back (so it is out of reach to strike back), unless
       // it is a war engine or the tile behind is taken or no ground it could stand on
-      if (attacker.T.gale && !defender.dead && defender.T.al !== 4) {
+      if (attacker.T.gale && !defender.dead && defender.T.al !== 4 && !defender.T.bulwark) {
         const bx = defender.tx * 2 - attacker.tx,
           by = defender.ty * 2 - attacker.ty;
         if (this.inBounds(bx, by) && !this.unitAt(bx, by) && this.moveCost(defender, bx, by) < 99) {

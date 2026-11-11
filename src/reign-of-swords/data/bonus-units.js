@@ -60,8 +60,8 @@ export const BONUS_WEAPONS = {
     name: "Stone Fist",
     row: 13, // Greatsword
     range: [1, 1],
-    tags: [2], // Last Strike
-    desc: "A Stone Fist delivers crushing melee damage, but the Sentinel is slow and strikes last.",
+    tags: [],
+    desc: "A Stone Fist delivers crushing melee damage.",
   },
   39: {
     name: "Boarding Musket",
@@ -275,9 +275,9 @@ export const BONUS_COMBAT = {
     armour: 10,
     rating: 4,
     rf: 100,
-    abilities: [14, 2, 4],
-    lastStrike: true,
+    abilities: [14, 4],
     unyielding: true,
+    bulwark: true, // a charge gains nothing against it, it cannot be flanked, and nothing throws it back
     armourName: "Living Stone",
   },
   // terrainRange: the musket reaches 3 tiles from open ground, 2 from woods, scrub, rocks or shallows
@@ -422,6 +422,7 @@ export const BONUS_COMBAT = {
     rf: 100,
     abilities: [14, 4],
     unyielding: true,
+    bulwark: true,
     stoneskin: 20,
     armourName: "Rune Stone",
   },
@@ -482,7 +483,7 @@ export const BONUS_COURAGE = {
 export const BONUS_COST = {
   cragsmen: 175,
   spellwardens: 225,
-  sentinel: 250,
+  sentinel: 300,
   marines: 125,
   pavisiers: 200,
   battlemage: 750,
@@ -539,7 +540,8 @@ export const BONUS_TYPES = {
     sprite: "sentinel",
     ...strip(8, 5),
     kind: "melee",
-    ability: "Unyielding — feels no Fear, ignores quicksand, cannot be healed by Priests; Craftsmen can repair it.",
+    ability:
+      "Bulwark — charges and flank attacks gain nothing against it. Unyielding — ignores quicksand, cannot be healed by Priests; Craftsmen can repair it. Fear.",
   },
   marines: {
     name: "Marines",
@@ -556,7 +558,8 @@ export const BONUS_TYPES = {
     ...both(8, 5),
     kind: "ranged",
     projectile: "arrow",
-    ability: "Pavise — while it has not moved, it and the ally behind it take half ranged damage.",
+    ability:
+      "Pavise — while it has not moved, it and the ally behind it take half ranged damage, it takes a quarter less in melee, and its own bolts hit harder.",
   },
   battlemage: {
     name: "Battlemage",
@@ -754,6 +757,12 @@ export const BONUS_SKILLS = [
     d: "Enemy magic does nothing to any friendly unit within 2 tiles (the Spellwarden included): Fireball, Lightning Storm, Ice Field and Chain Lightning deal no damage and do not slow, an enemy Spirit Shroud saps nothing, and quicksand neither stops nor hurts.",
   },
   {
+    flag: "bulwark",
+    n: "Bulwark",
+    icon: "skill_pavise",
+    d: "Immovable: a charge gains nothing against it, attacks from its flank or rear gain nothing, and it cannot be thrown back.",
+  },
+  {
     flag: "unyielding",
     n: "Unyielding",
     icon: "skill_unyielding",
@@ -853,7 +862,7 @@ export const BONUS_SKILLS = [
     flag: "pavise",
     n: "Pavise",
     icon: "skill_pavise",
-    d: "Ends a turn without moving and it plants its pavise: until it next moves, it and any friendly unit standing directly behind it take half damage from ranged attacks.",
+    d: "Ends a turn without moving and it plants its pavise: until it next moves, it and any friendly unit standing directly behind it take half damage from ranged attacks, it takes a quarter less from blows hand to hand, and its own bolts are 10 stronger on the weapon and armour table.",
   },
   {
     flag: "chain",

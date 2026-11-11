@@ -493,7 +493,7 @@ LEVELS.append(
         "name": "The Sleepers Wake",
         "objective": "Destroy every Stone Sentinel that wakes among the ruins.",
         "turn_limit": 30,
-        "budget": 2500,
+        "budget": 3250,
         "win_switch": False,
         "sides": {"P": "Carrone Army", "E": "Tomb Keepers", "E2": "Stone Sentinels"},
         "terrain": """
@@ -600,7 +600,7 @@ LEVELS.append(
         "name": "The Empty Tomb",
         "objective": "Defeat Warden Tolm before the tomb of the Battlemage.",
         "turn_limit": 30,
-        "budget": 5000,
+        "budget": 5750,
         "sides": {"P": "Carrone Army", "E": "Warden Tolm", "E2": "Stone Sentinels"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^
