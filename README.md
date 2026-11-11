@@ -48,9 +48,9 @@ It is a remake, not an exact copy.
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
 - **Five fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
   Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles) and Satoshi, 21 battles and 12 raids that
-  follow the "Battlemage" letters Episode II ends on, with fourteen new units (Cragsmen, Spellwardens, Stone
+  follow the "Battlemage" letters Episode II ends on, with twenty new units (Cragsmen, Spellwardens, Stone
   Sentinels, Marines, Pavisiers, the Battlemage, Gladiators, Samurai, Dragon Riders, Beast Masters with their Hounds,
-  Sohei, Shinobi, Oni and Tengu).
+  Sohei, Shinobi, Oni, Tengu, Alchemists with their Imps, Golems, Unicorns, Efreet, Naga and Skeletons).
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.

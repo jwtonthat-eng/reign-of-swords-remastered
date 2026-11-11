@@ -391,7 +391,7 @@ export class LoopMethods {
   _landHeal(a) {
     const target = a.target,
       tile = this.tile;
-    const gained = this._healTick(target);
+    const gained = this._healTick(target, a.u && a.u.T.healAmount);
     target.flash = 0.14;
     // the Heal state's overlay (5017 #3) plays on the healed unit — renderOverlay @0x7641a draws it at Map+0x1c, which
     // Unit::heal (@0x6bfac) points at the target; nothing plays on the Priest

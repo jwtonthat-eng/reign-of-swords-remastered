@@ -800,6 +800,7 @@ for (const [id, weapon] of Object.entries(BONUS_WEAPONS)) {
   if (weapon.tags.length) WEAPON_TAGS[id] = weapon.tags;
   WEAPON_NAME[id] = weapon.name;
   WEAPON_DESC[id] = weapon.desc;
+  if (weapon.blast) BLAST_SHARE[id] = weapon.blast;
 }
 Object.assign(UNIT_AL, BONUS_AL);
 for (const [unit, combat] of Object.entries(BONUS_COMBAT)) {

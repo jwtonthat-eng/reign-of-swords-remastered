@@ -143,6 +143,13 @@ export const UNIT_CATEGORY = {
   shinobi: "Missile",
   oni: "Infantry",
   tengu: "Flying",
+  alchemist: "Casters",
+  imp: "Flying",
+  golem: "Infantry",
+  unicorn: "Flying",
+  efreet: "Flying",
+  naga: "Infantry",
+  skeleton: "Infantry",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

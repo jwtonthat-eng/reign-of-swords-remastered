@@ -426,7 +426,7 @@ LEVELS.append(
         "name": "The Arsenal",
         "objective": "Hold the Arsenal for 12 turns.",
         "turn_limit": 16,
-        "budget": 4000,
+        "budget": 4500,
         "win_switch": False,
         "sides": {"P": ARMY, "A": "Shipwrights", "E": DOGE, "E2": "Stone Sentinels"},
         "terrain": """
@@ -466,13 +466,14 @@ cc.....DDDDDDD.....ee
 .....................
 .....................
 .....y..ssnnnss.y....
-.......o.x.x.o.......
+.......o.L.x.o.......
 ......t.iijii.T......
 """,
         "legend": {
             "C": U("craftsmen", "A", group=1, hold=True),
             "s": U("swordsmen", "E", group=2),
             "x": U("crossbowmen", "E", group=3),
+            "L": U("alchemist", "E", group=3),
             "t": U("trebuchet", "E", group=4, hold=True),
             "T": U("trebuchet", "E", group=5, hold=True),
         },
@@ -539,7 +540,7 @@ cc.....DDDDDDD.....ee
             ("advisor", "There is only the citadel left, Varius. And whatever he woke inside it."),
         ],
         "defeat": [("officer_hurt", "The Arsenal is lost, Commander. The fleet is burning at its moorings.")],
-        "reward": {"units": {}, "spoils": {"Lore": 1, "Weapons": 1, "Spirit": 1}},
+        "reward": {"units": {"alchemist": 1}, "spoils": {"Lore": 1, "Weapons": 1, "Spirit": 1}},
     }
 )
 

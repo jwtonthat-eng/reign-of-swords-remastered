@@ -38,7 +38,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("fourteen units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("twenty units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -54,6 +54,12 @@ describe("bonus units: the data", () => {
       "shinobi",
       "oni",
       "tengu",
+      "alchemist",
+      "golem",
+      "unicorn",
+      "efreet",
+      "naga",
+      "skeleton",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -102,6 +108,12 @@ describe("bonus units: upgrade paths", () => {
       ["rangers", "shinobi", "Lore"],
       ["greatswordsmen", "oni", "Spirit"],
       ["beastmaster", "tengu", "Spirit"],
+      ["priests", "alchemist", "Lore"],
+      ["sentinel", "golem", "Armor"],
+      ["knights", "unicorn", "Spirit"],
+      ["dunesirens", "efreet", "Lore"],
+      ["marines", "naga", "Beasts"],
+      ["conjurer", "skeleton", "Spirit"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -752,5 +764,132 @@ describe("Satoshi's second wave: Sohei, Shinobi, Oni, Tengu", () => {
     expect(upgradeGate("shinobi", true)).toBe(5962);
     expect(upgradeGate("oni", true)).toBe(5963);
     expect(upgradeGate("tengu", true)).toBe(5963);
+  });
+});
+
+describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efreet, Naga, Skeletons", () => {
+  const field = () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    return g;
+  };
+  it("the Acid Flask bursts on its target and the tiles around it, and leaves 5 HP a turn of acid for 3 turns", () => {
+    const g = field();
+    const alchemist = spawn(g, "alchemist", "blue", 5, 10),
+      target = spawn(g, "footmen", "red", 9, 10),
+      beside = spawn(g, "footmen", "red", 9, 11),
+      apart = spawn(g, "footmen", "red", 11, 10);
+    expect(g._weaponAt(alchemist, 4)).toBe(50);
+    expect(UNIT_TYPES.alchemist.range).toBe(6);
+    g.resolveDamage(alchemist, target, {});
+    expect(100 - beside.hp).toBeGreaterThan(0);
+    expect(100 - beside.hp).toBeLessThan(100 - target.hp); // the cross takes 60%
+    expect(apart.hp).toBe(100);
+    expect(target._acid.turns).toBe(3);
+    expect(beside._acid.turns).toBe(3);
+    expect(apart._acid).toBeFalsy();
+    const after = target.hp;
+    for (let turn = 1; turn <= 4; turn++) g.healOnKeeps("red");
+    expect(after - target.hp).toBe(15); // 5 + 5 + 5, then nothing
+    expect(target._acid).toBeNull();
+  });
+  it("the Alchemist heals 30 HP at up to 2 tiles, and summons Imps where a Beast Master calls Hounds", () => {
+    const g = field();
+    const alchemist = spawn(g, "alchemist", "blue", 10, 10),
+      near = spawn(g, "footmen", "blue", 12, 10),
+      far = spawn(g, "footmen", "blue", 13, 10);
+    near.hp = 40;
+    far.hp = 40;
+    g.selected = alchemist;
+    expect(g._clickHeal(far)).toBe(false); // 3 tiles away
+    expect(g._clickHeal(near)).toBe(true);
+    for (let i = 0; i < 200; i++) step(g);
+    expect(near.hp).toBe(70);
+    alchemist.acted = false;
+    expect(g._abilitySkills(alchemist).map((s) => s.id)).toContain("conjure_imp");
+    g._castConjure(alchemist, "imp", 10, 11);
+    settle(g);
+    const imp = g.units.find((u) => u.type === "imp");
+    expect(imp._conjuredBy).toBe(alchemist.id);
+    expect(UNIT_TYPES.imp.summoned && UNIT_TYPES.imp.fly).toBe(true);
+    expect(DEPLOY_ORDER).not.toContain("imp");
+  });
+  it("Stoneskin: no single blow takes more than 20 HP from a Golem", () => {
+    const g = field();
+    const golem = spawn(g, "golem", "blue", 10, 10);
+    for (const [type, x] of [
+      ["greatswordsmen", 11],
+      ["knights", 9],
+    ]) {
+      const foe = spawn(g, type, "red", x, 10);
+      expect(g.computeDamage(foe, golem)).toBeLessThanOrEqual(20);
+      expect(g.computeDamage(foe, golem, { charge: true })).toBeLessThanOrEqual(20);
+    }
+    const cannon = spawn(g, "cannon", "red", 10, 15);
+    expect(g.computeDamage(cannon, golem)).toBeLessThanOrEqual(20);
+    expect(UNIT_TYPES.golem.unyielding && UNIT_TYPES.golem.fear).toBe(true);
+  });
+  it("Purity: friends within 2 tiles of a Unicorn feel no Fear and are washed clean of acid", () => {
+    const g = field();
+    spawn(g, "unicorn", "blue", 10, 10);
+    const near = spawn(g, "footmen", "blue", 12, 10),
+      far = spawn(g, "footmen", "blue", 14, 10),
+      oni = spawn(g, "oni", "red", 12, 11);
+    expect(g._purified(near)).toBe(true);
+    expect(g._purified(far)).toBe(false);
+    g.rng = () => 0.999; // the worst courage roll there is
+    expect(g._fearCheck(near, oni, () => {})).toBe(false); // never balks
+    near._acid = { turns: 3, by: oni };
+    far._acid = { turns: 3, by: oni };
+    g.healOnKeeps("blue");
+    expect([near.hp, far.hp]).toEqual([100, 95]);
+    expect(near._acid).toBeNull();
+    expect(UNIT_TYPES.unicorn.fly).toBe(true);
+  });
+  it("Burning Aura: an enemy beside an Efreet loses 10 HP as its turn begins; its friends do not", () => {
+    const g = field();
+    spawn(g, "efreet", "blue", 10, 10);
+    const foe = spawn(g, "footmen", "red", 11, 10),
+      farFoe = spawn(g, "footmen", "red", 13, 10),
+      friend = spawn(g, "footmen", "blue", 10, 11);
+    g.healOnKeeps("red");
+    g.healOnKeeps("blue");
+    expect([foe.hp, farFoe.hp, friend.hp]).toEqual([90, 100, 100]);
+  });
+  it("Constrict: the foe a Naga strikes cannot move on its next turn, and is free again after it", () => {
+    const g = field();
+    const naga = spawn(g, "naga", "blue", 10, 10),
+      foe = spawn(g, "footmen", "red", 11, 10);
+    g.resolveDamage(naga, foe, {});
+    expect(foe._held).toBe(true);
+    expect(g.moveOf(foe)).toBe(0);
+    expect(g.computeReach(foe).stops.size).toBe(1); // its own tile
+    g._endTurnHide([foe]);
+    expect(g.moveOf(foe)).toBe(4);
+    expect(UNIT_TYPES.naga.amphibious).toBe(true);
+  });
+  it("Rise Again: a Skeleton struck down gets up once with 40 HP, and stays down the second time", () => {
+    const g = field();
+    const skeleton = spawn(g, "skeleton", "blue", 10, 10),
+      foe = spawn(g, "knights", "red", 11, 10);
+    g._applyHit(skeleton, foe, 150, false);
+    expect([skeleton.dead, skeleton.hp]).toEqual([false, 40]);
+    g._applyHit(skeleton, foe, 150, false);
+    expect(skeleton.dead).toBe(true);
+  });
+  it("each has its price, its upgrade and the battle that opens it", () => {
+    const cost = (k) => DEPLOY_COST[k];
+    expect(["alchemist", "golem", "unicorn", "efreet", "naga", "skeleton"].map(cost)).toEqual([
+      250, 400, 275, 300, 150, 100,
+    ]);
+    for (const [unit, gate] of [
+      ["alchemist", 5925],
+      ["golem", 5905],
+      ["unicorn", 5971],
+      ["efreet", 5983],
+      ["naga", 5981],
+      ["skeleton", 5903],
+    ])
+      expect(upgradeGate(unit, true)).toBe(gate);
   });
 });

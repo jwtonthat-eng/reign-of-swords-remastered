@@ -87,15 +87,15 @@ export const AbilityMethods = {
         full = kids >= 2;
       out.push({
         id: "conjure_" + unit.T.conjures,
-        name: "Call Hounds",
+        name: unit.T.conjures === "imp" ? "Summon Imp" : "Call Hounds",
         icon: "skill_conjure",
         min: 1,
         max: 1,
         count: kids + "/2",
         disabled: full,
         desc: full
-          ? "Limit reached — this Beast Master already has two packs of Hounds. One must fall before it can call another."
-          : "Call a pack of Hounds onto an adjacent free tile (max 2 standing, leashed within 8 tiles; they are gone if the Beast Master falls).",
+          ? "Limit reached — two of its creatures are already standing. One must fall before it can call another."
+          : "Call its creature onto an adjacent free tile (max 2 standing, leashed within 8 tiles; they are gone if their master falls).",
       });
     } else if (unit.T.conjure) {
       const kids = this.units.filter((o) => !o.dead && o._conjuredBy === unit.id).length;
@@ -222,7 +222,7 @@ export const AbilityMethods = {
       return true;
     }
     if (
-      (id === "conjure_sapper" || id === "conjure_bodyguard" || id === "conjure_hounds") &&
+      id.startsWith("conjure_") &&
       Math.max(Math.abs(tx - sel.tx), Math.abs(ty - sel.ty)) === 1 &&
       !this.unitAt(tx, ty) &&
       this.terrainAt(tx, ty).passable

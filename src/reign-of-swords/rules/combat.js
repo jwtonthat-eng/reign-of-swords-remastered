@@ -21,6 +21,8 @@ import {
   CHAIN_BONUS,
   CHAIN_SHARE,
   CHAIN_REACH,
+  FLASK_WEAPON,
+  ACID,
   BONUS_RANGED,
   DRAGONFIRE_WEAPON,
   BREATH_SHARE,
@@ -366,6 +368,7 @@ export class CombatMethods {
       // Map::isUnitShielded — a Priest's Shield; BONUS: a planted Pavise halves a shot the same way (they don't stack)
       if (this._shielded(defender) || this._pavised(defender, attacker)) dmg = Math.trunc(dmg / 2);
     } else if (this._siegeArmored(defender)) dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
+    if (defender.T.stoneskin) dmg = Math.min(dmg, toHp256(defender.T.stoneskin)); // BONUS: the Golem's Stoneskin
     return Math.max(0, dmg);
   }
   // PRAYER MARKS — the Shield prayer and Unit::retribution push the casting Priest's TILE on a per-group list on the
@@ -1017,6 +1020,7 @@ export class CombatMethods {
   }
   _fearCheck(attacker, defender, onBalk) {
     if (!defender || !defender.T.fear || attacker.T.fearless || attacker.T.fear) return false;
+    if (this._purified(attacker)) return false; // BONUS: a Unicorn's Purity
     const courage = this._courage(attacker);
     // Unit::attack's roll: r = (getRandom % 1000)·256/1000 (0..255) passes when r <= courage·256/100 — so 100+ never balks.
     let passed = this._courageChance(attacker) >= 1;
@@ -1250,6 +1254,21 @@ export class CombatMethods {
     const pierceShot = attacker.T.pierce && !!this._ballistaStep(attacker, defender.tx, defender.ty); // Piercing Bolt: the aimed cell is the bolt's first (85%)
     const damage = shared(this.computeDamage(attacker, defender, opts), pierceShot ? blastShare(28, 0) : 1);
     this._applyHit(defender, attacker, damage, damage >= 55, !!opts.siege, wMain);
+    if (wMain === FLASK_WEAPON) this._acidify(defender, attacker); // BONUS: the Alchemist's flask leaves acid
+    // BONUS: Constrict — the foe a Naga strikes hand to hand is held: it cannot move on its next turn (the hold ends
+    // with that turn — grid _endTurnHide — so a blow struck during the victim's own turn holds nothing)
+    if (attacker.T.constrict && !defender.dead && manhattan(attacker, defender) === 1 && defender.T.al !== 4) {
+      defender._held = true;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 8,
+        t: 0,
+        life: 0.9,
+        vy: -14,
+        text: "Held",
+        crit: true,
+      });
+    }
     // The struck cell's STRUCTURE takes the blow too (Unit::onTick → Map::applyDamage on the attack location) — a
     // unit sheltering in a house or on a rampart, or a shot aimed at the empty building itself.
     this._structureBlow(attacker, defender.tx, defender.ty, pierceShot ? blastShare(28, 0) : 1, wMain);
@@ -1305,7 +1324,7 @@ export class CombatMethods {
       }
     }
     // A wizard jabbing point-blank uses its Wand (weapon 7) — a plain melee hit, no spell splash.
-    if (attacker.T.splash && !(attacker.T.canLightning && manhattan(attacker, defender) <= 1))
+    if (attacker.T.splash && !((attacker.T.canLightning || attacker.T.flask) && manhattan(attacker, defender) <= 1))
       this._resolveSplash(attacker, defender, opts, wMain);
   }
 
@@ -1455,7 +1474,7 @@ export class CombatMethods {
       const dx = Math.abs(e.tx - defender.tx),
         dy = Math.abs(e.ty - defender.ty);
       const inArea = square ? Math.max(dx, dy) <= 1 : dx + dy <= 1;
-      if (inArea)
+      if (inArea) {
         this._applyHit(
           e,
           attacker,
@@ -1463,6 +1482,8 @@ export class CombatMethods {
           false,
           !!opts.siege,
         );
+        if (wMain === FLASK_WEAPON) this._acidify(e, attacker);
+      }
     }
     // …and every structure in the blast (the onTick blast loop applies Map::applyDamage per destination cell, scaled
     // by the cell's blast share — the same share the units there take: Rock 50%, Pitch 40%, Fireball 60%).
@@ -1784,6 +1805,22 @@ export class CombatMethods {
         });
       }
     }
+    // BONUS: Rise Again — a Skeleton struck down for the first time gets back up
+    if (defender.hp <= 0 && defender.T.undying && !defender._risen) {
+      defender._risen = true;
+      defender.hp = defender.T.undying;
+      defender._acid = null;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 10,
+        t: 0,
+        life: 1.1,
+        vy: -14,
+        text: "Rises again",
+        crit: true,
+        heal: true,
+      });
+    }
     if (defender.hp <= 0) {
       defender.dead = true;
       defender.dieT = 0; // no death sound / fall animation — the unit just leaves the field
@@ -1795,10 +1832,43 @@ export class CombatMethods {
   // Unit::onTick's heal state (iOS Ep2 @0x79476 — the Priest's Heal and the Craftsmen mending a war engine): the original
   // adds 51 of 256 (19.9 HP); in whole HP (DELIBERATE DEVIATION, MECHANICS.md §13) it is +20, capped at 100 — so always
   // 20 unless the unit is above 80. Returns the gain shown.
-  _healTick(u) {
+  _healTick(u, amount) {
+    if (amount) {
+      // BONUS: the Alchemist's Elixir heals its own amount, on the shown HP
+      const before = u.hp;
+      u.hp = Math.min(100, before + amount);
+      return Math.round(u.hp - before);
+    }
     const step = healStep(u.hp);
     u.hp = step.hp;
     return step.shown;
+  }
+  // BONUS — the flask's acid: ACID.damage HP at the start of each of the victim's next ACID.turns turns (a fresh
+  // flask restarts the count; war engines and structures do not corrode), and the tick itself.
+  _acidify(e, by) {
+    if (!e || e.dead || e.T.al === 4) return;
+    e._acid = { turns: ACID.turns, by };
+  }
+  // BONUS — what a unit suffers as its side's turn begins (engine healOnKeeps): acid, and an Efreet's Burning Aura.
+  // A Unicorn's Purity washes acid from friends within its reach first.
+  _turnStartAilments(u) {
+    if (u.dead) return;
+    const near = (o, n) => !o.dead && Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) <= n;
+    if (u._acid && this.units.some((o) => o.team === u.team && o.T.purity && near(o, o.T.purity))) u._acid = null;
+    if (u._acid) {
+      const { by } = u._acid;
+      if (--u._acid.turns <= 0) u._acid = null;
+      this._applyHit(u, by, ACID.damage, false, true);
+    }
+    if (u.dead) return;
+    const efreet = this.units.find((o) => o.team !== u.team && o.T.burn && near(o, 1));
+    if (efreet) this._applyHit(u, efreet, efreet.T.burn, false, true);
+  }
+  // BONUS — Purity: a unit within reach of a friendly Unicorn feels no Fear
+  _purified(u) {
+    return this.units.some(
+      (o) => !o.dead && o.team === u.team && o.T.purity && Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) <= o.T.purity,
+    );
   }
   _killConjuredChildren(conjurer) {
     let any = false;
@@ -1854,6 +1924,7 @@ export class CombatMethods {
       scale: opts.scale,
       flip: opts.flip,
       angle: opts.angle || 0,
+      hue: opts.hue || 0, // BONUS: a hue shift, in degrees (the green flask)
     });
   }
   // Schedule fn to run after `delay` seconds, driven by update(dt). Used for cascading effects (Lightning Storm bolts).
@@ -2128,7 +2199,8 @@ export class CombatMethods {
       ang: angle,
       cannon: isCannon,
       magic: !!u.T.magic,
-      spell: u.T.magic ? u.spell || "fireball" : null,
+      spell: u.T.magic ? u.spell || u.T.shotSpell || "fireball" : null, // (shotSpell: the Unicorn's bolt flies as an ice bolt)
+      green: !!u.T.greenShot, // the Alchemist's flask
       impactSnd: this._impactSound(u, kind, lobbed, isCannon),
       impactVol: lobbed ? 0.5 : 0.55,
     });
@@ -2153,7 +2225,7 @@ export class CombatMethods {
   // fireball → 13 (the burst), the Catapult's Rocks → 25, the Trebuchet (unit type 24) → 32, the Ballistae → 52. A
   // direct shot (arrow, musket ball, hammer) lands without a clip.
   _impactSound(u, kind, lobbed, isCannon) {
-    if (isCannon || (u.T.magic && (u.spell === "fireball" || !u.spell))) return "explosion";
+    if (isCannon || (u.T.magic && (u.spell === "fireball" || (!u.spell && !u.T.shotSpell)))) return "explosion";
     if (lobbed) return u.type === "trebuchet" ? "boulder_hit" : "rock_hit";
     if (kind === "bolt") return "bolt_hit";
     return null;
@@ -2167,7 +2239,7 @@ export class CombatMethods {
   _launchSound(u, kind, lobbed, isCannon) {
     if (u.T.magic) {
       if (u.spell === "lightning") return "thunder";
-      if (u.spell === "ice") return "spell";
+      if (u.spell === "ice" || (!u.spell && u.T.shotSpell === "ice")) return "spell";
       return "spellfire"; // default/undefined = Fireball → spellfire (snd_002); only Ice uses "spell" (snd_011)
     }
     if (isCannon) return "cannon";
@@ -2205,12 +2277,13 @@ export class CombatMethods {
     } else if (kind === "ball") {
       // Cannon shell & the wizard's FIREBALL burst in fire; ice/lightning do NOT (their own area FX resolve
       // separately in resolveDamage — a blue ice bolt shouldn't explode in flame).
-      if (!u.T.magic || u.spell === "fireball" || !u.spell) {
+      const hue = u.T.greenShot ? 80 : 0; // the flask bursts green
+      if (!u.T.magic || u.spell === "fireball" || (!u.spell && !u.T.shotSpell)) {
         // the Fireball bursts in the explosion (5017 #35, android z_024), the Cannonball in the fire burst (#37) —
         // startAreaAttack's impact strips (@0x72bd6 / @0x72f24)
-        this.spawnFx(u.T.magic ? "blast" : "fire", hitX, hitY, { delay: dur, scale: 1.0 });
+        this.spawnFx(u.T.magic ? "blast" : "fire", hitX, hitY, { delay: dur, scale: 1.0, hue });
         // DELIBERATE DEVIATION — the flames a Wizard's Fireball leaves behind (not in the original)
-        if (u.T.magic) this.spawnFx("fire", hitX, hitY + tile * 0.04, { delay: dur + 0.12 });
+        if (u.T.magic) this.spawnFx("fire", hitX, hitY + tile * 0.04, { delay: dur + 0.12, hue });
         this._burst(hitX, hitY, {
           delay: dur,
           big: false,

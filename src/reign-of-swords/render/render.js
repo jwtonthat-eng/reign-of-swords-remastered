@@ -69,7 +69,16 @@ export class Renderer {
     for (const u of list) this._drawUnit(g, u);
     this._drawTargetNumbers(g); // damage/charge forecast ON TOP of the sprites (never hidden behind one)
     for (const shot of this.game.projectiles) this._drawProjectile(g, shot);
-    if (this.game.fx) for (const e of this.game.fx) this._drawFx(g, e);
+    if (this.game.fx)
+      for (const e of this.game.fx) {
+        if (!e.hue) this._drawFx(g, e);
+        else {
+          g.save(); // BONUS: a hue-shifted effect (the Alchemist's green burst)
+          g.filter = `hue-rotate(${e.hue}deg)`;
+          this._drawFx(g, e);
+          g.restore();
+        }
+      }
     if (this.game.particles) for (const particle of this.game.particles) this._drawParticle(g, particle);
     if (this.game.bolts) for (const b of this.game.bolts) this.game._drawBolt(g, b);
     for (const floater of this.game.floaters) this._drawFloater(g, floater);
@@ -808,7 +817,7 @@ export class Renderer {
     const sel = this.game.selected;
     if (!(this.game.phase === "player" && sel && sel.T.heal && !sel.acted && !this.game.aimMode)) return;
     const tile = this.game.tile,
-      range = sel.T.range || 1;
+      range = sel.T.healRange || sel.T.range || 1;
     g.font = `800 ${Math.max(11, tile * 0.3)}px system-ui`;
     g.textAlign = "center";
     g.textBaseline = "middle";
@@ -1904,6 +1913,7 @@ export class Renderer {
       g.fill();
       return;
     }
+    if (shot.green) g.filter = "hue-rotate(80deg)"; // BONUS: the Alchemist's flask (the caller restores the context)
     const frameW = isFire ? 64 : 28,
       frames = 5;
     const frame = isFire ? Math.floor(shot.t * 22) % frames : Math.min(frames - 1, Math.floor(flight * frames));

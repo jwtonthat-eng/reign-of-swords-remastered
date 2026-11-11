@@ -302,7 +302,7 @@ LEVELS.append(
 """,
         "legend": {
             "w": U("spellwardens", "E", group=1),
-            "h": U("halberdiers", "E", group=1),
+            "h": U("skeleton", "E", group=1),
             "x": U("crossbowmen", "E", group=2),
             "S": U("shamans", "E", group=2),
         },
@@ -379,7 +379,7 @@ LEVELS.append(
             ("advisor", "Or to keep some of his own on a leash."),
         ],
         "defeat": [("officer_hurt", "They have the stones, Commander. The road to the tomb is open to them.")],
-        "reward": {"units": {}, "spoils": {"Lore": 1, "Spirit": 1}},
+        "reward": {"units": {"skeleton": 2}, "spoils": {"Lore": 1, "Spirit": 1}},
     }
 )
 
@@ -520,7 +520,7 @@ LEVELS.append(
 .....................
 .....................
 ..........c..........
-........S.c.S........
+........G.c.S........
 .......h.S.S.h.......
 ......h.h...h.h......
 .....................
@@ -538,6 +538,7 @@ LEVELS.append(
 """,
         "legend": {
             "S": U("sentinel", "E2", group=1),
+            "G": U("golem", "E2", group=1),
             "c": U("conjurer", "E", group=1, hold=True),
             "h": U("halberdiers", "E", group=2),
             "g": U("greatswordsmen", "P"),
@@ -587,7 +588,7 @@ LEVELS.append(
             ("officer", "The inner tomb is on the plateau above. The Warden's banner is flying over it."),
         ],
         "defeat": [("officer_hurt", "They do not tire, Commander. They do not even slow.")],
-        "reward": {"units": {}, "spoils": {"Weapons": 1, "Lore": 1, "Beasts": 1}},
+        "reward": {"units": {"golem": 1}, "spoils": {"Weapons": 1, "Lore": 1, "Beasts": 1}},
     }
 )
 

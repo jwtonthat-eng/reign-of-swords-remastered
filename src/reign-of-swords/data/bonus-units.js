@@ -23,9 +23,15 @@ export const BONUS_ORDER = [
   "shinobi",
   "oni",
   "tengu",
+  "alchemist", // the laboratory and its creatures (unlocked across the bonus campaigns)
+  "golem",
+  "unicorn",
+  "efreet",
+  "naga",
+  "skeleton",
 ];
 // Units a bonus unit calls onto the field: never deployed or owned (the Beast Master's Hounds).
-export const BONUS_SUMMONS = ["hounds"];
+export const BONUS_SUMMONS = ["hounds", "imp"];
 
 // New weapon ids (the originals end at 34). `row` = the ORIGINAL weapon whose damage row it copies.
 export const BONUS_WEAPONS = {
@@ -135,11 +141,79 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "The Tengu's blade strikes with a gust from its fan behind it: the foe is thrown a tile back.",
   },
+  // blast: the share of the blow the aimed tile and its four neighbours take (data/combat-data BLAST_SHARE)
+  50: {
+    name: "Acid Flask",
+    row: 25, // Fireball
+    range: [2, 6],
+    tags: [],
+    blast: [100, 60],
+    desc: "An Acid Flask bursts like a Fireball, on its target and the four tiles around it, and leaves acid that eats 5 HP a turn for 3 turns.",
+  },
+  51: {
+    name: "Dagger",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Dagger is a last resort: weak against everything but the unarmoured.",
+  },
+  52: {
+    name: "Rune Fists",
+    row: 13, // Greatsword
+    range: [1, 1],
+    tags: [],
+    desc: "The Golem's Rune Fists deliver crushing melee damage.",
+  },
+  53: {
+    name: "Claws",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "An Imp's Claws scratch at the lightly armoured and do little else.",
+  },
+  54: {
+    name: "Starlight",
+    row: 26, // Lightning Storm
+    range: [2, 4],
+    tags: [],
+    desc: "Starlight is a bolt from the Unicorn's horn: steady damage against every armor.",
+  },
+  55: {
+    name: "Flame Jet",
+    row: 25, // Fireball
+    range: [2, 4],
+    tags: [13], // a fire weapon: double damage to Flammable war engines
+    desc: "A Flame Jet is a gout of fire at short range, ruinous to war engines.",
+  },
+  56: {
+    name: "Burning Hands",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [13],
+    desc: "The Efreet's Burning Hands deliver good damage up close.",
+  },
+  57: {
+    name: "Twin Scimitars",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "Twin Scimitars deliver good damage against all armor types, but are less effective against the heaviest armors.",
+  },
+  58: {
+    name: "Rusted Sword",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Rusted Sword still cuts: good damage against all but the heaviest armors.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
 export const MAGIC_WEAPONS = [25, 26, 27, 36];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
-export const BONUS_RANGED = [35, 36, 39, 42, 46];
+export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55];
+// the Alchemist's flask, and the acid it leaves: HP a turn, for how many of the victim's turns
+export const FLASK_WEAPON = 50;
+export const ACID = { damage: 5, turns: 3 };
 export const CHAIN_WEAPON = 36;
 // Chain Lightning: added to the weapon x armour cell of every bolt and leap, and the share of the bolt each leap
 // carries (four leaps, each from the unit last struck to the nearest unstruck enemy within CHAIN_REACH tiles)
@@ -167,6 +241,13 @@ export const BONUS_AL = {
   shinobi: 1,
   oni: 2,
   tengu: 0,
+  alchemist: 2,
+  imp: 0,
+  golem: 2,
+  unicorn: 0,
+  efreet: 0,
+  naga: 1,
+  skeleton: 2,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -316,6 +397,63 @@ export const BONUS_COMBAT = {
   },
   // gale: the foe it strikes is thrown one tile back (and so cannot strike back), when there is room behind it
   tengu: { move: 7, weapon: 49, weapon2: 0, armour: 7, rating: 4, rf: 100, abilities: [], fly: true, gale: true },
+  // THE LABORATORY AND ITS CREATURES. The Alchemist throws flasks (flask: a Fireball-shaped burst that leaves acid),
+  // heals (the Priest's Heal, 30 HP at 2 tiles) and summons Imps (the Conjurer's rule).
+  alchemist: {
+    move: 4,
+    weapon: 50,
+    weapon2: 51,
+    armour: 9,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    flask: true,
+    conjure: true,
+    conjures: "imp",
+  },
+  imp: { move: 6, weapon: 53, weapon2: 0, armour: 2, rating: 2, rf: 75, abilities: [], fly: true, summoned: true },
+  // stoneskin: no single blow takes more than this many HP from it
+  golem: {
+    move: 3,
+    weapon: 52,
+    weapon2: 0,
+    armour: 10,
+    rating: 4,
+    rf: 100,
+    abilities: [14, 4],
+    unyielding: true,
+    stoneskin: 20,
+    armourName: "Rune Stone",
+  },
+  // purity: friends within this many tiles feel no Fear and are cleansed of acid
+  unicorn: { move: 7, weapon: 54, weapon2: 4, armour: 7, rating: 3, rf: 90, abilities: [], fly: true, purity: 2 },
+  // burn: HP every enemy standing beside it loses at the start of that enemy's turn
+  efreet: {
+    move: 5,
+    weapon: 55,
+    weapon2: 56,
+    armour: 7,
+    rating: 4,
+    rf: 100,
+    abilities: [14],
+    fly: true,
+    burn: 10,
+    armourName: "Living Flame",
+  },
+  // constrict: the foe it strikes cannot move on its next turn
+  naga: {
+    move: 5,
+    weapon: 57,
+    weapon2: 0,
+    armour: 5,
+    rating: 4,
+    rf: 100,
+    abilities: [],
+    amphibious: true,
+    constrict: true,
+  },
+  // undying: the first time it is struck down it rises again with this many HP
+  skeleton: { move: 4, weapon: 58, weapon2: 0, armour: 1, rating: 2, rf: 75, abilities: [4], undying: 40 },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -333,6 +471,13 @@ export const BONUS_COURAGE = {
   shinobi: 3,
   oni: 5,
   tengu: 4,
+  alchemist: 3,
+  imp: 2,
+  golem: 5,
+  unicorn: 4,
+  efreet: 5,
+  naga: 3,
+  skeleton: 5,
 };
 export const BONUS_COST = {
   cragsmen: 175,
@@ -350,6 +495,13 @@ export const BONUS_COST = {
   shinobi: 225,
   oni: 350,
   tengu: 225,
+  alchemist: 250,
+  imp: 0, // summoned by the Alchemist
+  golem: 400,
+  unicorn: 275,
+  efreet: 300,
+  naga: 150,
+  skeleton: 100,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
 export const BONUS_ELITE = { battlemage: true, dragonrider: true };
@@ -509,6 +661,82 @@ export const BONUS_TYPES = {
     kind: "cavalry",
     ability: "Gale — the foe it strikes is thrown a tile back and cannot strike back. Flies.",
   },
+  // heal / healAmount / healRange: the Priest's Heal with its own numbers. magic + projectile "ball": the flask flies
+  // as the Fireball does; greenShot tints it and its burst green. splash: the + cross of a Fireball.
+  alchemist: {
+    name: "Alchemist",
+    sprite: "alchemist",
+    ...both(4, 2),
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    greenShot: true,
+    splash: true,
+    heal: true,
+    healAmount: 30,
+    healRange: 2,
+    ability:
+      "Throws Acid Flasks that burst like a Fireball and leave acid; heals 30 HP at 2 tiles; summons up to two Imps.",
+  },
+  imp: {
+    name: "Imp",
+    sprite: "imp",
+    ...strip(4, 2),
+    kind: "melee",
+    ability: "Summoned by an Alchemist: a small flier, leashed within 8 tiles of it, and gone if it falls.",
+  },
+  golem: {
+    name: "Golem",
+    sprite: "golem",
+    frames: 4,
+    frameW: 104,
+    frameH: 104,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Stoneskin — no single blow takes more than 20 HP from it. Fear, Fearless; only Craftsmen can mend it.",
+  },
+  // shotSpell: its bolt flies as the Wizard's ice bolt does (a white-blue streak), with no burst of flame
+  unicorn: {
+    name: "Unicorn",
+    sprite: "unicorn",
+    frames: 4,
+    frameW: 112,
+    frameH: 104,
+    hitFrame: 1,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 1,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotSpell: "ice",
+    ability: "Purity — friends within 2 tiles feel no Fear and are cleansed of acid. Starlight at 2–4 tiles. Flies.",
+  },
+  efreet: {
+    name: "Efreet",
+    sprite: "efreet",
+    ...both(4, 2),
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    ability: "Burning Aura — enemies beside it lose 10 HP each turn. Flame Jet at 2–4 tiles. Fear. Flies.",
+  },
+  naga: {
+    name: "Naga",
+    sprite: "naga",
+    ...strip(4, 2),
+    kind: "melee",
+    ability: "Constrict — the foe it strikes cannot move on its next turn. Amphibious.",
+  },
+  skeleton: {
+    name: "Skeletons",
+    sprite: "skeleton",
+    ...strip(4, 2),
+    kind: "melee",
+    ability: "Rise Again — the first time it is struck down it rises with 40 HP. Fearless.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -530,6 +758,48 @@ export const BONUS_SKILLS = [
     n: "Unyielding",
     icon: "skill_unyielding",
     d: "Living stone: a Priest's Heal does nothing for it and quicksand neither stops nor hurts it. Craftsmen can Repair it like a war engine.",
+  },
+  {
+    flag: "flask",
+    n: "Acid Flask",
+    icon: "skill_chain",
+    d: "Its flask bursts like a Fireball on the target and the four tiles around it (friend or foe), and everyone it burns loses 5 HP at the start of each of their next 3 turns.",
+  },
+  {
+    flag: "healRange",
+    n: "Elixir",
+    icon: "skill_nullify",
+    d: "Heals a friendly unit within 2 tiles for 30 HP, in place of its attack.",
+  },
+  {
+    flag: "stoneskin",
+    n: "Stoneskin",
+    icon: "skill_unyielding",
+    d: "No single blow takes more than 20 HP from it, however strong.",
+  },
+  {
+    flag: "purity",
+    n: "Purity",
+    icon: "skill_nullify",
+    d: "Friendly units within 2 tiles feel no Fear, and acid is washed from them at the start of their turn.",
+  },
+  {
+    flag: "burn",
+    n: "Burning Aura",
+    icon: "skill_chain",
+    d: "Every enemy standing beside it loses 10 HP at the start of that enemy's turn.",
+  },
+  {
+    flag: "constrict",
+    n: "Constrict",
+    icon: "skill_amphibious",
+    d: "The foe it strikes in its own turn is held in its coils: it cannot move on its next turn, though it can still fight.",
+  },
+  {
+    flag: "undying",
+    n: "Rise Again",
+    icon: "skill_unyielding",
+    d: "The first time it is struck down in a battle it rises again at once with 40 HP.",
   },
   {
     flag: "sutra",
@@ -569,9 +839,9 @@ export const BONUS_SKILLS = [
   },
   {
     flag: "conjures",
-    n: "Call Hounds",
+    n: "Call",
     icon: "skill_conjure",
-    d: "Calls a pack of Hounds onto a tile beside it — up to two at once, each leashed within range 8 and unable to act the turn it arrives. They are gone if the Beast Master falls.",
+    d: "Calls its creature (a Beast Master's Hounds, an Alchemist's Imp) onto a tile beside it — up to two at once, each leashed within range 8 and unable to act the turn it arrives. They are gone if their master falls.",
   },
   {
     flag: "amphibious",
@@ -652,6 +922,12 @@ export const BONUS_UPGRADES = [
   { from: "rangers", to: "shinobi", need: "Lore", gate: 5962 }, // Satoshi 2
   { from: "greatswordsmen", to: "oni", need: "Spirit", gate: 5963 }, // Satoshi 3
   { from: "beastmaster", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
+  { from: "priests", to: "alchemist", need: "Lore", gate: 5925 }, // Isoluccia 5, The Arsenal
+  { from: "sentinel", to: "golem", need: "Armor", gate: 5905 }, // Tilicia 5, The Sleepers Wake
+  { from: "knights", to: "unicorn", need: "Spirit", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
+  { from: "dunesirens", to: "efreet", need: "Lore", gate: 5983 }, // the Mirror Sea 3, The Reaver-King
+  { from: "marines", to: "naga", need: "Beasts", gate: 5981 }, // the Mirror Sea 1, The Line of Hulls
+  { from: "conjurer", to: "skeleton", need: "Spirit", gate: 5903 }, // Tilicia 3, The Sealed Vale
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
@@ -725,6 +1001,36 @@ export const BONUS_META = {
     role: "Wind Spirit",
     kit: "⚔ Gale Blade · 🛡 Feathered Hide",
     note: "Crow-winged spirits of the cedar forests. A Tengu's fan throws the foe it strikes a tile back, out of reach of any reply.",
+  },
+  alchemist: {
+    role: "Battle Chemist",
+    kit: "⚔ Acid Flask / Dagger · 🛡 Holy Vestment",
+    note: "A priest who left the temple for the laboratory. Its flasks burst like a Fireball and leave acid that eats 5 HP a turn for 3 turns; its elixirs heal 30 HP at 2 tiles; and it keeps up to two Imps on a leash.",
+  },
+  golem: {
+    role: "Rune Construct",
+    kit: "⚔ Rune Fists · 🛡 Rune Stone",
+    note: "A Stone Sentinel rebuilt with rune-cut armour. Slower still, but no single blow takes more than 20 HP from it.",
+  },
+  unicorn: {
+    role: "Winged Unicorn",
+    kit: "⚔ Starlight / Hooves · 🛡 Feathered Hide",
+    note: "A winged unicorn that only the truest knights can ride. Friends within 2 tiles feel no Fear and are washed clean of acid; its horn throws Starlight at 2–4 tiles.",
+  },
+  efreet: {
+    role: "Fire Djinn",
+    kit: "⚔ Flame Jet / Burning Hands · 🛡 Living Flame",
+    note: "A djinn of the deep desert, bound by the Sirens' songs. Enemies who stand beside it burn for 10 HP a turn.",
+  },
+  naga: {
+    role: "Serpent Warrior",
+    kit: "⚔ Twin Scimitars · 🛡 Breastplate",
+    note: "Serpent warriors of the warm seas. A Naga swims like the Marines, and the foe it strikes is held in its coils for a turn.",
+  },
+  skeleton: {
+    role: "Undead Warrior",
+    kit: "⚔ Rusted Sword · 🛡 Shield",
+    note: "The dead of old battlefields, raised by a Conjurer. Cheap, fearless, and each one has to be put down twice.",
   },
 };
 // Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi

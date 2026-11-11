@@ -24,7 +24,8 @@ from PIL import Image, ImageDraw
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
 SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg",
-          "beasts": "beastmaster-hounds-sheet.jpg", "satoshi": "satoshi-units-sheet.jpg"}  # a unit's "sheet" (default first)
+          "beasts": "beastmaster-hounds-sheet.jpg", "satoshi": "satoshi-units-sheet.jpg",
+          "alchemy": "alchemy-units-sheet.jpg", "mythic": "mythic-units-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -149,6 +150,56 @@ UNITS = {
         "anchors": [140, 387, 680, 1013, 1413, 1953],
         "stand": 0, "walk": [2, 3, 2, 3], "attack": [2, 3, 4, 3], "height": 70, "team": False,
         "frame": (144, 104), "lift": 0,
+    },
+    # The alchemy sheet (Alchemist, Golem, Imp; its Gryphon Rider row is not used) and the mythic sheet (Unicorn,
+    # Efreet, Naga, Skeleton). The splashes, beams and flames drawn beside the figures are left out: the engine
+    # draws the shots.
+    "alchemist": {
+        "sheet": "alchemy",
+        "rows": (460, 649),
+        "cells": [(9, 111), (121, 224), (280, 376), (385, 479), (491, 599), (664, 785), (789, 891), (898, 1014),
+                  (1514, 1622)],
+        "stand": 0, "walk": [2, 3, 4, 3], "attack": [1, 5, 6, 7], "height": 62, "team": False,
+    },
+    "golem": {
+        "sheet": "alchemy",
+        "rows": (741, 987),
+        "cells": [(6, 144), (156, 289), (341, 489), (501, 651), (694, 856), (867, 1040), (1051, 1218),
+                  (1227, 1416), (1463, 1635)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [5, 6, 7, 8], "height": 76, "team": False,
+        "frame": (104, 104),
+    },
+    "imp": {
+        "sheet": "alchemy",
+        "rows": (1107, 1251),
+        "cells": [(15, 104), (124, 214), (277, 366), (383, 480), (494, 615), (661, 789), (809, 952), (969, 1093)],
+        "stand": 0, "walk": [2, 3, 4, 3], "attack": [4, 5, 6, 7], "height": 46, "team": False,
+    },
+    "unicorn": {
+        "sheet": "mythic",
+        "rows": (74, 354),
+        "cells": [(21, 202), (238, 419), (472, 697), (708, 933), (959, 1189), (1504, 1717)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 4], "height": 78, "team": False,
+        "frame": (112, 104),
+    },
+    "efreet": {
+        "sheet": "mythic",
+        "rows": (436, 655),
+        "cells": [(51, 139), (187, 310), (465, 648), (664, 891), (915, 1150), (1525, 1694)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 3, 4, 1], "height": 70, "team": False,
+    },
+    "naga": {
+        "sheet": "mythic",
+        "rows": (756, 1000),
+        "cells": [(16, 167), (190, 342), (413, 636), (642, 830), (1255, 1438), (1478, 1651)],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [0, 1, 4, 5], "height": 70, "team": False,
+    },
+    # (its walking and overhead poses are drawn without the helmet, so the helmeted ones are used throughout)
+    "skeleton": {
+        "sheet": "mythic",
+        "rows": (1075, 1315),
+        "cells": [(20, 153), (187, 320), (403, 539), (568, 713), (802, 947), (974, 1209), (1256, 1429)],
+        "stand": 0, "walk": [1, 4, 1, 4], "attack": [0, 4, 5, 4], "height": 62, "team": False,
     },
 }
 

@@ -160,6 +160,13 @@ const RANK = {
   shinobi: 5,
   oni: 2,
   tengu: 4,
+  alchemist: 6,
+  imp: 4,
+  golem: 2,
+  unicorn: 5,
+  efreet: 5,
+  naga: 3,
+  skeleton: 2,
 };
 const slotRank = (u) => (RANK[u.type] != null ? RANK[u.type] : -1);
 // Row width for one rank category (the C.119 map: ranks 0–6 → category 0, ranks 7–8 → category 1): five exactly →

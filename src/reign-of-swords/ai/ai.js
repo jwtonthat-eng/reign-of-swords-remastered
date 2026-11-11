@@ -407,7 +407,8 @@ export class AiMethods {
     let target = null,
       targetScore = 0;
     for (const a of this.game.units) {
-      if (a.dead || a.team !== self || a.hp >= 100 || a.T.unyielding || manhattan(a, u) > 1) continue;
+      if (a.dead || a.team !== self || a.hp >= 100 || a.T.unyielding || manhattan(a, u) > (u.T.healRange || 1))
+        continue;
       const score = (100 - a.hp) * this._aiValue(a);
       if (score > targetScore) {
         targetScore = score;
@@ -479,7 +480,7 @@ export class AiMethods {
     for (const spot of stops)
       for (const a of this.game.units) {
         if (a.dead || a.team !== self || a.hp >= 100 || a.T.unyielding) continue;
-        if ((a === u ? 0 : manhattan(a, spot)) > 1) continue; // the priest itself heals wherever it stands
+        if ((a === u ? 0 : manhattan(a, spot)) > (u.T.healRange || 1)) continue; // the priest itself heals wherever it stands
         const score = (100 - a.hp) * this._aiValue(a);
         if (score > hScore) {
           hScore = score;

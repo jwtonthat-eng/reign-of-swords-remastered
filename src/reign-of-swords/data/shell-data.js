@@ -554,6 +554,18 @@ UNIT_META.hounds = {
   conjured: true,
   note: "A pack of corsair war hounds, called by a Beast Master: fast and savage, a little less than a Stag. Leashed within 8 tiles of their master, and gone if it falls.",
 };
+// …and the Alchemist's Imp
+UNIT_META.imp = {
+  name: UNIT_TYPES.imp.name,
+  cost: 0,
+  role: "Summoned Imp",
+  kit: "⚔ Claws · 🛡 Minor Ward",
+  upgrades: null,
+  ep2: true,
+  bonus: true,
+  conjured: true,
+  note: "A small winged familiar, summoned by an Alchemist: quick and weak. Leashed within 8 tiles of its master, and gone if it falls.",
+};
 for (const { from, to, need } of BONUS_UPGRADES)
   UNIT_META[from].upgrades = [...(UNIT_META[from].upgrades || []), { to, need, ep2: true, bonus: true }];
 // The bonus campaigns open once Episode II is finished: Oasis Standoff (5432), Abbisin's last battle, is won.
@@ -582,6 +594,9 @@ export const ARMY_GROUPS = [
       "sohei",
       "shinobi",
       "oni",
+      "golem",
+      "naga",
+      "skeleton",
     ],
   },
   {
@@ -600,7 +615,17 @@ export const ARMY_GROUPS = [
     id: "caster",
     label: "Casters",
     icon: "class_caster",
-    units: ["shamans", "druids", "priests", "wizards", "dunesirens", "conjurer", "battlemage", "beastmaster"],
+    units: [
+      "shamans",
+      "druids",
+      "priests",
+      "wizards",
+      "dunesirens",
+      "conjurer",
+      "battlemage",
+      "beastmaster",
+      "alchemist",
+    ],
   },
   {
     id: "siege",
@@ -608,7 +633,12 @@ export const ARMY_GROUPS = [
     icon: "class_siege",
     units: ["craftsmen", "catapult", "trebuchet", "cannon", "ballistae"],
   },
-  { id: "fly", label: "Flyers", icon: "class_fly", units: ["bloodgorgers", "griffon", "dragonrider", "tengu"] },
+  {
+    id: "fly",
+    label: "Flyers",
+    icon: "class_fly",
+    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet"],
+  },
 ];
 export const ORDER = [
   "militiamen",
@@ -1333,6 +1363,12 @@ export const TREE_COL = {
   shinobi: 3,
   oni: 4,
   tengu: 2,
+  alchemist: 3,
+  golem: 4,
+  unicorn: 4,
+  efreet: 3,
+  naga: 3,
+  skeleton: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1377,6 +1413,12 @@ export const TREE_ROW = {
   shinobi: 15,
   oni: 0,
   tengu: 16,
+  alchemist: 16,
+  golem: 5,
+  unicorn: 6,
+  efreet: 17,
+  naga: 18,
+  skeleton: 19,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

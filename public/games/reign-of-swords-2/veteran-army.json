@@ -44,7 +44,13 @@
   "sohei": 8,
   "shinobi": 8,
   "oni": 8,
-  "tengu": 8
+  "tengu": 8,
+  "alchemist": 8,
+  "golem": 8,
+  "unicorn": 8,
+  "efreet": 8,
+  "naga": 8,
+  "skeleton": 8
  },
  "spoils": {
   "Medal": 8,

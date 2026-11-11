@@ -644,7 +644,7 @@ kept apart from the original data so that everything else stays checkable agains
   naval campaign, its marker on the northern sea under the map's own "Mirror Sea" label) both open after Mare Nostra. Until then nothing of them shows: not the kingdoms, the units, their
   Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
   battle, raid or battlefield.
-- **Fourteen units** (and the Hounds a Beast Master calls), each on the damage row of an original weapon and an original armour column (§2), so the real
+- **Twenty units** (and the Hounds and Imps two of them call), each on the damage row of an original weapon and an original armour column (§2), so the real
   weapon x armour table prices them:
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
@@ -664,7 +664,28 @@ kept apart from the original data so that everything else stays checkable agains
   | Shinobi | 5, skirmish | Shuriken 2-3 (Spear), Ninjato | Light | 3 | 225 | Shadow, Stealth |
   | Oni | 3, formation | Kanabo (Greatsword) | Heavy, shown as Oni Hide | 4 | 350 | Earthshaker, Fear, Fearless |
   | Tengu | 7, flying | Gale Blade (Sword) | Feathered Hide | 4 | 225 | Gale |
+  | Alchemist | 4, formation | Acid Flask 2-6 (Fireball), Dagger | Holy Vestment | 3 | 250 | Acid Flask, Elixir, Summon Imp |
+  | Imp (summoned) | 6, flying | Claws (Short Sword) | Minor Ward | 2 | - | leashed, as the Conjurer's minions |
+  | Golem | 3, formation | Rune Fists (Greatsword) | Heavy & Shield, shown as Rune Stone | 4 | 400 | Stoneskin, Unyielding, Fear, Fearless |
+  | Unicorn | 7, flying | Starlight 2-4 (Lightning Storm), Antlers | Feathered Hide | 3 | 275 | Purity |
+  | Efreet | 5, flying | Flame Jet 2-4 (Fireball), Burning Hands | Feathered Hide, shown as Living Flame | 4 | 300 | Burning Aura, Fear |
+  | Naga | 5, skirmish | Twin Scimitars (Sword) | Breastplate | 4 | 150 | Constrict, Amphibious |
+  | Skeletons | 4, formation | Rusted Sword (Sword) | Shield | 2 | 100 | Rise Again, Fearless |
 
+- **The laboratory and its creatures** (the third wave; art supplied by the user, its Gryphon Rider row unused).
+  *Acid Flask* (Alchemist): a Fireball in everything but colour, the same + cross at 100% / 60% on friend and foe,
+  flying and bursting green; every unit it burns (not war engines) carries acid, 5 HP at the start of each of its
+  side's next 3 turns, a fresh flask restarting the count. Point-blank the Alchemist uses its Dagger, with no burst.
+  *Elixir*: the Priest's Heal with its own numbers, 30 HP on the shown HP at up to 2 tiles. *Summon Imp*: the
+  Conjurer's Conjure with one summon, as the Beast Master's Hounds. *Stoneskin* (Golem): a blow's damage is capped at
+  20 HP after every other rule. *Purity* (Unicorn): a unit within 2 tiles of a friendly Unicorn passes every Fear
+  check and loses its acid at the start of its turn. *Burning Aura* (Efreet): a unit that begins its side's turn
+  beside an enemy Efreet loses 10 HP. *Constrict* (Naga): the unit it strikes hand to hand (not a war engine) has a
+  move of 0 until its own next turn ends. *Rise Again* (Skeletons): the first time its HP reaches 0 it is set to 40
+  instead. Upgrades: Priests + Lore to Alchemist (after Isoluccia 5), Stone Sentinel + Armor to Golem (Tilicia 5),
+  Knights + Spirit to Unicorn (Satoshi's first raid), Dune Sirens + Lore to Efreet (the Mirror Sea 3), Marines +
+  Beasts to Naga (the Mirror Sea 1), Conjurer + Spirit to Skeletons (Tilicia 3); each of those battles fields the
+  creature and rewards one.
 - **More abilities** (added with the later units). *Grapple* (Marines): once a battle, in place of the move, a swing
   to any free tile within 6 that the Marines could stand on (no step rule, so a rampart will do; not deep water),
   played as the Wizard's blink; it cannot be undone and the computer does not use it. *Breach* (Marines): the tile

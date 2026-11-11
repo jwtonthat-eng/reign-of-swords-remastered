@@ -260,7 +260,7 @@ export class InputMethods {
     const sel = this.selected;
     if (!sel || !sel.T.heal || sel.acted || !u || u.team !== "blue" || u.dead || u.hp >= 100 || u.T.unyielding)
       return false; // (BONUS: a Stone Sentinel can't be healed)
-    if (manhattan(sel, u) > sel.T.range) return false;
+    if (manhattan(sel, u) > (sel.T.healRange || sel.T.range)) return false;
     this.healUnit(sel, u);
     return true;
   }
@@ -685,7 +685,7 @@ export class InputMethods {
   // A wounded unit of the healer's side within its casting range, the healer itself included (Unit::startHeal).
   _canHealNow(u) {
     if (!u || u.acted || !u.T.heal) return false;
-    const range = u.T.range || 1;
+    const range = u.T.healRange || u.T.range || 1;
     return this.units.some(
       (a) => !a.dead && a.team === u.team && a.hp < 100 && !a.T.unyielding && manhattan(a, u) <= range,
     );

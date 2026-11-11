@@ -753,6 +753,8 @@ class Game {
   healOnKeeps(team, only) {
     for (const u of this.units) {
       if (u.dead || u.team !== team || (only && !only(u))) continue;
+      this._turnStartAilments(u); // BONUS: acid, an Efreet's Burning Aura
+      if (u.dead) continue;
       // BONUS: Spellwardens mend themselves (T.regen) at the same moment, on top of anything the ground heals
       const ground = this.terrainAt(u.tx, u.ty);
       // …and a Sohei's Sutra mends every friend standing beside it (not what a Priest cannot heal)

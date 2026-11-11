@@ -64,7 +64,7 @@ LEVELS.append(
             "h": U("halberdiers", "E", group=8, hold=True),
             "k": U("gladiator", "E", group=9, hold=True),
             "w": U("greatswordsmen", "E", group=9, hold=True),
-            "n": U("marines", "E"),
+            "n": U("naga", "E"),
         },
         "camera": (6, 6),
         "intro": [
@@ -80,7 +80,7 @@ LEVELS.append(
             ("advisor", "There was a cage on the last one, Varius. Iron, man-high, and chewed from the inside. Whatever they kept in it, they took it with them."),
         ],
         "defeat": [("officer_hurt", "They have thrown us back across the plank, Commander. The strait is still shut.")],
-        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1}},
+        "reward": {"units": {"naga": 1}, "spoils": {"Weapons": 1, "Armor": 1}},
     }
 )
 
@@ -165,7 +165,7 @@ LEVELS.append(
         "name": "The Reaver-King",
         "objective": "Cross the flagship to the islet and defeat Reaver-King Skarl.",
         "turn_limit": 34,
-        "budget": 3250,
+        "budget": 3500,
         "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -207,7 +207,7 @@ LEVELS.append(
             "H": U("hounds", "E", group=4),
             "g": U("gladiator", "E", group=5, hold=True),
             "s": U("swordsmen", "E", group=6, hold=True),
-            "p": U("pavisiers", "E", group=7, hold=True),
+            "p": U("efreet", "E", group=7, hold=True),
             "h": U("halberdiers", "E", group=8, hold=True),
             "x": U("crossbowmen", "E", group=9, hold=True),
         },
@@ -233,7 +233,7 @@ LEVELS.append(
             ("advisor", "The Rukiev coast can fish again, Varius, and so can we. Two seas in one year. The Emperor will run out of water to send you to."),
         ],
         "defeat": [("officer_hurt", "We never reached the sand, Commander. The flagship has thrown us back.")],
-        "reward": {"units": {"marines": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
+        "reward": {"units": {"marines": 1, "efreet": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
     }
 )
 

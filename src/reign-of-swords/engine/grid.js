@@ -433,6 +433,7 @@ export class GridMethods {
     return true;
   }
   moveOf(u) {
+    if (u._held) return 0; // BONUS: held in a Naga's coils
     const move = u._paceMove || u.T.move || 4;
     return u.slowed ? Math.trunc((move * 3) / 4) : move;
   } // _paceMove: a grouped AI Hero marches at its group's pace (ai/grouplogic.js)   // Ice Field: move × 3 / 4 (Unit::onTick @0x78f5c)
@@ -492,12 +493,8 @@ export class GridMethods {
   _passesOverFoes(u) {
     if (!(this.mission && this.mission.ep === 2)) return false;
     return (
-      u.type === "griffon" ||
-      u.type === "greateagle" ||
-      u.type === "dunesirens" ||
-      u.type === "dragonrider" ||
-      u.type === "tengu"
-    ); // (+ the bonus flier)
+      u.type === "griffon" || u.type === "greateagle" || u.type === "dunesirens" || !!(u.T.bonus && u.T.fly) // (+ the bonus fliers)
+    );
   }
   _walkReach(u, moveBudget) {
     const dist = new Map(),
@@ -803,6 +800,7 @@ export class GridMethods {
   _endTurnHide(units) {
     for (const u of units) {
       if (u.T.shadowStep) u._ambushReady = false;
+      if (u._held) u._held = false; // a Naga's hold lasts the one turn
       if (u.dead || !this._canHideUnit(u)) continue;
       this._setHidden(u, !u.attackedTurn && this._canHide(u));
     }
