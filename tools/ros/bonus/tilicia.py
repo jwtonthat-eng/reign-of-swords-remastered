@@ -281,7 +281,7 @@ LEVELS.append(
         "units": """
 ....................
 ......x.wSSw.x......
-.......hhhhhh.......
+.......Zhhhhh.......
 ......x.w..w.x......
 ....................
 ....................
@@ -302,7 +302,8 @@ LEVELS.append(
 """,
         "legend": {
             "w": U("spellwardens", "E", group=1),
-            "h": U("skeleton", "E", group=1),
+            "h": U("halberdiers", "E", group=1),
+            "Z": U("skeleton", "E", group=1),
             "x": U("crossbowmen", "E", group=2),
             "S": U("shamans", "E", group=2),
         },
@@ -379,7 +380,7 @@ LEVELS.append(
             ("advisor", "Or to keep some of his own on a leash."),
         ],
         "defeat": [("officer_hurt", "They have the stones, Commander. The road to the tomb is open to them.")],
-        "reward": {"units": {"skeleton": 2}, "spoils": {"Lore": 1, "Spirit": 1}},
+        "reward": {"units": {"skeleton": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
     }
 )
 

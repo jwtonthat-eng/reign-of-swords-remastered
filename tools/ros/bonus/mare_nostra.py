@@ -280,7 +280,7 @@ LEVELS.append(
         "name": "Blockade Runner",
         "objective": "Hold your deck for 8 turns against the boarders.",
         "turn_limit": 12,
-        "budget": 3000,
+        "budget": 3750,
         "win_switch": False,
         "sides": {"P": ARMY, "E": FLEET},
         "terrain": """
@@ -331,7 +331,7 @@ LEVELS.append(
             {
                 "when": ("round", 2),
                 "cam": (11, 2),
-                "spawn": [("marines", "a", "E"), ("footmen", "f", "E"), ("gladiator", "e", "E")],
+                "spawn": [("footmen", "a", "E"), ("footmen", "f", "E"), ("gladiator", "e", "E")],
                 "say": [("officer_alarm", "Marines over the side to the north!")],
             },
             {
@@ -342,7 +342,7 @@ LEVELS.append(
             {
                 "when": ("round", 4),
                 "cam": (11, 2),
-                "spawn": [("marines", "a", "E"), ("crossbowmen", "y", "E"), ("gladiator", "c", "E")],
+                "spawn": [("footmen", "a", "E"), ("crossbowmen", "y", "E"), ("gladiator", "c", "E")],
             },
             {
                 "when": ("round", 5),
@@ -353,7 +353,7 @@ LEVELS.append(
             {
                 "when": ("round", 6),
                 "cam": (11, 12),
-                "spawn": [("swordsmen", "h", "E"), ("gladiator", "c", "E"), ("marines", "a", "E")],
+                "spawn": [("swordsmen", "h", "E"), ("gladiator", "c", "E"), ("footmen", "a", "E")],
             },
             {
                 "when": ("round", 7),

@@ -622,14 +622,14 @@ not on this list is meant to match the binaries — a difference that is not lis
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
 
-### The bonus campaigns: Tilicia, Isoluccia, Mare Nostra, Satoshi and the Mirror Sea (Episode II only)
+### The bonus campaigns: Tilicia, Isoluccia, Mare Nostra, Satoshi, the Mirror Sea and Tezcal (Episode II only)
 
-Five fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+Six fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
 kept apart from the original data so that everything else stays checkable against the binaries.
 
 - **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
-  beside it) holds the five regions, their 21 story battles and 12 raids (map ids 5901-5913 Tilicia, 5921-5933 Isoluccia,
-  5941-5952 Mare Nostra, 5961-5972 Satoshi, 5981-5992 the Mirror Sea), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
+  beside it) holds the six regions, their 24 story battles and 14 raids (map ids 5901-5913 Tilicia, 5921-5933 Isoluccia,
+  5941-5952 Mare Nostra, 5961-5972 Satoshi, 5981-5992 the Mirror Sea, 5994-5998 Tezcal), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
   the code. Their sprites are cut from art sheets supplied for this project
@@ -644,7 +644,7 @@ kept apart from the original data so that everything else stays checkable agains
   naval campaign, its marker on the northern sea under the map's own "Mirror Sea" label) both open after Mare Nostra. Until then nothing of them shows: not the kingdoms, the units, their
   Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
   battle, raid or battlefield.
-- **Twenty units** (and the Hounds and Imps two of them call), each on the damage row of an original weapon and an original armour column (§2), so the real
+- **Twenty-four units** (and the Hounds and Imps two of them call), each on the damage row of an original weapon and an original armour column (§2), so the real
   weapon x armour table prices them:
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
@@ -652,7 +652,7 @@ kept apart from the original data so that everything else stays checkable agains
   | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 175 | Climb, Shoot and Move |
   | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Mending Runes, Formation |
   | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 300 | Bulwark, Unyielding, Fear, Fearless |
-  | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Short Sword | Light & Shield | 2 | 125 | Amphibious, Grapple, Breach, Move or Shoot |
+  | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Sword | Light & Shield | 3 | 150 | Amphibious, Grapple, Breach, Move or Shoot |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
   | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 3 | 750, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
   | Gladiators | 4, skirmish | Gladius (Sword) | Heavy & Shield (-10 taken) | 3 | 175 | Whirl |
@@ -660,18 +660,40 @@ kept apart from the original data so that everything else stays checkable agains
   | Dragon Riders | 8, flying | Dragonfire 2-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Fire and Lance, First Strike, Fear, Charge |
   | Beast Master | 4, formation | Whip (Spear) | Shield | 1 | 250 | Call Hounds |
   | Hounds (called) | 7, skirmish | Fangs (Antlers) | Nature's Cloak | 2 | - | leashed, as the Conjurer's minions |
-  | Sohei | 4, formation | Naginata (Halberd) | Holy Vestment | 4 | 175 | Sutra, Fearless |
+  | Sohei | 4, formation | Naginata (Halberd, +5) | Holy Vestment | 4 | 175 | Sutra, Fearless |
   | Shinobi | 5, skirmish | Shuriken 2-3 (Spear), Ninjato | Light | 3 | 225 | Shadow, Stealth |
   | Oni | 3, formation | Kanabo (Greatsword) | Heavy, shown as Oni Hide | 4 | 350 | Earthshaker, Fear, Fearless |
-  | Tengu | 7, flying | Gale Blade (Sword) | Feathered Hide | 4 | 225 | Gale |
+  | Tengu | 7, flying | Gale Blade (Sword, +20) | Feathered Hide (-10 taken) | 5 | 325 | Gale |
   | Alchemist | 4, formation | Acid Flask 2-6 (Fireball), Dagger | Holy Vestment | 3 | 250 | Acid Flask, Elixir, Summon Imp |
   | Imp (summoned) | 6, flying | Claws (Short Sword) | Minor Ward | 2 | - | leashed, as the Conjurer's minions |
   | Golem | 3, formation | Rune Fists (Greatsword) | Heavy & Shield, shown as Rune Stone | 4 | 400 | Stoneskin, Unyielding, Fear, Fearless |
   | Unicorn | 7, flying | Starlight 2-4 (Lightning Storm), Antlers | Feathered Hide | 3 | 275 | Purity |
-  | Efreet | 5, flying | Flame Jet 2-4 (Fireball), Burning Hands | Feathered Hide, shown as Living Flame | 4 | 300 | Burning Aura, Fear |
-  | Naga | 5, skirmish | Twin Scimitars (Sword) | Breastplate | 4 | 150 | Constrict, Amphibious |
-  | Skeletons | 4, formation | Rusted Sword (Sword) | Shield | 2 | 100 | Rise Again, Fearless |
+  | Efreet | 5, flying | Flame Jet 2-4 (Fireball, with its + cross), Burning Hands | Feathered Hide (-10 taken), shown as Living Flame | 5 | 350 | Burning Aura (20), Fear |
+  | Naga | 5, skirmish | Twin Scimitars (Sword, +10) | Heavy & Shield (-10 taken) | 5 | 300 | Constrict, Whirl, Amphibious |
+  | Skeletons | 4, formation | Rusted Sword (Sword, +10) | Heavy & Shield (-10 taken) | 5 | 500 | Rise Again (at full HP), Fearless |
+  | Jaguar Warriors | 5, skirmish | Macuahuitl (Sword) | Light & Shield (-5 taken) | 3 | 150 | Jungle Stride, Pounce |
+  | Eagle Warriors | 5, skirmish | Atlatl Dart 2-3 (Spear), Macuahuitl | Light | 2 | 175 | Jungle Stride, Eagle Eye, Shoot and Move |
+  | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 400, elite | Sun Magic |
+  | Feathered Serpent | 7, flying | Gale 2-4 (Lightning Storm, +10), Fangs | Feathered Hide | 4 | 300 | Tailwind, Shoot and Move |
 
+- **Tezcal and the upgrade rule** (the fourth wave; art supplied by the user). A sixth region, the Jungles of
+  Tezcal (map ids 5994-5998: three story battles, two raids), opens after the Mirror Sea; its marker is east of the
+  Mirror Sea, between Satoshi and Tilicia. *Jungle Stride* (Jaguar and Eagle Warriors): woods (terrain types 4, 28)
+  cost 1. *Pounce* (Jaguar): +20 on the cell of a blow struck from woods, tall grass, scrub or rocks (types 3, 4, 22,
+  27, 28). *Eagle Eye*: an Eagle Warrior's dart counts its target's tile cover as none. *Sun Magic* (Sun Priest, the
+  Wizard's counterpart): Sunbeam, its attack, is the Fireball's row +30 on one target and burns on through the two
+  tiles beyond it (60% then 35%, the Dragonfire's line), and Nullify stops it; Dawn mends every friend within 2 tiles
+  by 15 HP (not war engines or Stone Sentinels); Eclipse blinds a foe within 5 tiles, halving every blow it deals
+  until its own next turn ends. The computer casts only Sunbeam. *Tailwind* (Feathered Serpent): a friend beside it
+  has 1 more movement. Upgrades: Pikemen + Beasts to Jaguar Warriors (Tezcal 1), Archers + Lore to Eagle Warriors
+  (Tezcal 2), Cavalry + Spirit to Feathered Serpent and Priests + Medal to Sun Priest (Tezcal 3).
+  *The Beast Master's tree* (user decision): Unicorn (Lore), Efreet (Weapons), Naga (Beasts) and Skeletons (Armor)
+  are now upgraded from the Beast Master, beside the Tengu (Spirit); their unlock battles are unchanged.
+  *An upgrade beats its base* (user decision): six of a unit must beat six of the unit it is upgraded from, one for
+  one (the arena's `upgrade` duel, the mean of both sides and two dice seeds). To pass it Marines, Skeletons, Naga,
+  Efreet, Tengu, Jaguar Warriors, the Feathered Serpent and Sohei were strengthened and re-priced (the table above
+  has their present numbers); the four made from a Beast Master had to outfight a master and its two packs of Hounds,
+  which is why Skeletons are now a 500-point unit that rises at full health.
 - **Stone Sentinel and Pavisiers, improved** (user decision, from the arena's battle types). The Sentinel no
   longer strikes last and has *Bulwark* (the Golem too): a charge adds nothing against it, the flank bonus is not
   applied against it, and a Tengu's Gale does not move it; it costs 300. A planted *Pavise* now also takes a quarter
@@ -755,6 +777,13 @@ kept apart from the original data so that everything else stays checkable agains
   without the transfer limits, marks every original Episode II battle and raid won, and replaces the army and
   collectibles with the file's. *With the veteran army* (for testing): marks every battle of every campaign won, the
   bonus ones included, so all are open to replay, with 8 of every unit and collectible.
+- **The website offers Episode II only** (user decision). The page boots straight into Episode II: there is no
+  episode switch, an address that still names an episode (`#reign-of-swords`, `#reign-of-swords-2`) lands on
+  Episode II and the hash is dropped, and the page's search metadata describes Episode II alone. Episode I is hidden,
+  not removed: its data, rules and tests stay in the repository (Episode II draws its sprites and sounds from
+  Episode I's folder), and its saves are neither read nor deleted. In Episode II's Settings the Army transfer group
+  is the export alone ("Army file", the file Resume Episode II reads back); importing an Episode I army is no longer
+  offered there.
 - **The page.** The standalone site gives the game the whole window: the page never scrolls, the campaign screen's
   map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
   battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the

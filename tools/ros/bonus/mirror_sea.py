@@ -19,7 +19,7 @@ LEVELS.append(
         "name": "The Line of Hulls",
         "objective": "Fight from hull to hull along the reaver line. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 5000,
+        "budget": 5500,
         "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -313,7 +313,7 @@ LEVELS.append(
         "name": "Wolf Pack",
         "objective": "Three reaver cutters have you grappled. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3600,
+        "budget": 3850,
         "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

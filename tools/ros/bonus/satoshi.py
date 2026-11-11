@@ -256,7 +256,7 @@ LEVELS.append(
         "name": "The Castle of Lord Kagemori",
         "objective": "Storm the castle and defeat Lord Kagemori.",
         "turn_limit": 35,
-        "budget": 5500,
+        "budget": 6250,
         "sides": {"P": "Carrone Army", "E": "Kagemori's Host"},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -391,7 +391,7 @@ LEVELS.append(
         "name": "The Shrine Pass",
         "objective": "Reach the mountain shrine within fourteen turns, before Kagemori's men carry off its relics.",
         "turn_limit": 14,
-        "budget": 3750,
+        "budget": 4500,
         "sides": {"P": "Carrone Army", "E": "Shrine Guard"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^

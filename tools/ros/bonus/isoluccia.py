@@ -119,7 +119,7 @@ LEVELS.append(
         "name": "The Causeway",
         "objective": "Cross the causeways and eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3500,
+        "budget": 3900,
         "sides": {"P": ARMY, "E": DOGE},
         "terrain": """
 ~~~..f.....s.~~~
@@ -426,7 +426,7 @@ LEVELS.append(
         "name": "The Arsenal",
         "objective": "Hold the Arsenal for 12 turns.",
         "turn_limit": 16,
-        "budget": 4500,
+        "budget": 5000,
         "win_switch": False,
         "sides": {"P": ARMY, "A": "Shipwrights", "E": DOGE, "E2": "Stone Sentinels"},
         "terrain": """
@@ -552,7 +552,7 @@ LEVELS.append(
         "name": "Reign of the Battlemage",
         "objective": "Storm the citadel and defeat the Battlemage.",
         "turn_limit": 36,
-        "budget": 5500,
+        "budget": 6000,
         "sides": {"P": ARMY, "E": DOGE, "E2": "The Battlemage"},
         "terrain": """
 ~~~..^^....f.....^^...f.
@@ -738,7 +738,7 @@ LEVELS.append(
         "name": "Lighthouse Rock",
         "objective": "Hold the lighthouse for 10 turns.",
         "turn_limit": 14,
-        "budget": 3500,
+        "budget": 4500,
         "win_switch": False,
         "sides": {"P": ARMY, "E": DOGE},
         "terrain": """

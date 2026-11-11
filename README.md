@@ -46,11 +46,12 @@ It is a remake, not an exact copy.
 - **The original army.** Knights, Pikemen, Swordsmen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen,
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
-- **Five fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
-  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles) and Satoshi, 21 battles and 12 raids that
-  follow the "Battlemage" letters Episode II ends on, with twenty new units (Cragsmen, Spellwardens, Stone
-  Sentinels, Marines, Pavisiers, the Battlemage, Gladiators, Samurai, Dragon Riders, Beast Masters with their Hounds,
-  Sohei, Shinobi, Oni, Tengu, Alchemists with their Imps, Golems, Unicorns, Efreet, Naga and Skeletons).
+- **Six fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
+  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi and the jungles of Tezcal, 24
+  battles and 14 raids that follow the "Battlemage" letters Episode II ends on, with twenty-four new units (Cragsmen,
+  Spellwardens, Stone Sentinels, Marines, Pavisiers, the Battlemage, Gladiators, Samurai, Dragon Riders, Beast
+  Masters with their Hounds, Sohei, Shinobi, Oni, Tengu, Alchemists with their Imps, Golems, Unicorns, Efreet, Naga,
+  Skeletons, Jaguar Warriors, Eagle Warriors, the Sun Priest and Feathered Serpents).
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.
@@ -137,7 +138,7 @@ public/games/
   reign-of-swords-2/        Episode II data (shares Episode I's sprites and audio)
 public/ros-atlas/           the interactive map and animation atlases (Story & Assets)
 tools/ros/                  Python tools that extracted and audited the data from the original iOS games
-tools/ros/bonus/            the five fan-made bonus campaigns: level sources, sprite-sheet importer and their builder
+tools/ros/bonus/            the six fan-made bonus campaigns: level sources, sprite-sheet importer and their builder
 docs/images/                the screenshots in this README
 ```
 
