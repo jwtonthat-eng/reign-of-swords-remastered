@@ -755,7 +755,24 @@ class Game {
       if (u.dead || u.team !== team || (only && !only(u))) continue;
       // BONUS: Spellwardens mend themselves (T.regen) at the same moment, on top of anything the ground heals
       const ground = this.terrainAt(u.tx, u.ty);
-      const terrain = u.T.regen ? { heal: (ground.heal || 0) + u.T.regen } : ground;
+      // …and a Sohei's Sutra mends every friend standing beside it (not what a Priest cannot heal)
+      const sutra =
+        u.T.al === 4 || u.T.unyielding
+          ? 0
+          : this.units.reduce(
+              (best, o) =>
+                !o.dead &&
+                o !== u &&
+                o.team === u.team &&
+                o.T.sutra &&
+                Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) === 1
+                  ? Math.max(best, o.T.sutra)
+                  : best,
+              0,
+            );
+      if (u.T.shadowStep) u._ambushReady = !!u._hidden; // Shinobi: a turn begun in hiding is an ambush
+      const mend = (u.T.regen || 0) + sutra;
+      const terrain = mend ? { heal: (ground.heal || 0) + mend } : ground;
       if (terrain.heal && u.hp < 100) {
         // GameScreen::hideCurrentMenu's turn-start heal (iOS Ep2 @0x1f856) works on the shown HP: + bonus, capped at 100
         const before = u.hp;

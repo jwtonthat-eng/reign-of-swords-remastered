@@ -644,6 +644,8 @@ for (const k in UNIT_TYPES) {
   for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
     T[flag] = !!c[flag];
   for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
+  for (const flag of ["shadowStep", "quake", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
+  T.sutra = c.sutra || 0; // Sohei: HP mended by each friend beside it at the start of its turn
   T.grapple = c.grapple || 0; // Marines: the reach of their once-a-battle Grapple
   T.conjures = c.conjures || null; // Beast Master: what its Conjure calls (Hounds)
   if (c.summoned) T.summoned = true; // Hounds: leashed, never deployed

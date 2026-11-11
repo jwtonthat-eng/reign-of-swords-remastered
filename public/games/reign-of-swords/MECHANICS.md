@@ -622,14 +622,14 @@ not on this list is meant to match the binaries — a difference that is not lis
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
 
-### The bonus campaigns: Tilicia, Isoluccia, the Mirror Sea and Satoshi (Episode II only)
+### The bonus campaigns: Tilicia, Isoluccia, Mare Nostra, Satoshi and the Mirror Sea (Episode II only)
 
-Four fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+Five fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
 kept apart from the original data so that everything else stays checkable against the binaries.
 
 - **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
-  beside it) holds the four regions, their 18 story battles and 10 raids (map ids 5901-5913 Tilicia, 5921-5933 Isoluccia,
-  5941-5952 the Mirror Sea, 5961-5972 Satoshi), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
+  beside it) holds the five regions, their 21 story battles and 12 raids (map ids 5901-5913 Tilicia, 5921-5933 Isoluccia,
+  5941-5952 Mare Nostra, 5961-5972 Satoshi, 5981-5992 the Mirror Sea), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
   the code. Their sprites are cut from art sheets supplied for this project
@@ -639,11 +639,12 @@ kept apart from the original data so that everything else stays checkable agains
   maps reuse the Episode II tileset, the speakers reuse its portraits, and every battle runs on the original scenario
   script (round, kill, tile, escape and escort triggers), with no new script commands.
 - **Opening.** The kingdoms appear on the Episode II world map, marked "Bonus campaign", once Oasis Standoff is won.
-  Tilicia opens first, then Isoluccia, the Mirror Sea (its marker is in Mare Nostra, by user decision) and Satoshi
-  (the top-right corner), each after the one before. Until then nothing of them shows: not the kingdoms, the units, their
+  Tilicia opens first, then Isoluccia, then Mare Nostra (the five ship battles first built as "the Mirror Sea";
+  renamed by user decision, its marker in Mare Nostra); Satoshi (the top-right corner) and the Mirror Sea (a second
+  naval campaign, its marker on the northern sea under the map's own "Mirror Sea" label) both open after Mare Nostra. Until then nothing of them shows: not the kingdoms, the units, their
   Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
   battle, raid or battlefield.
-- **Nine units**, each on the damage row of an original weapon and an original armour column (§2), so the real
+- **Fourteen units** (and the Hounds a Beast Master calls), each on the damage row of an original weapon and an original armour column (§2), so the real
   weapon x armour table prices them:
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
@@ -651,13 +652,34 @@ kept apart from the original data so that everything else stays checkable agains
   | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 175 | Climb, Shoot and Move |
   | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Mending Runes, Formation |
   | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 250 | Unyielding, Fear, Fearless, Last Strike |
-  | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Short Sword | Light & Shield | 2 | 125 | Amphibious, Move or Shoot |
+  | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Short Sword | Light & Shield | 2 | 125 | Amphibious, Grapple, Breach, Move or Shoot |
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
   | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 3 | 750, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
-  | Gladiators | 4, skirmish | Gladius (Sword) | Light & Shield | 3 | 150 | Whirl |
+  | Gladiators | 4, skirmish | Gladius (Sword) | Heavy & Shield (-10 taken) | 3 | 175 | Whirl |
   | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 250 | Lesser Shroud, Pike Wall |
   | Dragon Riders | 8, flying | Dragonfire 2-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Fire and Lance, First Strike, Fear, Charge |
+  | Beast Master | 4, formation | Whip (Spear) | Shield | 1 | 250 | Call Hounds |
+  | Hounds (called) | 7, skirmish | Fangs (Antlers) | Nature's Cloak | 2 | - | leashed, as the Conjurer's minions |
+  | Sohei | 4, formation | Naginata (Halberd) | Holy Vestment | 4 | 175 | Sutra, Fearless |
+  | Shinobi | 5, skirmish | Shuriken 2-3 (Spear), Ninjato | Light | 3 | 225 | Shadow, Stealth |
+  | Oni | 3, formation | Kanabo (Greatsword) | Heavy, shown as Oni Hide | 4 | 350 | Earthshaker, Fear, Fearless |
+  | Tengu | 7, flying | Gale Blade (Sword) | Feathered Hide | 4 | 225 | Gale |
 
+- **More abilities** (added with the later units). *Grapple* (Marines): once a battle, in place of the move, a swing
+  to any free tile within 6 that the Marines could stand on (no step rule, so a rampart will do; not deep water),
+  played as the Wizard's blink; it cannot be undone and the computer does not use it. *Breach* (Marines): the tile
+  cover of a fortification (terrain types 6, 8, 10, 12, 14, 16) counts as none against their blows and shots. *Call
+  Hounds* (Beast Master): the Conjurer's Conjure with one summon, Hounds; the cap of two, the 8-tile leash, the turn
+  of arrival and the death of the pack with its master are the Conjurer's rules unchanged. Upgrade: Militia + Medal,
+  after the Mirror Sea's second battle. *Sutra* (Sohei): at the start of its side's turn every friendly unit
+  orthogonally beside a Sohei mends 10 HP with the village heal (not war engines or Stone Sentinels). *Shadow*
+  (Shinobi): Stealth that hides on any ground, not only in cover; a turn begun in hiding makes its blows that turn an
+  ambush, +30 on the weapon x armour cell. *Earthshaker* (Oni): every other enemy adjacent to its melee target takes
+  half the blow. *Gale* (Tengu): its melee target is moved one tile straight back if that tile is free and ground it
+  could stand on (war engines never), before the counter-attack is judged, so a thrown foe does not strike back.
+  Gladiators now wear the Heavy & Shield column with a further 10 off every cell (the Samurai's rule), at 175.
+  DELIBERATE FIX found with the Shinobi: a move cut short beside a hidden foe no longer stops on a tile another unit
+  holds (a flier over a friend); it stops on the next free tile.
 - **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
   to the Gladiators takes 3/4 of the same blow. *Lesser Shroud* (Samurai): the Shaman's Spirit Shroud with a reach of
   2 tiles instead of 4, raised the same way. *Mending Runes* (Spellwardens): +10 HP at the start of each of their
@@ -691,7 +713,7 @@ kept apart from the original data so that everything else stays checkable agains
 - **Unit arena and stress run** (`npm run e2e:arena`, `npm run e2e:stress`). Balance tools, not game content: the
   arena fights equal-points squads of each unit against a basket of fourteen original units on an emptied Open
   Field, from both sides and over several dice seeds, and scores the share of points left; the stress run plays the
-  bonus battles at random with the player's army swapped for the nine bonus units, under the fuzzer's invariants.
+  bonus battles at random with the player's army swapped for the bonus units, under the fuzzer's invariants.
   The bonus units' costs and the Battlemage's rating were set from the arena so that each scores near the original
   unit it sits beside (Battlemage and Dragon Rider near the Hero).
 - **Resume Episode II** (Settings, Episode II only). *From an army file*: reads an Episode II army file back in

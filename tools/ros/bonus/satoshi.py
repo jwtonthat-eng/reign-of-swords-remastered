@@ -67,7 +67,7 @@ f.........==..........
 """,
         "legend": {
             "a": U("archers", "E", group=1, hold=True),
-            "S": U("shamans", "E", group=1, hold=True),
+            "S": U("sohei", "E", group=1, hold=True),
             "s": U("samurai", "E", group=2),
             "p": U("pikemen", "E", group=2),
             "c": U("cavalry", "E", group=3),
@@ -104,7 +104,7 @@ f.........==..........
             ("ishiro", "He knows you have landed. He will come for my hill before you can reach his castle. Come quickly."),
         ],
         "defeat": [("officer_hurt", "We are driven back to the boats, Commander.")],
-        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1, "Spirit": 1}},
+        "reward": {"units": {"sohei": 1}, "spoils": {"Weapons": 1, "Armor": 1, "Spirit": 1}},
     }
 )
 
@@ -186,8 +186,8 @@ LEVELS.append(
                     ("swordsmen", (21, 6), "E"),
                     ("swordsmen", (21, 8), "E"),
                     ("swordsmen", (20, 8), "E"),
-                    ("horsebowmen", (20, 6), "E"),
-                    ("horsebowmen", (21, 5), "E"),
+                    ("shinobi", (20, 6), "E"),
+                    ("shinobi", (21, 5), "E"),
                 ],
                 "say": [("officer_alarm", "They are on the east road, Commander!")],
             },
@@ -244,7 +244,7 @@ LEVELS.append(
             ("advisor", "His castle lies across the strait, Varius, with the sea at its back. Corvane's scrolls are inside it."),
         ],
         "defeat": [("officer_hurt", "The hill is lost, Commander, and Lord Ishiro with it.")],
-        "reward": {"units": {"samurai": 2}, "spoils": {}},
+        "reward": {"units": {"samurai": 2, "shinobi": 1}, "spoils": {}},
     }
 )
 
@@ -317,8 +317,8 @@ LEVELS.append(
         "legend": {
             "K": U("king", "E", group=1, hold=True, name="kagemori"),
             "s": U("samurai", "E", group=1, hold=True),
-            "g": U("greatswordsmen", "E", group=1, hold=True),
-            "q": U("priests", "E", group=1, hold=True),
+            "g": U("oni", "E", group=1, hold=True),
+            "q": U("sohei", "E", group=1, hold=True),
             "z": U("shamans", "E", group=1, hold=True),
             "a": U("archers", "E", group=3, hold=True),
             "t": U("samurai", "E", group=2, hold=True),
@@ -327,7 +327,7 @@ LEVELS.append(
             "w": U("swordsmen", "E", group=5),
             "y": U("shamans", "E", group=5),
             "c": U("cavalry", "E", group=6),
-            "H": U("horsebowmen", "E", group=6),
+            "H": U("tengu", "E", group=6),
         },
         "camera": (9, 4),
         "intro": [
@@ -379,7 +379,7 @@ LEVELS.append(
             ("advisor", "Then there is one Battlemage in the world, and it marches under your banner. See that it never needs a second. Let us go home."),
         ],
         "defeat": [("officer_hurt", "We could not carry the moat, Commander. Kagemori still holds his castle.")],
-        "reward": {"units": {}, "spoils": {"Lore": 1, "Spirit": 1, "Armor": 1}},
+        "reward": {"units": {"oni": 1, "tengu": 1}, "spoils": {"Lore": 1, "Spirit": 1, "Armor": 1}},
     }
 )
 
@@ -391,7 +391,7 @@ LEVELS.append(
         "name": "The Shrine Pass",
         "objective": "Reach the mountain shrine within fourteen turns, before Kagemori's men carry off its relics.",
         "turn_limit": 14,
-        "budget": 3500,
+        "budget": 3750,
         "sides": {"P": "Carrone Army", "E": "Shrine Guard"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^
@@ -435,11 +435,11 @@ LEVELS.append(
 """,
         "legend": {
             "a": U("archers", "E", group=1, hold=True),
-            "q": U("priests", "E", group=1, hold=True),
+            "q": U("sohei", "E", group=1, hold=True),
             "s": U("samurai", "E", group=2, hold=True),
             "p": U("pikemen", "E", group=3, hold=True),
             "w": U("swordsmen", "E", group=3, hold=True),
-            "H": U("horsebowmen", "E", group=4),
+            "H": U("tengu", "E", group=4),
         },
         "camera": (7, 2),
         "intro": [
@@ -532,7 +532,7 @@ LEVELS.append(
                 "spawn": [
                     ("samurai", (18, 13), "E"),
                     ("swordsmen", (18, 14), "E"),
-                    ("swordsmen", (17, 13), "E"),
+                    ("shinobi", (17, 13), "E"),
                 ],
                 "say": [("officer_alarm", "A boat on the beach behind us, Commander! More of them are wading ashore.")],
             },

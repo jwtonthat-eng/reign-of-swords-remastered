@@ -491,7 +491,13 @@ export class GridMethods {
   // Android port's a.j likewise — so there a flyer goes round enemy units like everyone else.
   _passesOverFoes(u) {
     if (!(this.mission && this.mission.ep === 2)) return false;
-    return u.type === "griffon" || u.type === "greateagle" || u.type === "dunesirens" || u.type === "dragonrider"; // (+ the bonus flier)
+    return (
+      u.type === "griffon" ||
+      u.type === "greateagle" ||
+      u.type === "dunesirens" ||
+      u.type === "dragonrider" ||
+      u.type === "tengu"
+    ); // (+ the bonus flier)
   }
   _walkReach(u, moveBudget) {
     const dist = new Map(),
@@ -790,12 +796,13 @@ export class GridMethods {
   }
   _canHide(u) {
     const tileDamagePct = Math.round(100 - (this.terrainAt(u.tx, u.ty).defBonus || 0) * 100);
-    if (tileDamagePct > 90) return false;
+    if (tileDamagePct > 90 && !(u.T && u.T.shadowStep)) return false; // BONUS: a Shinobi hides on any ground
     return !this.units.some((o) => !o.dead && o.team !== u.team && manhattan(o, u) === 1);
   }
   // Unit::endTurn's rule, for the units whose turn just ended.
   _endTurnHide(units) {
     for (const u of units) {
+      if (u.T.shadowStep) u._ambushReady = false;
       if (u.dead || !this._canHideUnit(u)) continue;
       this._setHidden(u, !u.attackedTurn && this._canHide(u));
     }

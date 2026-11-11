@@ -139,6 +139,10 @@ export const UNIT_CATEGORY = {
   dragonrider: "Flying",
   beastmaster: "Casters",
   hounds: "Infantry",
+  sohei: "Infantry",
+  shinobi: "Missile",
+  oni: "Infantry",
+  tengu: "Flying",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

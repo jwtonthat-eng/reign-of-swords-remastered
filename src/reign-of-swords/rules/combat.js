@@ -326,6 +326,7 @@ export class CombatMethods {
     let base = weaponBase(defender, weapon);
     if (isFireWeapon(weapon) && defender.T.flammable) base *= 2;
     if (opts.charge) base += 30; // the rider's charging flag
+    if (attacker._ambushReady && attacker.T.shadowStep) base += 30; // BONUS: a Shinobi striking from hiding
     if (opts.brace) base += 30; // Ep1: a braced Pike Wall's first strike
     if (base <= 0) return 0;
     // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
@@ -1261,6 +1262,29 @@ export class CombatMethods {
       for (const e of this.units)
         if (!e.dead && e !== defender && e.team !== attacker.team && manhattan(e, attacker) === 1 && !this._isHidden(e))
           this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.75), false, false, wMain);
+    if (manhattan(attacker, defender) === 1 && opts.weapon == null) {
+      // BONUS: Earthshaker — the Oni's blow shakes every other enemy standing next to its TARGET, at half strength
+      if (attacker.T.quake)
+        for (const e of this.units)
+          if (
+            !e.dead &&
+            e !== defender &&
+            e.team !== attacker.team &&
+            manhattan(e, defender) === 1 &&
+            !this._isHidden(e)
+          )
+            this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.5), false, false, wMain);
+      // BONUS: Gale — the Tengu's foe is thrown one tile straight back (so it is out of reach to strike back), unless
+      // it is a war engine or the tile behind is taken or no ground it could stand on
+      if (attacker.T.gale && !defender.dead && defender.T.al !== 4) {
+        const bx = defender.tx * 2 - attacker.tx,
+          by = defender.ty * 2 - attacker.ty;
+        if (this.inBounds(bx, by) && !this.unitAt(bx, by) && this.moveCost(defender, bx, by) < 99) {
+          Object.assign(defender, { tx: bx, ty: by, px: bx * this.tile, py: by * this.tile });
+          this.spawnFx("sand_puff", bx * this.tile + this.tile / 2, by * this.tile + this.tile * 0.5, {});
+        }
+      }
+    }
     // A wizard jabbing point-blank uses its Wand (weapon 7) — a plain melee hit, no spell splash.
     if (attacker.T.splash && !(attacker.T.canLightning && manhattan(attacker, defender) <= 1))
       this._resolveSplash(attacker, defender, opts, wMain);

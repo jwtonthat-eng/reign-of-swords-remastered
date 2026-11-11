@@ -24,7 +24,7 @@ from PIL import Image, ImageDraw
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", ".."))
 ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
 SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg",
-          "beasts": "beastmaster-hounds-sheet.jpg"}  # a unit's "sheet" (default first)
+          "beasts": "beastmaster-hounds-sheet.jpg", "satoshi": "satoshi-units-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -114,10 +114,76 @@ UNITS = {
                   (1606, 1850), (1877, 2065), (2096, 2334)],
         "stand": 0, "walk": [2, 3, 4, 3], "attack": [4, 5, 7, 6], "height": 36, "team": True,
     },
+    # The Satoshi sheet (Sohei, Shinobi, Oni, Tengu). Its poses overlap here and there: "solo" lists the cells where
+    # only the largest connected shape is kept (a neighbour's blade tip pokes in). Wide blows get a wider frame.
+    "sohei": {
+        "sheet": "satoshi",
+        "rows": (100, 423),
+        "cells": [(52, 191), (239, 512), (518, 756), (760, 1050), (1088, 1521), (1581, 1930), (1944, 2185)],
+        "solo": [3],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 6], "height": 80, "team": False,
+        "frame": (128, 88),
+    },
+    # strip: crouch, slash, dash (the sword) | ready, throw, ready (the shuriken)
+    "shinobi": {
+        "sheet": "satoshi",
+        "rows": (542, 822),
+        "cells": [(70, 201), (252, 410), (472, 708), (760, 992), (1066, 1434), (1454, 1842), (1906, 2119)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [2, 4, 3, 1, 5, 1], "height": 52, "team": False,
+        "frame": (104, 88),
+    },
+    # strip: brace, raise, slam, brace
+    "oni": {
+        "sheet": "satoshi",
+        "boxes": [(17, 935, 256, 1262), (541, 935, 783, 1262), (803, 935, 1034, 1262), (1097, 935, 1333, 1262),
+                  (1336, 935, 1807, 1262), (1860, 935, 2091, 1262)],
+        "anchors": [127, 653, 920, 1200, 1447, 1960],
+        "stand": 0, "walk": [1, 2, 1, 2], "attack": [5, 3, 4, 5], "height": 74, "team": False,
+        "frame": (128, 96), "lift": 0,
+    },
+    # strip: fly, fly with the blade, the gale, fly with the blade
+    "tengu": {
+        "sheet": "satoshi",
+        "boxes": [(17, 1352, 252, 1683), (272, 1352, 499, 1683), (539, 1297, 809, 1683), (849, 1297, 1122, 1683),
+                  (1181, 1297, 1750, 1683), (1802, 1297, 2081, 1683)],
+        "anchors": [140, 387, 680, 1013, 1413, 1953],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [2, 3, 4, 3], "height": 70, "team": False,
+        "frame": (144, 104), "lift": 0,
+    },
 }
 
 
-def cut(sheet, box):
+def largest_shape(cell):
+    """Clear everything but the largest connected shape (8-connected) of a cut pose."""
+    w, h = cell.size
+    px = cell.load()
+    label = [[0] * w for _ in range(h)]
+    sizes = {}
+    for sy in range(h):
+        for sx in range(w):
+            if not px[sx, sy][3] or label[sy][sx]:
+                continue
+            n = len(sizes) + 1
+            label[sy][sx] = n
+            queue, count = deque([(sx, sy)]), 0
+            while queue:
+                x, y = queue.popleft()
+                count += 1
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < w and 0 <= ny < h and px[nx, ny][3] and not label[ny][nx]:
+                            label[ny][nx] = n
+                            queue.append((nx, ny))
+            sizes[n] = count
+    keep = max(sizes, key=sizes.get)
+    for y in range(h):
+        for x in range(w):
+            if label[y][x] and label[y][x] != keep:
+                px[x, y] = (0, 0, 0, 0)
+
+
+def cut(sheet, box, solo=False):
     """One pose, its ground flood-filled to transparent from the cell's edges."""
     cell = sheet.crop(box).convert("RGBA")
     w, h = cell.size
@@ -150,6 +216,8 @@ def cut(sheet, box):
                     drop.append((x, y))
         for x, y in drop:
             px[x, y] = (0, 0, 0, 0)
+    if solo:
+        largest_shape(cell)
     box = cell.getbbox()
     out = cell.crop(box)
     out.info["dx"] = box[0]  # how far the crop moved the pose's left edge (for poses placed by a measured anchor)
@@ -212,7 +280,9 @@ def build(sheet, key):
         poses = [cut(sheet, box) for box in unit["boxes"]]
     else:
         top, bottom = unit["rows"]
-        poses = [cut(sheet, (x0, top, x1, bottom)) for x0, x1 in unit["cells"]]
+        poses = [
+            cut(sheet, (x0, top, x1, bottom), i in unit.get("solo", ())) for i, (x0, x1) in enumerate(unit["cells"])
+        ]
     scale = unit["height"] / poses[unit["stand"]].height
     small = [scaled(p, scale, unit["team"]) for p in poses]
     stand = small[unit["stand"]]
@@ -226,7 +296,7 @@ def build(sheet, key):
             left = round(width / 2 - (unit["anchors"][n] - unit["boxes"][n][0] - poses[n].info.get("dx", 0)) * scale)
             frame.alpha_composite(pose, (max(0, left), max(0, height - pose.height - unit.get("lift", 0))))
         else:
-            frame = framed(small[n], width, height, 40)
+            frame = framed(small[n], width, height, 40 if width == FRAME else width // 2 - 4)
         strip.alpha_composite(frame, (i * width, 0))
     walk = None
     if unit["walk"]:

@@ -15,10 +15,14 @@ export const BONUS_ORDER = [
   "marines",
   "pavisiers",
   "battlemage",
-  "gladiator", // the Mirror Sea
+  "gladiator", // Mare Nostra
   "samurai", // Satoshi
-  "dragonrider", // the Mirror Sea
+  "dragonrider", // Mare Nostra
   "beastmaster", // the Mirror Sea (the second naval campaign)
+  "sohei", // Satoshi
+  "shinobi",
+  "oni",
+  "tengu",
 ];
 // Units a bonus unit calls onto the field: never deployed or owned (the Beast Master's Hounds).
 export const BONUS_SUMMONS = ["hounds"];
@@ -96,11 +100,46 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "The Hounds' Fangs tear at lightly armoured troops, and do little to heavy plate.",
   },
+  45: {
+    name: "Naginata",
+    row: 10, // Halberd
+    range: [1, 1],
+    tags: [],
+    desc: "A Naginata is a long curved glaive: it cuts deep into every armor, and deepest into the lightest.",
+  },
+  46: {
+    name: "Shuriken",
+    row: 3, // Spear (as the Javelin)
+    range: [2, 3],
+    tags: [],
+    desc: "Shuriken are thrown blades: decent damage at a short distance against all but the heaviest armor.",
+  },
+  47: {
+    name: "Ninjato",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Ninjato is a short straight sword: good damage against all armor types, but less effective against the heaviest armors.",
+  },
+  48: {
+    name: "Kanabo",
+    row: 13, // Greatsword
+    range: [1, 1],
+    tags: [],
+    desc: "A Kanabo is an iron-studded war club as tall as a man. Its blow shakes the ground around its target.",
+  },
+  49: {
+    name: "Gale Blade",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "The Tengu's blade strikes with a gust from its fan behind it: the foe is thrown a tile back.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
 export const MAGIC_WEAPONS = [25, 26, 27, 36];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
-export const BONUS_RANGED = [35, 36, 39, 42];
+export const BONUS_RANGED = [35, 36, 39, 42, 46];
 export const CHAIN_WEAPON = 36;
 // Dragonfire, and the share of the blow the first and second tile BEYOND its target take
 export const DRAGONFIRE_WEAPON = 42;
@@ -119,6 +158,10 @@ export const BONUS_AL = {
   dragonrider: 0,
   beastmaster: 2,
   hounds: 1,
+  sohei: 2,
+  shinobi: 1,
+  oni: 2,
+  tengu: 0,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -249,6 +292,25 @@ export const BONUS_COMBAT = {
   },
   // the Stag one tier down: a point less movement, a rating tier lower, and no Charge
   hounds: { move: 7, weapon: 44, weapon2: 0, armour: 4, rating: 2, rf: 75, abilities: [], summoned: true },
+  // SATOSHI's second wave. sutra: the HP every friend beside it mends at the start of its turn.
+  sohei: { move: 4, weapon: 45, weapon2: 0, armour: 9, rating: 4, rf: 100, abilities: [4], sutra: 10 },
+  // shadowStep: hides on ANY ground (not only in cover) when it ends a turn unattacking, and its blows from hiding land
+  // as an ambush (+30 on the cell, like a charge)
+  shinobi: { move: 5, weapon: 46, weapon2: 47, armour: 3, rating: 3, rf: 90, abilities: [16], shadowStep: true },
+  // quake: its blow also shakes every other enemy standing next to its TARGET, at half strength
+  oni: {
+    move: 3,
+    weapon: 48,
+    weapon2: 0,
+    armour: 8,
+    rating: 4,
+    rf: 100,
+    abilities: [14, 4],
+    quake: true,
+    armourName: "Oni Hide",
+  },
+  // gale: the foe it strikes is thrown one tile back (and so cannot strike back), when there is room behind it
+  tengu: { move: 7, weapon: 49, weapon2: 0, armour: 7, rating: 4, rf: 100, abilities: [], fly: true, gale: true },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -262,6 +324,10 @@ export const BONUS_COURAGE = {
   dragonrider: 5,
   beastmaster: 3,
   hounds: 3,
+  sohei: 4,
+  shinobi: 3,
+  oni: 5,
+  tengu: 4,
 };
 export const BONUS_COST = {
   cragsmen: 175,
@@ -275,6 +341,10 @@ export const BONUS_COST = {
   dragonrider: 750,
   beastmaster: 250,
   hounds: 0, // called by the Beast Master, never deployed
+  sohei: 175,
+  shinobi: 225,
+  oni: 350,
+  tengu: 225,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
 export const BONUS_ELITE = { battlemage: true, dragonrider: true };
@@ -387,6 +457,52 @@ export const BONUS_TYPES = {
     kind: "melee",
     ability: "Called by a Beast Master: fast, leashed within 8 tiles of it, and gone if it falls.",
   },
+  sohei: {
+    name: "Sohei",
+    sprite: "sohei",
+    frames: 4,
+    frameW: 128,
+    frameH: 88,
+    hitFrame: 1,
+    kind: "melee",
+    ability: "Sutra — friends beside it mend 10 HP at the start of its turn. Fearless.",
+  },
+  shinobi: {
+    name: "Shinobi",
+    sprite: "shinobi",
+    frames: 6,
+    frameW: 104,
+    frameH: 88,
+    meleeFrom: 0,
+    meleeTo: 2,
+    hitFrame: 1,
+    rangedFrom: 3,
+    rangedTo: 5,
+    rangedHit: 4,
+    kind: "ranged",
+    projectile: "bolt",
+    ability: "Shadow — hides on any ground; its first blow from hiding is an ambush. Throws Shuriken at 2–3 tiles.",
+  },
+  oni: {
+    name: "Oni",
+    sprite: "oni",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Earthshaker — its blow shakes every other enemy beside its target at half strength. Fear, Fearless.",
+  },
+  tengu: {
+    name: "Tengu",
+    sprite: "tengu",
+    frames: 4,
+    frameW: 144,
+    frameH: 104,
+    hitFrame: 2,
+    kind: "cavalry",
+    ability: "Gale — the foe it strikes is thrown a tile back and cannot strike back. Flies.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -408,6 +524,30 @@ export const BONUS_SKILLS = [
     n: "Unyielding",
     icon: "skill_unyielding",
     d: "Living stone: a Priest's Heal does nothing for it and quicksand neither stops nor hurts it. Craftsmen can Repair it like a war engine.",
+  },
+  {
+    flag: "sutra",
+    n: "Sutra",
+    icon: "skill_nullify",
+    d: "At the start of its turn, every friendly unit standing beside it mends 10 HP (war engines and Stone Sentinels do not).",
+  },
+  {
+    flag: "shadowStep",
+    n: "Shadow",
+    icon: "skill_first",
+    d: "Hides on any ground, not only in cover, when it ends a turn without attacking and no enemy stands beside it. A blow or throw from hiding is an ambush: 30 stronger on the weapon and armour table.",
+  },
+  {
+    flag: "quake",
+    n: "Earthshaker",
+    icon: "skill_unyielding",
+    d: "Its blow shakes the ground: every other enemy standing next to its target takes half of it.",
+  },
+  {
+    flag: "gale",
+    n: "Gale",
+    icon: "skill_charge",
+    d: "The foe it strikes is thrown one tile straight back, and so cannot strike back. War engines, and foes with no free ground behind them, stand fast.",
   },
   {
     flag: "grapple",
@@ -502,6 +642,10 @@ export const BONUS_UPGRADES = [
   { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
   { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
   { from: "militiamen", to: "beastmaster", need: "Medal", gate: 5982 }, // the Mirror Sea 2
+  { from: "priests", to: "sohei", need: "Weapons", gate: 5961 }, // Satoshi 1
+  { from: "rangers", to: "shinobi", need: "Lore", gate: 5962 }, // Satoshi 2
+  { from: "greatswordsmen", to: "oni", need: "Spirit", gate: 5963 }, // Satoshi 3
+  { from: "griffon", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
 ];
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
@@ -555,6 +699,26 @@ export const BONUS_META = {
     role: "Hound Handler",
     kit: "⚔ Whip · 🛡 Light Armor",
     note: "Kennel-masters of the Mirror Sea corsairs. A Beast Master whistles up to two packs of war Hounds to its side — fast, savage, a little less than a Stag — leashed within 8 tiles and gone if their master falls.",
+  },
+  sohei: {
+    role: "Warrior Monk",
+    kit: "⚔ Naginata · 🛡 Holy Vestment",
+    note: "Monks of the mountain temples of Satoshi, who fight with the naginata and chant as they do. Friends beside a Sohei mend 10 HP each turn, and nothing frightens it.",
+  },
+  shinobi: {
+    role: "Shadow Agent",
+    kit: "⚔ Shuriken / Ninjato · 🛡 Light Armor",
+    note: "Spies and night-fighters. A Shinobi hides on open ground as others hide in woods, and strikes hardest from hiding.",
+  },
+  oni: {
+    role: "Mountain Ogre",
+    kit: "⚔ Kanabo · 🛡 Oni Hide",
+    note: "A red ogre of the high passes with an iron club. Slow and terrible: its blow shakes every foe beside the one it lands on.",
+  },
+  tengu: {
+    role: "Wind Spirit",
+    kit: "⚔ Gale Blade · 🛡 Feathered Hide",
+    note: "Crow-winged spirits of the cedar forests. A Tengu's fan throws the foe it strikes a tile back, out of reach of any reply.",
   },
 };
 // Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi

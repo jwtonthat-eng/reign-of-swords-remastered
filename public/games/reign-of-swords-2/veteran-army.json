@@ -40,7 +40,11 @@
   "gladiator": 8,
   "samurai": 8,
   "dragonrider": 8,
-  "beastmaster": 8
+  "beastmaster": 8,
+  "sohei": 8,
+  "shinobi": 8,
+  "oni": 8,
+  "tengu": 8
  },
  "spoils": {
   "Medal": 8,

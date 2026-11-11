@@ -38,7 +38,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("ten units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("fourteen units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -50,6 +50,10 @@ describe("bonus units: the data", () => {
       "samurai",
       "dragonrider",
       "beastmaster",
+      "sohei",
+      "shinobi",
+      "oni",
+      "tengu",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -94,6 +98,10 @@ describe("bonus units: upgrade paths", () => {
       ["swordsmen", "samurai", "Spirit"],
       ["griffon", "dragonrider", "Medal"],
       ["militiamen", "beastmaster", "Medal"],
+      ["priests", "sohei", "Weapons"],
+      ["rangers", "shinobi", "Lore"],
+      ["greatswordsmen", "oni", "Spirit"],
+      ["griffon", "tengu", "Spirit"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -663,5 +671,76 @@ describe("Gladiators and the Beast Master", () => {
     const called = g.units.filter((u) => !u.dead && u._conjuredBy === master.id);
     expect(called.length).toBe(1);
     expect(called[0].type).toBe("hounds");
+  });
+});
+
+describe("Satoshi's second wave: Sohei, Shinobi, Oni, Tengu", () => {
+  const field = () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    return g;
+  };
+  it("Sutra: friends beside a Sohei mend 10 HP at the start of its side's turn; a Stone Sentinel does not", () => {
+    const g = field();
+    spawn(g, "sohei", "blue", 10, 10);
+    const beside = spawn(g, "footmen", "blue", 11, 10),
+      apart = spawn(g, "footmen", "blue", 13, 10),
+      stone = spawn(g, "sentinel", "blue", 10, 11);
+    for (const u of [beside, apart, stone]) u.hp = 50;
+    g.healOnKeeps("blue");
+    expect([beside.hp, apart.hp, stone.hp]).toEqual([60, 50, 50]);
+    expect(UNIT_TYPES.sohei.fearless).toBe(true);
+  });
+  it("Shadow: a Shinobi hides on open ground, and its blow from hiding is 30 stronger on the table", () => {
+    const g = field();
+    const shinobi = spawn(g, "shinobi", "blue", 10, 10),
+      ranger = spawn(g, "rangers", "blue", 10, 14),
+      foe = spawn(g, "footmen", "red", 12, 10);
+    expect(g._canHide(shinobi)).toBe(true); // open field: no cover at all
+    expect(g._canHide(ranger)).toBe(false);
+    const plain = g.computeDamage(shinobi, foe);
+    g._setHidden(shinobi, true);
+    g.healOnKeeps("blue"); // its turn begins in hiding
+    expect(shinobi._ambushReady).toBe(true);
+    expect(g.computeDamage(shinobi, foe)).toBeGreaterThan(plain);
+    g._endTurnHide([shinobi]);
+    expect(shinobi._ambushReady).toBe(false);
+    Object.assign(foe, { tx: 11, ty: 10 }); // an enemy beside it: nowhere to hide
+    expect(g._canHide(shinobi)).toBe(false);
+  });
+  it("Earthshaker: the Oni's blow also lands, at half strength, on every other enemy beside its target", () => {
+    const g = field();
+    const oni = spawn(g, "oni", "blue", 10, 10),
+      target = spawn(g, "footmen", "red", 11, 10),
+      beside = spawn(g, "footmen", "red", 12, 10),
+      besideOni = spawn(g, "footmen", "red", 10, 11),
+      friend = spawn(g, "footmen", "blue", 11, 9);
+    g.resolveDamage(oni, target);
+    expect(target.hp).toBeLessThan(100);
+    expect(beside.hp).toBeLessThan(100);
+    expect(100 - beside.hp).toBeLessThan(100 - target.hp);
+    expect(besideOni.hp).toBe(100); // beside the Oni, not beside the target
+    expect(friend.hp).toBe(100);
+    expect(UNIT_TYPES.oni.fear && UNIT_TYPES.oni.armourName === "Oni Hide").toBe(true);
+  });
+  it("Gale: the Tengu's foe is thrown a tile back and cannot strike back; with no room behind, it stands", () => {
+    const g = field();
+    const tengu = spawn(g, "tengu", "blue", 10, 10),
+      foe = spawn(g, "footmen", "red", 11, 10);
+    g.resolveDamage(tengu, foe);
+    expect([foe.tx, foe.ty]).toEqual([12, 10]);
+    expect(g._countersAfter(tengu, foe, false)).toBe(false);
+    const pinned = spawn(g, "footmen", "red", 10, 11);
+    spawn(g, "footmen", "red", 10, 12);
+    g.resolveDamage(tengu, pinned);
+    expect([pinned.tx, pinned.ty]).toEqual([10, 11]);
+    expect(UNIT_TYPES.tengu.fly && UNIT_TYPES.tengu.al === 0).toBe(true);
+  });
+  it("each has its price, its upgrade and its Satoshi battle", () => {
+    expect([DEPLOY_COST.sohei, DEPLOY_COST.shinobi, DEPLOY_COST.oni, DEPLOY_COST.tengu]).toEqual([175, 225, 350, 225]);
+    expect(upgradeGate("sohei", true)).toBe(5961);
+    expect(upgradeGate("shinobi", true)).toBe(5962);
+    expect(upgradeGate("oni", true)).toBe(5963);
+    expect(upgradeGate("tengu", true)).toBe(5963);
   });
 });

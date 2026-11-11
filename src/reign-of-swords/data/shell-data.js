@@ -579,6 +579,9 @@ export const ARMY_GROUPS = [
       "sentinel",
       "gladiator",
       "samurai",
+      "sohei",
+      "shinobi",
+      "oni",
     ],
   },
   {
@@ -605,7 +608,7 @@ export const ARMY_GROUPS = [
     icon: "class_siege",
     units: ["craftsmen", "catapult", "trebuchet", "cannon", "ballistae"],
   },
-  { id: "fly", label: "Flyers", icon: "class_fly", units: ["bloodgorgers", "griffon", "dragonrider"] },
+  { id: "fly", label: "Flyers", icon: "class_fly", units: ["bloodgorgers", "griffon", "dragonrider", "tengu"] },
 ];
 export const ORDER = [
   "militiamen",
@@ -1326,6 +1329,10 @@ export const TREE_COL = {
   samurai: 3,
   dragonrider: 4,
   beastmaster: 1,
+  sohei: 3,
+  shinobi: 3,
+  oni: 4,
+  tengu: 4,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1366,6 +1373,10 @@ export const TREE_ROW = {
   samurai: 13,
   dragonrider: 3,
   beastmaster: 15,
+  sohei: 14,
+  shinobi: 15,
+  oni: 0,
+  tengu: 4,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

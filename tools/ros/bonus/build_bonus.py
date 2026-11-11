@@ -247,10 +247,10 @@ OP_SPAWN, OP_SCREEN, OP_CAMERA, OP_COUNTER, OP_SETFLAG = 0, 1, 2, 9, 10
 MOVE_CLASS = {
     "cavalry": 3, "knights": 3, "king": 3, "raiders": 3, "horsebowmen": 3,
     "catapult": 4, "trebuchet": 4, "cannon": 4, "ballistae": 4,
-    "griffon": 0, "dragonrider": 0, "hounds": 1,
+    "griffon": 0, "dragonrider": 0, "tengu": 0, "hounds": 1,
     "footmen": 2, "swordsmen": 2, "greatswordsmen": 2, "pikemen": 2, "halberdiers": 2, "crossbowmen": 2,
     "musketeers": 2, "conjurer": 2, "bodyguard": 2, "bloodgorgers": 2,
-    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "beastmaster": 2,
+    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "sohei": 2, "oni": 2, "beastmaster": 2,
 }
 CROSSES = {"cragsmen": 21, "marines": 19}  # Climb / Amphibious
 
