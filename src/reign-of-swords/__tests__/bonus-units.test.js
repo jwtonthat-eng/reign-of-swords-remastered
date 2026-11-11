@@ -900,7 +900,7 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
       250, 400, 275, 350, 300, 500,
     ]);
     expect(upgradeGate("alchemist", true)).toBe(5925);
-    expect(upgradeGate("golem", true)).toBe(5905);
+    expect(upgradeGate("golem", true)).toBe(5912);
   });
   it("Unicorn, Efreet, Naga and Skeletons are hidden for now: built, but nowhere in the game", () => {
     expect(BONUS_HIDDEN).toEqual(["unicorn", "efreet", "naga", "skeleton"]);

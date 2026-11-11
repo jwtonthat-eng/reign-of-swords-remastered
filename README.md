@@ -47,7 +47,7 @@ It is a remake, not an exact copy.
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
 - **Six fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
-  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi and the jungles of Tezcal, 24
+  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi and the jungles of Tezcal, 18
   battles and 14 raids that follow the "Battlemage" letters Episode II ends on, with twenty-four new units (Cragsmen,
   Spellwardens, Stone Sentinels, Marines, Pavisiers, the Battlemage, Gladiators, Samurai, Dragon Riders, Beast
   Masters with their Hounds, Sohei, Shinobi, Oni, Tengu, Alchemists with their Imps, Golems, Unicorns, Efreet, Naga,

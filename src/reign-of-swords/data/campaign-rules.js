@@ -51,7 +51,12 @@ export function raidGate(camp, kingdomIdx, raidIdx) {
   const kingdom = camp && camp.kingdoms[kingdomIdx];
   if (!kingdom) return null;
   const order = kingdom.order ?? kingdomIdx;
-  const storyIdx = order === 0 ? kingdom.missions.length - 1 : order >= 8 ? raidIdx + 1 : raidIdx;
+  // BONUS (ours): a bonus region with as many raids as story battles — Tilicia and Isoluccia, three of each — opens
+  // its last raid with its last battle, there being no battle after it to wait for. The original kingdoms keep the
+  // original rule, where a raid past the story's end has no gate.
+  const last = kingdom.missions.length - 1;
+  const eastern = kingdom.bonus ? Math.min(raidIdx + 1, last) : raidIdx + 1;
+  const storyIdx = order === 0 ? last : order >= 8 ? eastern : raidIdx;
   return kingdom.missions[storyIdx] || null;
 }
 

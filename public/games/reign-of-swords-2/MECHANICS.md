@@ -628,7 +628,7 @@ Six fan-made campaigns, entirely ours (user decision). Nothing in this section c
 kept apart from the original data so that everything else stays checkable against the binaries.
 
 - **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
-  beside it) holds the six regions, their 24 story battles and 14 raids (map ids 5901-5913 Tilicia, 5921-5933 Isoluccia,
+  beside it) holds the six regions, their 18 story battles and 14 raids (map ids 5902-5913 Tilicia, 5924-5933 Isoluccia,
   5941-5952 Mare Nostra, 5961-5972 Satoshi, 5981-5992 the Mirror Sea, 5994-5998 Tezcal), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
@@ -676,6 +676,13 @@ kept apart from the original data so that everything else stays checkable agains
   | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 400, elite | Sun Magic |
   | Feathered Serpent | 7, flying | Gale 2-4 (Lightning Storm, +10), Fangs | Feathered Hide | 4 | 300 | Tailwind, Shoot and Move |
 
+- **Tilicia and Isoluccia are three battles each** (user decision; they were built with six). Every battle of
+  the two regions is now fought with an army the player deploys: the fixed-force battles (The Tolm Road, The Sleepers
+  Wake, Landfall, Free Company) are gone, with The Sealed Vale and The Causeway. Tilicia is Ostrak's Bargain,
+  Frostgate, The Empty Tomb (5902, 5904, 5906); Isoluccia is The Harbour Chain, The Arsenal, Reign of the Battlemage
+  (5924-5926). The Marines' upgrade now opens after The Harbour Chain and the Golem's after the Quarry of Giants raid.
+  With three battles and three raids, a bonus region's last raid opens with its last battle (`raidGate`; the
+  original kingdoms keep the original rule).
 - **Hidden for now** (user decision): the Unicorn, Efreet, Naga and Skeletons. Their data, rules, art and tests
   stay (`BONUS_HIDDEN` in `data/bonus-units.js`), but the game offers none of them: no camp or Field Manual card, no
   upgrade branch, no reward, no place in any battle or in the veteran army. What is written of them below describes
@@ -713,9 +720,9 @@ kept apart from the original data so that everything else stays checkable agains
   check and loses its acid at the start of its turn. *Burning Aura* (Efreet): a unit that begins its side's turn
   beside an enemy Efreet loses 10 HP. *Constrict* (Naga): the unit it strikes hand to hand (not a war engine) has a
   move of 0 until its own next turn ends. *Rise Again* (Skeletons): the first time its HP reaches 0 it is set to 40
-  instead. Upgrades: Priests + Lore to Alchemist (after Isoluccia 5), Stone Sentinel + Armor to Golem (Tilicia 5),
+  instead. Upgrades: Priests + Lore to Alchemist (after Isoluccia 2), Stone Sentinel + Armor to Golem (the Quarry of Giants raid),
   Knights + Spirit to Unicorn (Satoshi's first raid), Dune Sirens + Lore to Efreet (the Mirror Sea 3), Marines +
-  Beasts to Naga (the Mirror Sea 1), Conjurer + Spirit to Skeletons (Tilicia 3); each of those battles fields the
+  Beasts to Naga (the Mirror Sea 1), Conjurer + Spirit to Skeletons (hidden); each of those battles fields the
   creature and rewards one.
 - **More abilities** (added with the later units). *Grapple* (Marines): once a battle, in place of the move, a swing
   to any free tile within 6 that the Marines could stand on (no step rule, so a rampart will do; not deep water),
@@ -759,7 +766,7 @@ kept apart from the original data so that everything else stays checkable agains
   The AI needs no new behaviour: all six act through the movement costs, target lists and damage it already reads.
 - **Upgrades.** Each unit hangs off an original unit in a collectible slot that unit leaves empty, and waits on a
   bonus battle like Episode II's own units: Archers to Cragsmen (Armor, Ostrak's Bargain), Swordsmen to Spellwardens
-  (Lore, Frostgate), Craftsmen to Stone Sentinel (Spirit, The Empty Tomb), Footmen to Marines (Spirit, Free Company),
+  (Lore, Frostgate), Craftsmen to Stone Sentinel (Spirit, The Empty Tomb), Footmen to Marines (Spirit, The Harbour Chain),
   Crossbowmen to Pavisiers (Armor, The Harbour Chain), Wizards to Battlemage (Medal, Reign of the Battlemage),
   Halberdiers to Gladiators (Weapons, The Lashed Convoy), Swordsmen to Samurai (Spirit, Ishiro's Hill), Griffon
   Riders to Dragon Riders (Medal, The Admiral's Deck).

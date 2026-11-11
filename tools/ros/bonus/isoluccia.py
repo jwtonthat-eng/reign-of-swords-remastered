@@ -1,318 +1,16 @@
-"""Isoluccia — "Reign of the Battlemage": six story battles and three raids (ours; see build_bonus.py)."""
+"""Isoluccia — "Reign of the Battlemage": three story battles and three raids (ours; see build_bonus.py).
+
+Every battle is fought with an army the player musters from the budget (user decision): Landfall and Free Company,
+which handed out a fixed force, are gone with The Causeway between them, and the story runs The Harbour Chain, The
+Arsenal, Reign of the Battlemage. Captain Bellaro and his Free Company now come over before the harbour chain and
+fight there as an allied army."""
 from build_bonus import U
 
 LEVELS = []
 ARMY = "Carrone Army"
 DOGE = "Doge's Guard"
 
-# ---------------------------------------------------------------- 1. Landfall (take the beach)
-LEVELS.append(
-    {
-        "id": 5921,
-        "group": "story",
-        "name": "Landfall",
-        "objective": "Take the beach. Your army lands in three waves. Eliminate the defenders.",
-        "turn_limit": 30,
-        "sides": {"P": ARMY, "E": DOGE},
-        "terrain": """
-ff..h.==.hh.......h.==.h...ff
-f.....==......o.......==....f
-...s..==....,,....s...==.....
-^^.....,,............,,....^^
-^...........................^
-..,,..s...........s.....,,...
-...f....,,.......,,......f...
-..s....r.............r...s...
-.............................
------.....-------......------
-~~~~~-----~~~~~~~------~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-~~~~~~--~~~~~~~~~~~~--~~~~~~~
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-""",
-        "units": """
-....99.................99....
-.............................
-........B...........b........
-..r.......a.a.h.a.a.......R..
-.........vvvv.h.wwww.........
-.........f..f...f..f.........
-..............h..............
-.............................
-.....5588.PAFSFSFAP76........
-......1122........3344.......
-.............................
-.............................
-.............................
-.............................
-""",
-        "legend": {
-            "F": U("footmen", "P"),
-            "S": U("swordsmen", "P"),
-            "A": U("archers", "P"),
-            "P": U("pikemen", "P"),
-            "B": U("ballistae", "E", group=1, hold=True),
-            "b": U("ballistae", "E", group=2, hold=True),
-            "v": U("pavisiers", "E", group=3, hold=True),
-            "w": U("pavisiers", "E", group=4, hold=True),
-            "f": U("footmen", "E", group=5, hold=True),
-            "h": U("halberdiers", "E", group=6, hold=True),
-            "a": U("archers", "E", group=7, hold=True),
-            "r": U("raiders", "E", group=8),
-            "R": U("raiders", "E", group=9),
-        },
-        "camera": (14, 7),
-        "intro": [
-            ("officer", "The first boats are ashore, Commander. The rest of the fleet is still standing in."),
-            ("advisor", "Isoluccian crossbowmen, behind those tall shields. They call them pavises, Varius."),
-            ("advisor", "Once a pavise is planted our arrows will do half their work. Close with them, or ride around them."),
-        ],
-        "events": [
-            {
-                "when": ("round", 2),
-                "cam": (8, 9),
-                "spawn": [
-                    ("swordsmen", "1", "P"),
-                    ("pikemen", "2", "P"),
-                    ("cavalry", "3", "P"),
-                    ("crossbowmen", "4", "P"),
-                ],
-                "say": [("officer", "The second wave is on the sand, Commander!")],
-            },
-            {
-                "when": ("round", 6),
-                "cam": (14, 0),
-                "spawn": [("raiders", "9", "E")],
-                "say": [("officer_alarm", "Riders from the town, Commander! The Doge has sent his reserve!")],
-            },
-            {
-                "when": ("round", 3),
-                "cam": (19, 8),
-                "spawn": [
-                    ("knights", "5", "P"),
-                    ("halberdiers", "8", "P"),
-                    ("priests", "7", "P"),
-                    ("catapult", "6", "P"),
-                ],
-                "say": [("officer", "The last boats have landed. The whole army is ashore.")],
-            },
-        ],
-        "brief": [
-            ("advisor", "There it is, Varius. Isoluccia. Half a hundred islands and one very rich Doge."),
-            ("officer", "The beach ahead is the only one wide enough for our boats, and they know it."),
-        ],
-        "victory": [
-            ("officer", "The beach is ours, Commander."),
-            ("advisor", "A costly stretch of sand. Those pavises will be waiting on every wall from here to the citadel."),
-            ("officer", "The road inland runs across the causeways. There is no other way for men in armor."),
-        ],
-        "defeat": [("officer_hurt", "We are thrown back into the sea, Commander.")],
-        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 2. The Causeway
-LEVELS.append(
-    {
-        "id": 5922,
-        "group": "story",
-        "name": "The Causeway",
-        "objective": "Cross the causeways and eliminate all enemies.",
-        "turn_limit": 30,
-        "budget": 3900,
-        "sides": {"P": ARMY, "E": DOGE},
-        "terrain": """
-~~~..f.....s.~~~
-~~..f..h..h...~~
-~~..s.........~~
-~~........,,..~~
-~~~....==....~~~
-~~~~~~~==~~~~~~~
-~~--~~~==~~~--~~
-~~~~~~~==~~~~~~~
-~~~~...==...~~~~
-~~~...,......~~~
-~~..f......s..~~
-~~.........f..~~
-~~~..s.......~~~
-~~~~...==...~~~~
-~~~~~~~==~~~~~~~
-~~--~~~==~~~--~~
-~~~~~~~==~~~~~~~
-~~~~...==...~~~~
-~~~.f......s.~~~
-~~............~~
-~~............~~
-~~............~~
-~~~.s......f.~~~
-~~~~~......~~~~~
-""",
-        "units": """
-................
-...m....c...m...
-....x.x..x.x....
-..m..r.hh.r..m..
-...m..x..x..m...
-................
-................
-................
-....y..kk..y....
-...m.q....q.m...
-..m..s.ss.s..m..
-..m..........m..
-...m..y..y..m...
-................
-................
-................
-................
-................
-................
-...DDDDDDDDDD...
-...DDDDDDDDDD...
-...DDDDDDDDDD...
-................
-................
-""",
-        "legend": {
-            "c": U("cannon", "E", group=1, hold=True),
-            "x": U("crossbowmen", "E", group=2, hold=True),
-            "h": U("halberdiers", "E", group=3, hold=True),
-            "r": U("raiders", "E", group=4),
-            "q": U("raiders", "E", group=5),
-            "s": U("swordsmen", "E", group=6, hold=True),
-            "m": U("marines", "E"),
-            "k": U("halberdiers", "E", group=7, hold=True),
-            "y": U("crossbowmen", "E", group=8, hold=True),
-        },
-        "camera": (7, 10),
-        "intro": [
-            ("officer", "Three islets, Commander, and two causeways no wider than a cart between them."),
-            ("officer_alarm", "Men in the water! They are wading the channel as if it were a ford!"),
-            ("advisor", "Isoluccian marines. The sea is no wall to them. Guard the archers and the engines, Varius."),
-        ],
-        "brief": [
-            ("advisor", "The Doge has left the causeways standing. He means us to come this way."),
-        ],
-        "victory": [
-            ("officer", "The causeways are clear, Commander. The city is in sight."),
-            ("officer", "One of their marines asks to speak with you. He says his captain has had enough of the Doge."),
-        ],
-        "defeat": [("officer_hurt", "They came out of the sea on every side, Commander.")],
-        "reward": {"units": {}, "spoils": {"Beasts": 1, "Lore": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 3. Free Company (escort Bellaro to the quay)
-LEVELS.append(
-    {
-        "id": 5923,
-        "group": "story",
-        "name": "Free Company",
-        "objective": "Escort Captain Bellaro to the quay. He must survive.",
-        "turn_limit": 30,
-        "sides": {"P": ARMY, "A": "Free Company", "E": DOGE},
-        "terrain": """
-~~~~~~~~~~~~~~~~~~
-~~~~~~~====~~~~~~~
--.hh...====...hh.-
-...==========.hh..
-.h.=.hh.h.h.=..f..
-.h.=..F.....=.hh..
-.s.==========..h..
-..hh..f......=.hh.
-~~~~~~~~~~~~~==~~~
-~~~~~~~~~~~~~==~~~
-.hh...h..f...==.h.
-..==============..
-..=.hhh.o..hhh.=.h
-..=............=..
-..==============..
-...==.hh..f...hh..
-~~~==~~~~~~~~~~~~~
-~~~==~~~~~~~~~~~~~
-...==.hh...h..f...
-...===========.hh.
-.h......=.....f...
-.hh.....=..,,.....
-..f.....=.....h...
-........=.........
-.s...............f
-..................
-""",
-        "units": """
-..................
-.......qqqq.......
-........ss........
-......v....v......
-.....b......b.....
-........hh........
-.......s..h.......
-..................
-..................
-..................
-.............ww...
-.......t..t.......
-....c.............
-........t.........
-..................
-...yy.............
-..................
-..................
-..................
-.....u....u.......
-..................
-.MM...........MM..
-..M...............
-......FSBSF.......
-.....PXKSXP.......
-......SFR.........
-""",
-        "legend": {
-            "B": U("swordsmen", "P", name="bellaro"),
-            "F": U("footmen", "P"),
-            "S": U("swordsmen", "P"),
-            "P": U("pikemen", "P"),
-            "X": U("crossbowmen", "P"),
-            "K": U("knights", "P"),
-            "R": U("priests", "P"),
-            "M": U("marines", "A", group=1),
-            "s": U("swordsmen", "E", group=2),
-            "v": U("pavisiers", "E", group=3, hold=True),
-            "b": U("horsebowmen", "E", group=4),
-            "h": U("halberdiers", "E", group=5, hold=True),
-            "t": U("swordsmen", "E", group=6),
-            "w": U("crossbowmen", "E", group=7, hold=True),
-            "c": U("horsebowmen", "E", group=8),
-            "y": U("crossbowmen", "E", group=9, hold=True),
-            "u": U("swordsmen", "E", group=10),
-        },
-        "camera": (8, 23),
-        "intro": [
-            ("bellaro", "My company is done with the Doge, Commander. He woke something in the citadel that he cannot rule."),
-            ("bellaro", "Get me to the quay and I will signal every ship of the Free Company to your side."),
-            ("advisor", "His marines can cross the canals. We cannot. Keep the Captain close, Varius, and take the bridges."),
-        ],
-        "events": [
-            {
-                "when": ("escorted", "bellaro", 1, "q"),
-                "say": [("bellaro", "There is the signal. The Free Company sails with Carrone!")],
-            },
-        ],
-        "brief": [
-            ("officer", "The marine was telling the truth, Commander. His captain is waiting in the dockside quarter."),
-            ("advisor", "Captain Bellaro. A sellsword, but an honest one by all accounts. Let us hear him."),
-        ],
-        "victory": [
-            ("bellaro", "The Doge paid well, I will not deny it. But I do not fight beside a thing that does not sleep."),
-            ("advisor", "With his marines the harbor is no longer closed to us, Varius."),
-            ("officer", "Our fleet still cannot enter, Commander. There is a chain across the harbor mouth."),
-        ],
-        "defeat": [("officer_hurt", "Captain Bellaro has fallen, and his company with him.")],
-        "reward": {"units": {"marines": 2}, "spoils": {"Spirit": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 4. The Harbour Chain (timed capture)
+# ---------------------------------------------------------------- 1. The Harbour Chain (timed capture)
 LEVELS.append(
     {
         "id": 5924,
@@ -322,7 +20,7 @@ LEVELS.append(
         "mission_type": 2,
         "turn_limit": 20,
         "budget": 4500,
-        "sides": {"P": ARMY, "E": DOGE},
+        "sides": {"P": ARMY, "A": "Free Company", "E": DOGE},
         "areas": ["1", "2"],
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -368,7 +66,7 @@ LEVELS.append(
 .....ww...........WW.....
 .........................
 .........................
-.........................
+.BB...................BB.
 .......DDDDDDDDDDD.......
 .......DDDDDDDDDDD.......
 .......DDDDDDDDDDD.......
@@ -390,12 +88,13 @@ LEVELS.append(
             "w": U("halberdiers", "E", group=13, hold=True),
             "W": U("halberdiers", "E", group=14, hold=True),
             "r": U("raiders", "E", group=15),
+            "B": U("marines", "A", group=1),  # Bellaro's Free Company: they wade the channel between the forts
         },
         "camera": (12, 5),
         "intro": [
             ("officer", "Two towers, Commander, one on each shore, and the chain hangs between them."),
             ("bellaro", "The windlass is by the well in each fort. Take both and the chain goes to the bottom."),
-            ("advisor", "The fleet cannot wait past the tide, Varius. Marines may cross the channel. Everyone else must choose a shore."),
+            ("advisor", "The fleet cannot wait past the tide, Varius. The Captain's marines may wade the channel. Everyone else must choose a shore."),
         ],
         "events": [
             {
@@ -405,20 +104,23 @@ LEVELS.append(
             },
         ],
         "brief": [
-            ("bellaro", "The harbor mouth is shut with a chain as thick as a man. No ship of yours will pass it."),
-            ("advisor", "Then we open it from the land. Captain, your marines know those forts better than we do."),
+            ("advisor", "There it is, Varius. Isoluccia. Half a hundred islands, one very rich Doge, and a chain as thick as a man across his harbor mouth."),
+            ("officer", "A sellsword captain rowed out to the fleet in the night, Commander. Bellaro, of the Free Company. He says his marines are done with the Doge."),
+            ("bellaro", "He woke something in the citadel that he cannot rule, and I do not fight beside a thing that does not sleep. No ship of yours will pass that chain. My men know the forts that hold it."),
+            ("advisor", "A sellsword, but an honest one by all accounts. Then we open the harbor from the land, Captain, and your company sails with Carrone."),
         ],
         "victory": [
             ("officer", "The fleet is in the harbor, Commander. Siege engines and fresh troops are landing."),
+            ("bellaro", "There is the signal. The Free Company sails with Carrone! Take two bands of my marines for your own, Commander. The sea is no wall to them."),
             ("advisor", "And the Doge's own crossbowmen are coming over to us with their shields. They can see how this ends."),
             ("officer", "The Arsenal is the next strongpoint. Whoever holds it holds the harbor."),
         ],
         "defeat": [("officer_hurt", "The tide has turned, Commander. The fleet has stood back out to sea.")],
-        "reward": {"units": {"pavisiers": 2}, "spoils": {"Armor": 1}},
+        "reward": {"units": {"pavisiers": 2, "marines": 2}, "spoils": {"Armor": 1, "Spirit": 1}},
     }
 )
 
-# ---------------------------------------------------------------- 5. The Arsenal (hold for 12 turns)
+# ---------------------------------------------------------------- 2. The Arsenal (hold for 12 turns)
 LEVELS.append(
     {
         "id": 5925,
@@ -488,7 +190,7 @@ cc.....DDDDDDD.....ee
                 "when": ("round", 2),
                 "cam": (2, 3),
                 "spawn": [("marines", "a", "E"), ("marines", "b", "E")],
-                "say": [("officer_alarm", "Marines on both shores, Commander! They are making for the slipway!")],
+                "say": [("officer_alarm", "The Doge's own marines on both shores, Commander! They are making for the slipway!")],
             },
             {
                 "when": ("round", 3),
@@ -544,7 +246,7 @@ cc.....DDDDDDD.....ee
     }
 )
 
-# ---------------------------------------------------------------- 6. Reign of the Battlemage
+# ---------------------------------------------------------------- 3. Reign of the Battlemage
 LEVELS.append(
     {
         "id": 5926,
@@ -844,7 +546,7 @@ LEVELS.append(
         "name": "Pavise Row",
         "objective": "Break the shield line in the market square. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 4750,
+        "budget": 5000,
         "sides": {"P": ARMY, "E": DOGE},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -935,7 +637,7 @@ KINGDOM = {
         ),
         (
             "thaddius",
-            "Doge Aurelio Sant'Abra paid for all of it: Landower, Tolm, the digging. He means to rule the Empire through the Battlemage. The Emperor's fleet will carry your army to the islands. Do not let him finish waking it.",
+            "Doge Aurelio Sant'Abra paid for all of it: Landower, Tolm, the digging. He means to rule the Empire through the Battlemage. The Emperor's fleet will carry your army to the islands, but his harbor is chained shut. Open it, take the city, and do not let him finish waking it.",
         ),
     ],
     "levels": LEVELS,

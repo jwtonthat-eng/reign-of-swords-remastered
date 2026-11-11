@@ -42,9 +42,9 @@ describe("bonus kingdoms on the campaign map", () => {
       "The Jungles of Tezcal",
     ]);
     for (const kingdom of bonus.kingdoms) {
-      const small = ["mare-nostra", "satoshi", "mirror-sea", "tezcal"].includes(kingdom.id); // 3 battles and 2 raids each
+      const small = ["mare-nostra", "satoshi", "mirror-sea", "tezcal"].includes(kingdom.id); // 2 raids; the first two have 3
       expect(kingdom.bonus).toBe(true);
-      expect(kingdom.missions.length).toBe(small ? 3 : 6);
+      expect(kingdom.missions.length).toBe(3); // three story battles in every bonus region
       expect(kingdomRaids(levels, kingdom).length).toBe(small ? 2 : 3);
       expect(KINGDOM_POS_EP2[kingdom.id]).toBeTruthy();
       for (const mission of kingdom.missions) {
@@ -84,7 +84,13 @@ describe("bonus kingdoms on the campaign map", () => {
     const story = storyOf("tilicia");
     expect(raidUnlocked(camp, idx("tilicia"), 0, new Set([...done, story[0]]))).toBe(false);
     expect(raidUnlocked(camp, idx("tilicia"), 0, new Set([...done, story[0], story[1]]))).toBe(true);
-    expect(raidUnlocked(camp, idx("tilicia"), 2, new Set([...done, ...story.slice(0, 4)]))).toBe(true);
+    // Tilicia has three battles and three raids: its last raid opens with its last battle, as the second does
+    expect(story.length).toBe(3);
+    expect(raidUnlocked(camp, idx("tilicia"), 1, new Set([...done, story[0], story[1]]))).toBe(false);
+    expect(raidUnlocked(camp, idx("tilicia"), 2, new Set([...done, story[0], story[1]]))).toBe(false);
+    expect(raidUnlocked(camp, idx("tilicia"), 1, new Set([...done, ...story]))).toBe(true);
+    expect(raidUnlocked(camp, idx("tilicia"), 2, new Set([...done, ...story]))).toBe(true);
+    expect(raidUnlocked(camp, idx("isoluccia"), 2, new Set([...done, ...story, ...storyOf("isoluccia")]))).toBe(true);
   });
   it("the battles that hand out a bonus unit also open its upgrade", () => {
     const gives = (mapId) => Object.keys(rewards[mapId].units || {});
@@ -92,7 +98,8 @@ describe("bonus kingdoms on the campaign map", () => {
       [5902, "cragsmen"],
       [5904, "spellwardens"],
       [5906, "sentinel"],
-      [5923, "marines"],
+      [5912, "golem"], // a raid: the Quarry of Giants
+      [5924, "marines"], // Bellaro's Free Company comes over at the harbour chain
       [5924, "pavisiers"],
       [5926, "battlemage"],
       [5942, "gladiator"],

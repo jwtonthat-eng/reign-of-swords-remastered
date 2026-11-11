@@ -3,42 +3,62 @@
 import { describe, it, expect } from "vitest";
 import { loadEpisode, makeGame, startBattle, nextRound, put, step } from "./battle.js";
 import { missionList } from "../engine/engine.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 
 await loadEpisode(2);
 const mine = (g) => g.units.filter((u) => !u.dead && u.team === "blue" && !u.ally);
 const foes = (g) => g.units.filter((u) => !u.dead && u.team === "red");
 
 describe("bonus campaigns: loading", () => {
-  it("adds 38 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
+  it("adds 32 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
     const maps = missionList();
     const bonus = maps.filter((m) => m.mapId >= 5900 && m.mapId < 6000);
-    expect(bonus.filter((m) => m.group === "story").length).toBe(24); // 6 + 6 + 3 + 3 + 3 + 3
+    expect(bonus.filter((m) => m.group === "story").length).toBe(18); // 3 in each of the six regions
     expect(bonus.filter((m) => m.group === "siege").length).toBe(14); // 3 + 3 + 2 + 2 + 2 + 2
     expect(maps.some((m) => m.mapId === 5432)).toBe(true);
   });
 });
 
-describe("Tilicia 1, The Tolm Road (escape)", () => {
-  it("opens with Cragsmen on the cliffs, and riders shut the pass behind you on round 4", () => {
-    const g = startBattle(makeGame(5901));
-    expect(foes(g).some((u) => u.type === "cragsmen" && g.terrainAt(u.tx, u.ty).passable === false)).toBe(true);
-    const before = foes(g).filter((u) => u.type === "raiders").length;
-    for (let i = 0; i < 3 && g.phase === "player"; i++) nextRound(g);
-    expect(g.turn).toBe(4);
-    expect(foes(g).filter((u) => u.type === "raiders").length).toBeGreaterThan(before - 2); // + the two riders
-    expect(g.units.some((u) => u.wave && u.type === "raiders")).toBe(true);
+// Tilicia and Isoluccia are three story battles each, all fought with an army mustered from the budget (user decision):
+// the battles that handed out a fixed force or preset troops are gone.
+describe("Tilicia and Isoluccia: three battles each, every army mustered", () => {
+  const region = (lo, hi) => missionList().filter((m) => m.mapId >= lo && m.mapId <= hi);
+  it("keep Ostrak's Bargain, Frostgate, The Empty Tomb and The Harbour Chain, The Arsenal, Reign of the Battlemage", () => {
+    const story = (lo, hi) =>
+      region(lo, hi)
+        .filter((m) => m.group === "story")
+        .map((m) => m.mapId);
+    expect(story(5901, 5910)).toEqual([5902, 5904, 5906]);
+    expect(story(5921, 5930)).toEqual([5924, 5925, 5926]);
+    for (const gone of [5901, 5903, 5905, 5921, 5922, 5923])
+      expect(missionList().some((m) => m.mapId === gone)).toBe(false);
   });
-  it("is won when the fourth unit leaves by the head of the pass", () => {
-    const g = startBattle(makeGame(5901));
-    const goals = g.mission.script.goals;
-    mine(g)
-      .slice(0, 4)
-      .forEach((u, i) => {
-        put(g, u, goals[i][0], goals[i][1]);
-        g.scenario.onTileReached(u);
-        step(g, 5);
-      });
-    expect(g.phase).toBe("victory");
+  it("hand the player no troops: each battle and raid has a budget, a muster zone and no unit of yours on the field", () => {
+    const built = JSON.parse(readFileSync(join("public", "games", "reign-of-swords-2", "bonus.json"), "utf8")).levels;
+    const two = built.filter((l) => (l.mapId >= 5901 && l.mapId <= 5913) || (l.mapId >= 5921 && l.mapId <= 5933));
+    expect(two.length).toBe(12); // 3 battles and 3 raids in each
+    for (const level of two) {
+      expect(level.budget, level.name).toBeGreaterThan(0);
+      expect(level.deployZone.length, level.name).toBeGreaterThanOrEqual(12);
+      expect(level.player, level.name).toEqual([]);
+      // …nor does its script land any under your command later (a spawn into the player's own group)
+      const landed = level.script.actions.filter((a) => a.op === 0 && a.gi === level.playerGroup);
+      expect(landed, level.name).toEqual([]);
+      // …and the battle opens on the muster with nobody of yours on the field (allied armies — Clan Ostrak, the Free
+      // Company, the shipwrights — are not yours)
+      const g = makeGame(level.mapId);
+      step(g, 20);
+      expect(g.phase, level.name).toBe("deploy");
+      expect(mine(g).length, level.name).toBe(0);
+    }
+  });
+  it("Bellaro's Free Company fights beside you at the harbour chain, and the Quarry of Giants has its Golem", () => {
+    const chain = startBattle(makeGame(5924), "auto");
+    expect(chain.units.filter((u) => u.ally && u.type === "marines").length).toBe(4);
+    const quarry = startBattle(makeGame(5912), "auto");
+    expect(foes(quarry).filter((u) => u.type === "golem").length).toBe(1);
+    expect(foes(quarry).filter((u) => u.type === "sentinel").length).toBe(15);
   });
 });
 
@@ -54,10 +74,6 @@ const tag = (g, n) => g.mission.script.triggers.filter((t) => t.tag === n);
 const reach = (g, u, [x, y]) => {
   put(g, u, x, y);
   g.scenario.onTileReached(u);
-  step(g, 30);
-};
-const rounds = (g, turn) => {
-  for (let i = 0; i < 60 && g.turn < turn && g.phase === "player"; i++) nextRound(g);
   step(g, 30);
 };
 // a hold battle is judged on its clock: keep the garrison alive and the field clear while the rounds pass
@@ -80,16 +96,6 @@ describe("Tilicia: scripted endings", () => {
     expect(g.phase).not.toBe("defeat");
     fell(g, bands[3]);
     expect(g.phase).toBe("defeat");
-  });
-  it("The Sealed Vale is won by holding out to round 11, not by clearing the field early", () => {
-    const g = startBattle(makeGame(5903), "auto");
-    expect(g.captureMode).toBe(1);
-    expect(g.captureAreas.length).toBe(3);
-    for (const u of foes(g)) u.dead = true;
-    step(g, 30);
-    expect(g.phase).toBe("player"); // the win switch is off: more are coming
-    holdUntil(g, 11);
-    expect(g.phase).toBe("victory");
   });
   it("The Empty Tomb ends when Warden Tolm falls", () => {
     const g = startBattle(makeGame(5906), "auto");
@@ -114,31 +120,6 @@ describe("Tilicia: scripted endings", () => {
 });
 
 describe("Isoluccia: scripted endings", () => {
-  it("Landfall: the second and third waves land under your command", () => {
-    const g = startBattle(makeGame(5921));
-    const start = mine(g).length;
-    rounds(g, 3);
-    expect(mine(g).length).toBeGreaterThan(start);
-    expect(mine(g).every((u) => !u.ally)).toBe(true);
-  });
-  it("Free Company is won when Captain Bellaro reaches the quay, and lost if he falls", () => {
-    let g = startBattle(makeGame(5923));
-    const escort = g.mission.script.escort;
-    expect(escort.units.length).toBe(1);
-    expect(g.units.some((u) => u.ally && u.type === "marines")).toBe(true);
-    reach(
-      g,
-      g.units.find((u) => u.sid === escort.units[0]),
-      escort.markers[0],
-    );
-    expect(g.phase).toBe("victory");
-    g = startBattle(makeGame(5923));
-    fell(
-      g,
-      g.units.find((u) => u.sid === g.mission.script.escort.units[0]),
-    );
-    expect(g.phase).toBe("defeat");
-  });
   it("The Harbour Chain is won only once both towers are taken", () => {
     const g = startBattle(makeGame(5924), "auto");
     const tiles = tag(g, 6);

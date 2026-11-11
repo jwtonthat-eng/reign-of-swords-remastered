@@ -1151,12 +1151,12 @@ export const BONUS_SKILLS = [
 // UPGRADE ARMY — each bonus unit hangs off an original unit, in a collectible slot that unit leaves empty, and waits
 // on a bonus battle (the map id) the way Episode II's own units wait on theirs.
 export const BONUS_UPGRADES_ALL = [
-  { from: "archers", to: "cragsmen", need: "Armor", gate: 5902 }, // Tilicia 2, Ostrak's Bargain
-  { from: "swordsmen", to: "spellwardens", need: "Lore", gate: 5904 }, // Tilicia 4, Frostgate
-  { from: "craftsmen", to: "sentinel", need: "Spirit", gate: 5906 }, // Tilicia 6, The Empty Tomb
-  { from: "footmen", to: "marines", need: "Spirit", gate: 5923 }, // Isoluccia 3, Free Company
-  { from: "crossbowmen", to: "pavisiers", need: "Armor", gate: 5924 }, // Isoluccia 4, The Harbour Chain
-  { from: "wizards", to: "battlemage", need: "Medal", gate: 5926 }, // Isoluccia 6, Reign of the Battlemage
+  { from: "archers", to: "cragsmen", need: "Armor", gate: 5902 }, // Tilicia 1, Ostrak's Bargain
+  { from: "swordsmen", to: "spellwardens", need: "Lore", gate: 5904 }, // Tilicia 2, Frostgate
+  { from: "craftsmen", to: "sentinel", need: "Spirit", gate: 5906 }, // Tilicia 3, The Empty Tomb
+  { from: "footmen", to: "marines", need: "Spirit", gate: 5924 }, // Isoluccia 1, The Harbour Chain
+  { from: "crossbowmen", to: "pavisiers", need: "Armor", gate: 5924 }, // Isoluccia 1, The Harbour Chain
+  { from: "wizards", to: "battlemage", need: "Medal", gate: 5926 }, // Isoluccia 3, Reign of the Battlemage
   { from: "halberdiers", to: "gladiator", need: "Weapons", gate: 5942 }, // Mare Nostra 2
   { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
   { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
@@ -1165,13 +1165,13 @@ export const BONUS_UPGRADES_ALL = [
   { from: "rangers", to: "shinobi", need: "Lore", gate: 5962 }, // Satoshi 2
   { from: "greatswordsmen", to: "oni", need: "Spirit", gate: 5963 }, // Satoshi 3
   { from: "beastmaster", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
-  { from: "priests", to: "alchemist", need: "Lore", gate: 5925 }, // Isoluccia 5, The Arsenal
-  { from: "sentinel", to: "golem", need: "Armor", gate: 5905 }, // Tilicia 5, The Sleepers Wake
+  { from: "priests", to: "alchemist", need: "Lore", gate: 5925 }, // Isoluccia 2, The Arsenal
+  { from: "sentinel", to: "golem", need: "Armor", gate: 5912 }, // Tilicia raid 2, Quarry of Giants
   // the Beast Master's tree (user decision): its creatures are all made from a Beast Master
   { from: "beastmaster", to: "unicorn", need: "Lore", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
   { from: "beastmaster", to: "efreet", need: "Weapons", gate: 5983 }, // the Mirror Sea 3, The Reaver-King
   { from: "beastmaster", to: "naga", need: "Beasts", gate: 5981 }, // the Mirror Sea 1, The Line of Hulls
-  { from: "beastmaster", to: "skeleton", need: "Armor", gate: 5903 }, // Tilicia 3, The Sealed Vale
+  { from: "beastmaster", to: "skeleton", need: "Armor", gate: 5906 }, // (hidden; its first battle, The Sealed Vale, is gone)
   { from: "pikemen", to: "jaguar", need: "Beasts", gate: 5994 }, // Tezcal 1
   { from: "archers", to: "eagle", need: "Lore", gate: 5995 }, // Tezcal 2
   { from: "cavalry", to: "serpent", need: "Spirit", gate: 5996 }, // Tezcal 3
@@ -1305,6 +1305,6 @@ export const BONUS_META = {
     note: "A feathered serpent of the high temples: the horse-archer of the air. It throws a gale and flies on, and friends beside it are carried a tile further.",
   },
 };
-// Battle ids of the four bonus regions (Tilicia 5901–5913, Isoluccia 5921–5933, the Mirror Sea 5941–5952, Satoshi
-// 5961–5972).
+// Battle ids of the six bonus regions (Tilicia 5902–5913, Isoluccia 5924–5933, Mare Nostra 5941–5952, Satoshi
+// 5961–5972, the Mirror Sea 5981–5992, Tezcal 5994–5998).
 export const isBonusMap = (mapId) => mapId >= 5900 && mapId < 6000;

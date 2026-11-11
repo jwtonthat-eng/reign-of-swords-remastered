@@ -1,123 +1,13 @@
-"""Tilicia — "The Empty Tomb": six story battles and three raids (ours; see build_bonus.py)."""
+"""Tilicia — "The Empty Tomb": three story battles and three raids (ours; see build_bonus.py).
+
+Every battle is fought with an army the player musters from the budget (user decision): the three battles that
+handed out a fixed force or preset troops (The Tolm Road, The Sealed Vale, The Sleepers Wake) are gone, and the
+story runs Ostrak's Bargain, Frostgate, The Empty Tomb."""
 from build_bonus import U
 
 LEVELS = []
 
-# ---------------------------------------------------------------- 1. The Tolm Road (escape through the pass)
-LEVELS.append(
-    {
-        "id": 5901,
-        "group": "story",
-        "name": "The Tolm Road",
-        "objective": "Fight through the pass. At least four of your units must reach the head of the Tolm Road.",
-        "mission_type": 3,
-        "turn_limit": 30,
-        "sides": {"P": "Carrone Army", "E": "Tolm's Wardens"},
-        "terrain": """
-^^^^^^^.==.^^^^^^^
-^ff..r.,==,.r..ff^
-^f......==....fff^
-^..^^^..==..^^^.f^
-^,.^r...==...r^..^
-^.......==.......^
-^,,..f..==..ff.,,^
-^^^^.r..==..r.^^^^
-.ff^....==....^.f.
-..f^^..===..^^^...
-~~~~~~--~~~~--~~~~
-~~~~~~--~~~~--~~~~
-.ff..===...^^^^..r
-^^^r.==..x.^,,^...
-.f^..==.......^.,,
-..^r.==..ff...^^^^
-.....===..ff...f..
-.hh....==...,,....
-.h.....==..r^^^..f
-^^^^.,.==...^.ff..
-.ff^r..==...^..f..
-..f^..===.....,,..
-......==.....ff...
-..f...==..,...ff..
-.ff...==.........f
-.f....==..........
-""",
-        "units": """
-.......gggg.......
-..................
-..................
-....c........c....
-.......hhh........
-.....a...a..a.....
-..................
-..c............c..
-..................
-..................
-..................
-..................
-............d.....
-.d................
-.......rrr........
-..................
-..................
-..................
-.............e....
-..e...............
-..................
-..................
-.....ffxxff.......
-.....sskksp.......
-......bbpp........
-.......vv.........
-""",
-        "legend": {
-            "f": U("footmen", "P"),
-            "s": U("swordsmen", "P"),
-            "k": U("knights", "P"),
-            "x": U("halberdiers", "P"),
-            "p": U("pikemen", "P"),
-            "b": U("archers", "P"),
-            "v": U("cavalry", "P"),
-            "c": U("cragsmen", "E", group=1, hold=True),
-            "d": U("cragsmen", "E", group=5, hold=True),
-            "e": U("cragsmen", "E", group=6, hold=True),
-            "h": U("halberdiers", "E", group=2, hold=True),
-            "a": U("archers", "E", group=3, hold=True),
-            "r": U("raiders", "E", group=4),
-        },
-        "camera": (8, 22),
-        "intro": [
-            ("officer", "Commander, this is the Tolm Road, the only pass into Tilicia wide enough for an army."),
-            ("advisor", "And Warden Tolm knows it. Look to the cliffs, Varius. Those are no goatherds."),
-            ("officer_alarm", "Javelins! They are throwing from heights our men cannot climb!"),
-            ("advisor", "Then we do not stop to trade blows with a mountainside. Get the column to the head of the pass."),
-        ],
-        "events": [
-            {
-                "when": ("round", 4),
-                "cam": (10, 25),
-                "spawn": [("raiders", (9, 25), "E"), ("raiders", (10, 25), "E"), ("raiders", (11, 25), "E")],
-                "say": [("officer_alarm", "Riders behind us, Commander! They mean to shut the pass at both ends.")],
-            },
-            {
-                "when": ("escaped", 4, "g"),
-                "say": [("advisor", "The column is through. Well marched. Tilicia lies before us.")],
-            },
-        ],
-        "brief": [
-            ("advisor", "The letters we took from Landower's messenger name a Warden Hadrik Tolm, in Tilicia."),
-            ("advisor", "Tilicia is all mountain, Varius. There is one road in, and it bears the Warden's name."),
-        ],
-        "victory": [
-            ("officer", "We are through the pass, Commander, though the cliffs took their toll."),
-            ("advisor", "Men who climb like that would be worth having on our side of a wall."),
-            ("officer", "The scouts report a clan village in the next valley. They say its people have no love for the Warden."),
-        ],
-        "defeat": [("officer_hurt", "The pass is shut, Commander. We never saw half of them.")],
-        "reward": {"units": {}, "spoils": {"Armor": 1, "Weapons": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 2. Ostrak's Bargain (defend the clan village)
+# ---------------------------------------------------------------- 1. Ostrak's Bargain (defend the clan village)
 LEVELS.append(
     {
         "id": 5902,
@@ -172,7 +62,7 @@ DDDD.......mm...........
         },
         "camera": (12, 7),
         "intro": [
-            ("ostrak", "So the Empire comes to my door. The Warden's men are an hour behind you, Commander."),
+            ("ostrak", "So the Empire comes to my door. You climbed the Warden's road to do it, and his men are an hour behind you, Commander."),
             ("ostrak", "Hadrik Tolm takes our sons to dig in his tomb and burns the roof of any clan that refuses. Stand with us today and Clan Ostrak stands with you after."),
             ("advisor", "A fair bargain. Keep the clansmen alive, Varius. We will want every one of them."),
         ],
@@ -230,161 +120,21 @@ DDDD.......mm...........
             },
         ],
         "brief": [
-            ("officer", "The village belongs to Clan Ostrak, Commander. Their chief is one Maren Ostrak."),
-            ("advisor", "The Warden's riders are on the valley road. If we mean to win these people, now is the hour."),
+            ("advisor", "Tilicia is all mountain, Varius, and Warden Tolm holds the one road wide enough for an army. We will need friends who know the others."),
+            ("officer", "The village ahead belongs to Clan Ostrak, Commander. Their chief is one Maren Ostrak, and her people have no love for the Warden."),
+            ("advisor", "His riders are on the valley road. If we mean to win these people, now is the hour."),
         ],
         "victory": [
             ("ostrak", "You bled for a village that is not yours. I did not expect that of the Empire."),
             ("ostrak", "Take two bands of my Cragsmen. No wall in Tilicia was built to stop them."),
-            ("advisor", "She says the tomb lies past a sealed vale, and past that the fortress of Frostgate."),
+            ("advisor", "She says one fortress bars the road to the tomb: Frostgate. And that its builders never reckoned with men who climb."),
         ],
         "defeat": [("officer_hurt", "The village is lost, Commander, and the clans with it.")],
         "reward": {"units": {"cragsmen": 2}, "spoils": {}},
     }
 )
 
-# ---------------------------------------------------------------- 3. The Sealed Vale (hold the rune-stones)
-LEVELS.append(
-    {
-        "id": 5903,
-        "group": "story",
-        "name": "The Sealed Vale",
-        "objective": "Hold the vale of the rune-stones for ten turns against the Warden's Spellwardens.",
-        "mission_type": 1,
-        "areas": ["1", "2", "3"],
-        "turn_limit": 20,
-        "budget": 3500,
-        "win_switch": False,
-        "sides": {"P": "Carrone Army", "E": "Tolm's Wardens"},
-        "terrain": """
-^^^^^^^..==..^^^^^^^
-^fff.r...==...,,.ff^
-^ff......==.......f^
-^f...,,..==..r.....^
-^........===..~~~..^
-^..r......==..~~~.f^
-^.........==.......^
-^.oo.o....==.oo.o..^
-^.o.......==.o.....^
-^....o...===....o.r^
-^.o.oo...==..o.oo..^
-^f......o==o......f^
-^ff.....o==.....ff.^
-^f.,,....==o...,,..^
-^.......o==o....f..^
-^..ff....==....fff.^
-..f......==.......f.
-.........==.........
-..h.h....==.....h...
-.........==.........
-""",
-        "units": """
-....................
-......x.wSSw.x......
-.......Zhhhhh.......
-......x.w..w.x......
-....................
-....................
-....................
-....................
-...11.........22....
-...11.........22....
-....................
-....................
-.........33.........
-.........33.........
-....................
-....................
-....................
-.....DDDDDDDDDD.....
-.....DDDDDDDDDD.....
-.....DDDDDDDDDD.....
-""",
-        "legend": {
-            "w": U("spellwardens", "E", group=1),
-            "h": U("halberdiers", "E", group=1),
-            "Z": U("halberdiers", "E", group=1),
-            "x": U("crossbowmen", "E", group=2),
-            "S": U("shamans", "E", group=2),
-        },
-        "camera": (9, 2),
-        "intro": [
-            ("officer", "Three rings of standing stones, Commander, and every one of them carved."),
-            ("advisor", "Rune-stones. They seal the road to the tomb. The Warden cannot pass his diggers through while we stand among them."),
-            ("officer_alarm", "Heavy foot coming down the vale, with rune-marked shields. Our Wizards say their spells die in the air near those men."),
-            ("advisor", "Spellwardens. Then it is steel today. Hold the stones until Ostrak's clans close the vale behind them."),
-        ],
-        "events": [
-            {
-                "when": ("round", 3),
-                "cam": (9, 0),
-                "spawn": [
-                    ("spellwardens", (8, 0), "E"),
-                    ("spellwardens", (11, 0), "E"),
-                    ("halberdiers", (9, 0), "E"),
-                    ("halberdiers", (10, 0), "E"),
-                    ("crossbowmen", (7, 0), "E"),
-                    ("crossbowmen", (12, 0), "E"),
-                    ("halberdiers", (9, 1), "E"),
-                    ("spellwardens", (10, 1), "E"),
-                ],
-                "say": [("officer", "A second company at the head of the vale, Commander.")],
-            },
-            {
-                "when": ("round", 6),
-                "cam": (9, 0),
-                "spawn": [
-                    ("spellwardens", (8, 0), "E"),
-                    ("spellwardens", (11, 0), "E"),
-                    ("halberdiers", (9, 0), "E"),
-                    ("halberdiers", (10, 0), "E"),
-                    ("halberdiers", (9, 1), "E"),
-                    ("shamans", (10, 1), "E"),
-                    ("halberdiers", (8, 1), "E"),
-                    ("crossbowmen", (7, 0), "E"),
-                    ("crossbowmen", (12, 0), "E"),
-                ],
-                "say": [("enemy", "The Warden wants this vale by nightfall. Forward!")],
-            },
-            {
-                "when": ("round", 8),
-                "cam": (9, 0),
-                "spawn": [
-                    ("swordsmen", (8, 0), "E"),
-                    ("swordsmen", (9, 0), "E"),
-                    ("swordsmen", (10, 0), "E"),
-                    ("spellwardens", (11, 0), "E"),
-                    ("halberdiers", (7, 0), "E"),
-                    ("halberdiers", (12, 0), "E"),
-                    ("raiders", (9, 1), "E"),
-                    ("raiders", (10, 1), "E"),
-                ],
-                "say": [("officer_alarm", "They are throwing in their reserve!")],
-            },
-            {
-                "when": ("round", 11),
-                "say": [
-                    ("officer", "Horns on the ridge, Commander! The clans have closed the vale behind them."),
-                    ("advisor", "The Warden's men are breaking. The stones are ours.")
-                ],
-                "end": "victory",
-            },
-        ],
-        "brief": [
-            ("advisor", "Chief Ostrak's people call it the Sealed Vale. Nothing the Warden digs up can leave Tilicia except through it."),
-            ("advisor", "Her clans need until dusk to take the ridges. Until then the vale is ours to hold."),
-        ],
-        "victory": [
-            ("officer", "The vale is held, Commander. The Spellwardens have fallen back on Frostgate."),
-            ("advisor", "Men who can snuff out a Wizard's fire. The Warden has been preparing to face magic for some time."),
-            ("advisor", "Or to keep some of his own on a leash."),
-        ],
-        "defeat": [("officer_hurt", "They have the stones, Commander. The road to the tomb is open to them.")],
-        "reward": {"units": {}, "spoils": {"Lore": 1, "Spirit": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 4. Frostgate (storm the fortress)
+# ---------------------------------------------------------------- 2. Frostgate (storm the fortress)
 LEVELS.append(
     {
         "id": 5904,
@@ -459,6 +209,7 @@ LEVELS.append(
             ("officer", "Frostgate, Commander. One gate, and Musketeers on the wall either side of it."),
             ("advisor", "That gate is a killing ground. But look east. The wall ends where the cliff begins."),
             ("advisor", "No soldier of ours can climb it. Ostrak's Cragsmen can, and the Warden's engines stand just behind."),
+            ("advisor", "And mark the maces behind the gate. Spellwardens, the tomb's old keepers: no Wizard's fire touches a man who stands near one."),
         ],
         "events": [
             {
@@ -478,6 +229,7 @@ LEVELS.append(
         ],
         "victory": [
             ("officer", "Frostgate is ours, Commander. A handful of the Spellwardens have laid down their maces."),
+            ("advisor", "Men who can snuff out a Wizard's fire. The Warden has been preparing to face magic for some time. Or to keep some of his own on a leash."),
             ("advisor", "They say the Warden broke the last seal on the tomb two days ago, and that the mountain has not been quiet since."),
             ("officer", "They are asking to march with us, Sir Anston. They would rather face what is in that tomb beside an army."),
         ],
@@ -486,114 +238,7 @@ LEVELS.append(
     }
 )
 
-# ---------------------------------------------------------------- 5. The Sleepers Wake (the tomb's guardians)
-LEVELS.append(
-    {
-        "id": 5905,
-        "group": "story",
-        "name": "The Sleepers Wake",
-        "objective": "Destroy every Stone Sentinel that wakes among the ruins.",
-        "turn_limit": 30,
-        "budget": 3250,
-        "win_switch": False,
-        "sides": {"P": "Carrone Army", "E": "Tomb Keepers", "E2": "Stone Sentinels"},
-        "terrain": """
-^^^^^^^^^^^^^^^^^^^^^
-^..O.r...T_T..r..O.f^
-^f.......___.....,..^
-^..r..T..___..T..r..^
-^.,......___.....ff.^
-^o......_____...r..o^
-^..T...._____....T..^
-^O.....r_____......O^
-^f.r.....___..o..r..^
-^ff......___......f.^
-^,,...o..___..T...,,^
-^O...r...___.....f.O^
-.ff.....r___.....ff..
-..f......___..,,.....
-.........___......f..
-....,,...___.........
-.....................
-.....................
-""",
-        "units": """
-.....................
-.....................
-..........c..........
-........G.c.S........
-.......h.S.S.h.......
-......h.h...h.h......
-.....................
-.....................
-.....................
-.....................
-.....................
-.....................
-.....................
-.........g.g.........
-........w...w........
-.........kpk.........
-...DDDDDDDDDDDDDDD...
-...DDDDDDDDDDDDDDD...
-""",
-        "legend": {
-            "S": U("sentinel", "E2", group=1),
-            "G": U("golem", "E2", group=1),
-            "c": U("conjurer", "E", group=1, hold=True),
-            "h": U("halberdiers", "E", group=2),
-            "g": U("greatswordsmen", "P"),
-            "w": U("spellwardens", "P"),
-            "k": U("catapult", "P"),
-            "p": U("priests", "P"),
-        },
-        "camera": (10, 3),
-        "intro": [
-            ("officer", "The outer tomb, Commander. The Warden's diggers have been through here, and left in a hurry."),
-            ("officer_alarm", "Sir Anston, the statues. The statues are moving!"),
-            ("advisor", "Guardians of living stone. Arrows will not trouble them and our Priests cannot mend what they break."),
-            ("advisor", "Greatswords and siege stone, Varius. And watch those rune gates. I do not think these two are alone."),
-        ],
-        "events": [
-            {
-                "when": ("round", 3),
-                "cam": (3, 1),
-                "spawn": [("sentinel", (3, 1), "E2"), ("sentinel", (17, 1), "E2")],
-                "say": [("officer_alarm", "The northern gates are glowing. Two more of them, Commander!")],
-            },
-            {
-                "when": ("round", 4),
-                "cam": (1, 7),
-                "spawn": [
-                    ("sentinel", (1, 7), "E2"),
-                    ("sentinel", (19, 7), "E2"),
-                    ("sentinel", (3, 1), "E2"),
-                ],
-                "say": [("officer_alarm", "On the flanks! They are stepping out of the walls!")],
-            },
-            {
-                "when": ("round", 6),
-                "cam": (1, 11),
-                "spawn": [("sentinel", (1, 11), "E2"), ("sentinel", (19, 11), "E2")],
-                "say": [("advisor", "Behind our line, by the southern gates! Those are the last. Bring them down.")],
-                "win_switch": True,
-            },
-        ],
-        "brief": [
-            ("advisor", "The Spellwardens speak of sleepers in the outer tomb, set there by whoever sealed the Battlemage in."),
-            ("advisor", "The Warden marched past them with the right words. We do not have the words."),
-        ],
-        "victory": [
-            ("officer", "The last of them is rubble, Commander."),
-            ("advisor", "Built to keep the world out, or to keep something in. I begin to wonder which."),
-            ("officer", "The inner tomb is on the plateau above. The Warden's banner is flying over it."),
-        ],
-        "defeat": [("officer_hurt", "They do not tire, Commander. They do not even slow.")],
-        "reward": {"units": {"golem": 1}, "spoils": {"Weapons": 1, "Lore": 1, "Beasts": 1}},
-    }
-)
-
-# ---------------------------------------------------------------- 6. The Empty Tomb (Warden Tolm)
+# ---------------------------------------------------------------- 3. The Empty Tomb (Warden Tolm)
 LEVELS.append(
     {
         "id": 5906,
@@ -601,7 +246,7 @@ LEVELS.append(
         "name": "The Empty Tomb",
         "objective": "Defeat Warden Tolm before the tomb of the Battlemage.",
         "turn_limit": 30,
-        "budget": 5750,
+        "budget": 6000,
         "sides": {"P": "Carrone Army", "E": "Warden Tolm", "E2": "Stone Sentinels"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -669,6 +314,8 @@ LEVELS.append(
         "intro": [
             ("tolm", "So this is the Emperor's hound. You are late, Commander. Years late."),
             ("tolm", "Do you know what the old kings paid to bury what lay here? I have dug it out with goatherds."),
+            ("officer_alarm", "Sir Anston, the statues before the doors. The statues are moving!"),
+            ("advisor", "Guardians of living stone, set there by whoever sealed the Battlemage in. Our Priests cannot mend what they break, and no charge will move them."),
             ("advisor", "He is playing for time, Varius. Take the Warden and this ends."),
         ],
         "events": [
@@ -688,8 +335,8 @@ LEVELS.append(
             },
         ],
         "brief": [
-            ("advisor", "The inner tomb, Varius. Warden Tolm has drawn up everything he has left before its doors."),
-            ("advisor", "Clansmen, Spellwardens, even the stone guardians answer him here. Mind your rear on that plateau."),
+            ("advisor", "The tomb, Varius, on the plateau above Frostgate. Warden Tolm has drawn up everything he has left before its doors."),
+            ("advisor", "Clansmen, Spellwardens, and they say the tomb's own sleepers answer him here. Mind your rear on that plateau."),
         ],
         "victory": [
             ("officer", "Commander, the tomb is open. The sarcophagus is gone. There are drag marks, and cart ruts leading down to the river."),
@@ -710,7 +357,7 @@ LEVELS.append(
         "name": "Goat Track",
         "objective": "Set an ambush along the track and destroy the Warden's supply column.",
         "turn_limit": 30,
-        "budget": 3000,
+        "budget": 3250,
         "win_switch": False,
         "sides": {"P": "Carrone Army", "E": "Supply Column"},
         "terrain": """
@@ -802,7 +449,7 @@ LEVELS.append(
         "id": 5912,
         "group": "siege",
         "name": "Quarry of Giants",
-        "objective": "Destroy every Stone Sentinel in the old quarry.",
+        "objective": "Destroy every stone guardian in the old quarry.",
         "turn_limit": 30,
         "budget": 3000,
         "sides": {"P": "Carrone Army", "E": "Stone Sentinels"},
@@ -853,18 +500,21 @@ LEVELS.append(
             "S": U("sentinel", "E", group=1),
             "T": U("sentinel", "E", group=2),
             "U": U("sentinel", "E", group=3),
-            "V": U("sentinel", "E", group=3),
+            "V": U("golem", "E", group=3),  # the largest of them (the raid opens the Golem upgrade)
             "W": U("sentinel", "E", group=5),
         },
         "camera": (11, 7),
         "intro": [
             ("officer", "The clans call this the Quarry of Giants, Commander. They say the stone here was never cut by men."),
-            ("advisor", "It was cut into soldiers. Sixteen of them, by my count, and all of them awake."),
+            ("advisor", "It was cut into soldiers. Sixteen of them, by my count, all of them awake, and one in the middle that the others were only practice for."),
         ],
         "events": [],
-        "victory": [("officer", "The quarry is quiet, Commander. Nothing in it is standing.")],
+        "victory": [
+            ("officer", "The quarry is quiet, Commander. Nothing in it is standing."),
+            ("advisor", "The great one is whole under the rubble, Varius, runes and all. The craftsmen think they can raise it again, for us."),
+        ],
         "defeat": [("officer_hurt", "We cannot stand against them in the open, Commander.")],
-        "reward": {"units": {}, "spoils": {"Lore": 2, "Armor": 1}},
+        "reward": {"units": {"golem": 1}, "spoils": {"Lore": 2, "Armor": 1}},
     }
 )
 
