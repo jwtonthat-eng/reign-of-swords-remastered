@@ -643,7 +643,7 @@ for (const k in UNIT_TYPES) {
   // BONUS abilities (ours — rules/bonus.js): one trait flag per bonus unit.
   for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
     T[flag] = !!c[flag];
-  for (const flag of ["terrainRange", "dragonfire", "keen"]) T[flag] = !!c[flag];
+  for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack"]) T[flag] = !!c[flag];
   if (c.teleport) T.teleport = true; // the Battlemage moves as the Wizard does
   if (c.fly) T.fly = true; // the Dragon Rider
   T.regen = c.regen || 0; // HP mended at the start of its turn (Spellwardens)

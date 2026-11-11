@@ -75,9 +75,9 @@ export const BONUS_WEAPONS = {
     name: "Dragonfire",
     row: 23, // Cannonball
     patch: { 7: 35 }, // …but it burns fliers too (the Cannonball's Feathered Hide cell is 0)
-    range: [3, 8],
-    tags: [8, 13], // Shoot and Move, Burst (a fire weapon: double damage to Flammable war engines)
-    desc: "Dragonfire is a gout of flame hurled like a cannon shot: one target, far away, and ruinous to war engines and walls.",
+    range: [2, 8],
+    tags: [13], // Burst (a fire weapon: double damage to Flammable war engines)
+    desc: "Dragonfire is a breath of flame: it burns its target, then the two tiles beyond it in a line, and is ruinous to war engines and walls.",
   },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
@@ -85,6 +85,9 @@ export const MAGIC_WEAPONS = [25, 26, 27, 36];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
 export const BONUS_RANGED = [35, 36, 39, 42];
 export const CHAIN_WEAPON = 36;
+// Dragonfire, and the share of the blow the first and second tile BEYOND its target take
+export const DRAGONFIRE_WEAPON = 42;
+export const BREATH_SHARE = [0.6, 0.35];
 
 // Movement class (0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 war engine), as data/combat-data UNIT_AL.
 export const BONUS_AL = {
@@ -184,7 +187,8 @@ export const BONUS_COMBAT = {
     dmgBonus: 10,
     armourBonus: 10,
   },
-  // a flier in Relic Armour at the Hero's rating: the Lance (15) up close, Dragonfire at 3-8
+  // a flier in Relic Armour at the Hero's rating: the Lance (15) up close, Dragonfire at 2-8.
+  // twinAttack: each turn it may breathe fire once AND strike with the lance once, in either order, around its move.
   dragonrider: {
     move: 8,
     weapon: 42,
@@ -192,10 +196,11 @@ export const BONUS_COMBAT = {
     armour: 15,
     rating: 5,
     rf: 115,
-    abilities: [1, 14, 15, 8],
+    abilities: [1, 14, 15],
     charge: true,
     fly: true,
     dragonfire: true,
+    twinAttack: true,
   },
 };
 export const BONUS_COURAGE = {
@@ -384,7 +389,13 @@ export const BONUS_SKILLS = [
     flag: "dragonfire",
     n: "Dragonfire",
     icon: "skill_fireball",
-    d: "A gout of flame hurled like a cannon shot at 3–8 tiles: one target, double damage to flammable war engines, and it breaks walls. Unlike a cannon it may fire and move in the same turn.",
+    d: "A breath of flame at 2–8 tiles: full damage to the target, then 60% and 35% to whoever stands on the next two tiles in a line beyond it, friend or foe. Double damage to flammable war engines, and it breaks walls.",
+  },
+  {
+    flag: "twinAttack",
+    n: "Fire and Lance",
+    icon: "skill_charge",
+    d: "Each turn it may breathe Dragonfire once and strike with its Lance once, in either order, before or after its move. Tap a foe it can reach and it flies in with the lance; the Dragonfire button breathes instead.",
   },
   {
     flag: "keen",

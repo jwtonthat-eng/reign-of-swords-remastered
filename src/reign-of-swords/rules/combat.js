@@ -15,7 +15,7 @@
 import { manhattan, cheb, clamp, key, strictMost, toHp256, wholeHp, shownDamage, healStep } from "../util/util.js";
 import { WEAPON_DMG, WEAPON_RANGE, WEAPON_TAGS, BLAST_SHARE, spellStats } from "../data/combat-data.js";
 import { UNIT_TYPES, FX_TYPES, meleeHitFx } from "../data/game-data.js";
-import { MAGIC_WEAPONS, CHAIN_WEAPON, BONUS_RANGED } from "../data/bonus-units.js";
+import { MAGIC_WEAPONS, CHAIN_WEAPON, BONUS_RANGED, DRAGONFIRE_WEAPON, BREATH_SHARE } from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
 
 // Which weapon a unit swings at a target `dist` tiles away. A unit can carry two
@@ -1043,6 +1043,8 @@ export class CombatMethods {
     }
     this.targets = null; // drop the damage-preview overlay the instant the blow is ordered — it must NOT linger over the swing/retaliation
     attacker.attackedTurn = true;
+    // BONUS: the Dragon Rider spends its lance blow or its breath (it has one of each a turn — targetsFrom)
+    if (attacker.T.twinAttack) attacker[manhattan(attacker, defender) === 1 ? "_lanced" : "_fired"] = this.turn;
     if (attacker.T.pikeWall) attacker.walled = false; // giving an attack order lowers your own wall
     // Pike Wall: a braced defending pikeman strikes first; the wall replaces its later counter.
     // A CHARGE is the whole attack: onTick runs the defender's return blow only as a survival test and restores the
@@ -1230,6 +1232,26 @@ export class CombatMethods {
     // EPISODE II — Ballistae Piercing Bolt (help string 758): the bolt "damages three squares in a row" —
     // after the main hit it pierces the next two tiles behind the target, in the direction _ballistaStep picks.
     this._resolvePierce(attacker, defender, opts, wMain);
+    // BONUS: Dragonfire burns on through the two tiles beyond its target, in the line the Ballistae's bolt would take
+    // (60% then 35%), on whoever stands there and on any structure
+    if (wMain === DRAGONFIRE_WEAPON) {
+      const line = this._ballistaStep(attacker, defender.tx, defender.ty);
+      for (let k = 1; line && k <= 2; k++) {
+        const x = defender.tx + line.fx * k,
+          y = defender.ty + line.fy * k;
+        if (!this.inBounds(x, y)) break;
+        const e = this.unitAt(x, y);
+        this.spawnFx("fire", x * this.tile + this.tile / 2, y * this.tile + this.tile * 0.42, { delay: 0.08 * k });
+        if (e && !e.dead && e !== attacker)
+          this._applyHit(
+            e,
+            attacker,
+            shared(this.computeDamage(attacker, e, { weapon: wMain }), BREATH_SHARE[k - 1]),
+            false,
+          );
+        this._areaStructureHit(attacker, x, y, BREATH_SHARE[k - 1], wMain);
+      }
+    }
     // BONUS: Whirl — the Gladiators' blow spins on through every other enemy standing next to them, at 3/4 strength
     if (attacker.T.whirl && manhattan(attacker, defender) === 1 && opts.weapon == null)
       for (const e of this.units)

@@ -1,7 +1,7 @@
 // The six BONUS units (Tilicia & Isoluccia — ours, data/bonus-units.js) and their abilities: Climb, Nullify,
 // Unyielding, Amphibious, Pavise and Chain Lightning. Played on Episode II's own maps.
 import { describe, it, expect } from "vitest";
-import { loadEpisode, makeGame, startBattle, spawn, only, settle } from "./battle.js";
+import { loadEpisode, makeGame, startBattle, spawn, only, settle, step, nextRound } from "./battle.js";
 import { UNIT_TYPES, DEPLOY_COST } from "../data/game-data.js";
 import { WEAPON_DMG, UNIT_COMBAT } from "../data/combat-data.js";
 import { BONUS_ORDER, BONUS_WEAPONS, BONUS_UPGRADES } from "../data/bonus-units.js";
@@ -429,6 +429,9 @@ describe("the units as retuned", () => {
 });
 
 describe("Dragon Riders", () => {
+  const run = (g, n = 400) => {
+    for (let i = 0; i < n; i++) step(g);
+  };
   it("a 750-point elite flier in Relic Armour at the Hero's rating, upgraded from Griffon Riders with a Medal", () => {
     const T = UNIT_TYPES.dragonrider,
       hero = UNIT_TYPES.king;
@@ -437,29 +440,93 @@ describe("Dragon Riders", () => {
     expect(T.armour).toBe(hero.armour);
     expect(T.rf).toBe(hero.rf);
     expect(T.move).toBeGreaterThanOrEqual(hero.move);
-    expect(T.firstStrike && T.fear && T.hasCharge && T.shootMove).toBe(true);
+    expect(T.firstStrike && T.fear && T.hasCharge && T.twinAttack).toBe(true);
+    expect(T.harasser).toBe(false); // the computer flies it in to fight instead of hovering at range
+    expect([T.minRange, T.range]).toEqual([1, 8]); // the lance at 1, the breath at 2–8: no dead zone
     expect(UPGRADE_FROM.dragonrider).toEqual({ from: "griffon", need: "Medal" });
     expect(upgradeGate("dragonrider", true)).toBe(5943);
-    expect(unitSkills("dragonrider").map((s) => s.n)).toEqual(expect.arrayContaining(["Dragonfire", "Flight", "Fear"]));
+    expect(unitSkills("dragonrider").map((s) => s.n)).toEqual(
+      expect.arrayContaining(["Dragonfire", "Fire and Lance", "Flight", "Fear"]),
+    );
   });
-  it("Dragonfire: a cannon-like shot at 3–8 that also burns fliers and war engines; a Lance up close", () => {
+  it("Dragonfire burns its target, then the two tiles beyond it at 60% and 35% — fliers and war engines too", () => {
     const g = field();
     const dragon = spawn(g, "dragonrider", "blue", 4, 5),
-      foot = spawn(g, "footmen", "red", 10, 5),
-      griffon = spawn(g, "griffon", "red", 9, 6),
-      catapult = spawn(g, "catapult", "red", 8, 5),
-      adjacent = spawn(g, "footmen", "red", 5, 5),
-      tooFar = spawn(g, "footmen", "red", 13, 5);
-    expect(g._weaponAt(dragon, 6)).toBe(42);
+      first = spawn(g, "footmen", "red", 8, 5),
+      second = spawn(g, "footmen", "red", 9, 5),
+      third = spawn(g, "footmen", "red", 10, 5),
+      fourth = spawn(g, "footmen", "red", 11, 5),
+      aside = spawn(g, "footmen", "red", 8, 6);
+    only(g, dragon, first, second, third, fourth, aside);
+    expect(g._weaponAt(dragon, 4)).toBe(42);
+    expect(g._weaponAt(dragon, 2)).toBe(42);
     expect(g._weaponAt(dragon, 1)).toBe(15);
-    expect(WEAPON_DMG[42][0]).toBe(WEAPON_DMG[23][0]); // the Cannonball's row…
-    expect(g.computeDamage(dragon, griffon)).toBeGreaterThan(0); // …but it reaches fliers
-    const cannon = spawn(g, "cannon", "blue", 4, 6);
-    expect(g.computeDamage(cannon, griffon, { weapon: 23 })).toBe(0);
-    expect(g.computeDamage(dragon, catapult)).toBeGreaterThan(g.computeDamage(dragon, foot)); // fire on a Flammable engine
-    const targets = g.targetsFrom(dragon, 4, 5, true); // after a move: Shoot and Move
-    expect(targets).toEqual(expect.arrayContaining([foot, griffon, catapult, adjacent]));
-    expect(targets).not.toContain(tooFar);
-    expect(g.moveCost(dragon, 0, 0)).toBe(1); // it flies: any tile costs 1
+    const full = g.computeDamage(dragon, first);
+    g.resolveDamage(dragon, first, {});
+    expect(100 - first.hp).toBe(full);
+    expect(100 - second.hp).toBeGreaterThan(100 - third.hp);
+    expect(100 - second.hp).toBeLessThan(full);
+    expect(third.hp).toBeLessThan(100);
+    expect(fourth.hp).toBe(100);
+    expect(aside.hp).toBe(100);
+    const griffon = spawn(g, "griffon", "red", 4, 9),
+      catapult = spawn(g, "catapult", "red", 4, 10),
+      cannon = spawn(g, "cannon", "blue", 1, 9);
+    expect(g.computeDamage(dragon, griffon, { weapon: 42 })).toBeGreaterThan(0);
+    expect(g.computeDamage(cannon, griffon, { weapon: 23 })).toBe(0); // a Cannonball cannot touch a flier
+    expect(g.computeDamage(dragon, catapult, { weapon: 42 })).toBeGreaterThan(g.computeDamage(dragon, first));
+  });
+  it("a tap on a foe it can reach flies in with the lance; the breath is left for another foe that turn", () => {
+    const g = field();
+    const dragon = spawn(g, "dragonrider", "blue", 2, 5),
+      near = spawn(g, "footmen", "red", 7, 5),
+      far = spawn(g, "footmen", "red", 9, 9),
+      keep = spawn(g, "footmen", "blue", 1, 1); // (a second unit of yours, so the turn does not end by itself)
+    g.select(dragon);
+    expect(g.aimSkills().map((s) => s.id)).toEqual(["dragonfire"]);
+    g.click({ tx: 7, ty: 5 });
+    run(g);
+    expect(Math.abs(dragon.tx - near.tx) + Math.abs(dragon.ty - near.ty)).toBe(1); // it flew in
+    expect(near.hp).toBeLessThan(40); // a lance charge, not a 46-point breath
+    expect(dragon.acted).toBe(false);
+    expect(g.targets).toContain(far); // the breath is still to come
+    g.click({ tx: 9, ty: 9 });
+    run(g);
+    expect(far.hp).toBeLessThan(100);
+    expect(dragon.acted).toBe(true); // lance, breath and move all spent
+    expect(keep.acted).toBeFalsy();
+  });
+  it("🔥 Dragonfire armed: the tap breathes instead, and the lance and the move are still to come", () => {
+    const g = field();
+    const dragon = spawn(g, "dragonrider", "blue", 2, 5),
+      near = spawn(g, "footmen", "red", 7, 5);
+    spawn(g, "footmen", "blue", 1, 1);
+    g.select(dragon);
+    g.aimSkill("dragonfire");
+    expect(g.aimMode).toBe(true);
+    g.click({ tx: 7, ty: 5 });
+    run(g);
+    expect([dragon.tx, dragon.ty]).toEqual([2, 5]); // it stayed and breathed
+    const burned = near.hp;
+    expect(burned).toBeLessThan(100);
+    expect(g.aimSkills()).toBeNull(); // one breath a turn
+    expect(dragon.acted).toBe(false);
+    g.click({ tx: 7, ty: 5 });
+    run(g);
+    expect(near.dead || near.hp < burned).toBe(true); // …then the lance
+  });
+  it("the computer's Dragon Rider flies in and fights hand to hand", () => {
+    const g = startBattle(makeGame(5424));
+    const group = g.mission.groupOrder.find((x) => x.side === "enemy").gi; // (an enemy army that takes a turn)
+    only(g);
+    const mine = [
+      spawn(g, "footmen", "blue", 6, 5),
+      spawn(g, "archers", "blue", 6, 7),
+      spawn(g, "swordsmen", "blue", 5, 6),
+    ];
+    const dragon = spawn(g, "dragonrider", "red", 13, 5, { group });
+    nextRound(g);
+    expect(mine.some((u) => Math.abs(u.tx - dragon.tx) + Math.abs(u.ty - dragon.ty) === 1)).toBe(true);
+    expect(mine.some((u) => u.dead || u.hp < 60)).toBe(true);
   });
 });

@@ -656,16 +656,19 @@ kept apart from the original data so that everything else stays checkable agains
   | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 4 | 600, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
   | Gladiators | 4, skirmish | Gladius (Sword) | Light & Shield | 3 | 200 | Whirl |
   | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 250 | Lesser Shroud, Pike Wall |
-  | Dragon Riders | 8, flying | Dragonfire 3-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Shoot and Move, First Strike, Fear, Charge |
+  | Dragon Riders | 8, flying | Dragonfire 2-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Fire and Lance, First Strike, Fear, Charge |
 
 - **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
   to the Gladiators takes 3/4 of the same blow. *Lesser Shroud* (Samurai): the Shaman's Spirit Shroud with a reach of
   2 tiles instead of 4, raised the same way. *Mending Runes* (Spellwardens): +10 HP at the start of each of their
   turns, with the village heal. The *Boarding Musket* reaches 3 tiles, but only 2 when the Marines stand in woods,
   tall grass, scrub, rocky ground or shallows (terrain types 3, 4, 5, 22, 27, 28). *Master Swordsman* (Samurai): +10
-  on the weapon x armour cell of every blow dealt, -10 on every blow taken (never below 1). *Dragonfire*: a single-
-  target fire weapon on the Cannonball's row that also reaches fliers, drawn as a fireball; it obeys cover like any
-  shot, unlike the Cannonball. The Battlemage's Teleport is the Wizard's. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
+  on the weapon x armour cell of every blow dealt, -10 on every blow taken (never below 1). *Dragonfire*: a fire weapon on the Cannonball's row that also reaches fliers, at 2-8 tiles, drawn as
+  a fireball; it obeys cover like any shot, unlike the Cannonball, and burns on through the two tiles beyond its
+  target (60% then 35%, friend or foe, structures too) along the line the Ballistae's bolt would take. *Fire and
+  Lance*: each turn the Dragon Rider has one breath, one lance blow and its move, in any order. A tap on a foe it can
+  reach flies in and strikes with the lance (a charge when the lane allows); the Dragonfire button breathes instead.
+  The computer treats it as a melee unit, so it closes in, and makes one attack a turn. The Battlemage's Teleport is the Wizard's. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
   attack from a deep-water tile. *Nullify*: a unit within 2 tiles (Manhattan) of a living Spellwarden of its side
   takes 0 from enemy Fireball, Lightning Storm, Ice Field and Chain Lightning, is not slowed by an enemy Ice Field,
   ignores an enemy Spirit Shroud and is not stopped or hurt by quicksand. *Unyielding*: no Heal from a Priest, immune

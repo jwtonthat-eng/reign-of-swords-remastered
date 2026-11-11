@@ -755,6 +755,8 @@ export class GridMethods {
       if (this._weaponUselessVs(u, other, dist) && !this._chargeReaches(u, tx, ty, other) && !charged) continue; // Boulder / Cannonball can't hit fliers
       // BONUS: the Marines' Boarding Musket reaches 3 only from open ground — 2 from woods, tall grass, scrub, rocks
       // or shallows (terrain types 3, 4, 5, 22, 27, 28)
+      // BONUS: the Dragon Rider has one lance blow (range 1) and one breath (range 2+) a turn
+      if (u.T.twinAttack && (dist === 1 ? u._lanced : u._fired) === this.turn) continue;
       if (u.T.terrainRange && dist > 2 && [3, 4, 5, 22, 27, 28].includes(moveType(this.tileAt(tx, ty)))) continue;
       if (this._inWeaponRange(u, dist, hasMoved) || this._chargeReaches(u, tx, ty, other) || charged) out.push(other);
     }

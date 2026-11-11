@@ -340,6 +340,27 @@ export class InputMethods {
       }
       this.recalcTargets();
     }
+    // BONUS — the Dragon Rider: a tap on a foe it can reach flies in and strikes with the lance (a charge when the
+    // lane allows); only a foe out of the lance's reach is burned from where it hovers. With 🔥 Dragonfire armed
+    // (aimMode) the tap always breathes, and a foe too close to burn is only read.
+    if (sel.T.twinAttack && !sel.acted) {
+      if (this.aimMode) {
+        if (manhattan(sel, u) > 1 && this.targetsFrom(sel, sel.tx, sel.ty).includes(u)) this.doAttack(sel, u);
+        else this.inspectUnit(u);
+        return;
+      }
+      const spot = sel._lanced !== this.turn ? this._lanceSpot(sel, u) : null;
+      if (spot) {
+        const strike = () => {
+          if (!u.dead && this.targetsFrom(sel, sel.tx, sel.ty).includes(u)) this.doAttack(sel, u);
+          else this.enterAct(sel);
+        };
+        if (spot.tx === sel.tx && spot.ty === sel.ty) strike();
+        else
+          this.moveUnit(sel, this.pathTo(this.reach, spot.tx, spot.ty), strike, false, spot.charge ? true : undefined);
+        return;
+      }
+    }
     // Tap an in-range foe to strike it in place (a Shoot-and-Move unit only while its one shot is unspent).
     const inRange = !(sel.T.shootMove && sel.attackedTurn) && this.targetsFrom(sel, sel.tx, sel.ty).includes(u);
     if (inRange) {
@@ -510,6 +531,26 @@ export class InputMethods {
       const dist = Math.abs(enemy.tx - x) + Math.abs(enemy.ty - y);
       if (dist >= u.T.minRange && dist <= u.T.range && dist < bestDist) {
         bestDist = dist;
+        best = { tx: x, ty: y };
+      }
+    }
+    return best;
+  }
+  // BONUS — where the Dragon Rider strikes `enemy` with its lance from: its own tile if it is already beside it; else,
+  // if it has not moved yet, a charge launch (Auto-charge on) or the nearest tile it can reach beside the foe.
+  _lanceSpot(u, enemy) {
+    if (manhattan(u, enemy) === 1) return { tx: u.tx, ty: u.ty };
+    if (!this.reach || this._movedThisTurn(u)) return null;
+    const launch = this._autoChargeOn() ? this._chargeLaunch(u, enemy) : null;
+    if (launch) return { ...launch, charge: true };
+    let best = null,
+      bestCost = FAR;
+    for (const k of this.reach.stops) {
+      const [x, y] = k.split(",").map(Number);
+      if (Math.abs(enemy.tx - x) + Math.abs(enemy.ty - y) !== 1) continue;
+      const cost = this.reach.dist.get(k);
+      if (cost < bestCost) {
+        bestCost = cost;
         best = { tx: x, ty: y };
       }
     }
@@ -759,6 +800,23 @@ export class InputMethods {
   // A player's attack has resolved. A Shoot-and-Move unit that has not moved yet keeps its MOVE (menu @0x2154c) — it
   // stays selected with its move range and no targets; everyone else ends its turn.
   _afterAttack(u) {
+    // BONUS — the Dragon Rider has a lance blow, a breath and a move each turn, in any order: after an attack it
+    // keeps whatever is left (its move if unspent, else its other attack if a foe is in reach of it).
+    if (!u.dead && u.T.twinAttack && u.team === "blue" && !u.ally && this.phase === "player") {
+      this.aimMode = false;
+      if (!this._movedThisTurn(u)) {
+        this.selected = u;
+        this.mode = "select";
+        this.reach = this.computeReach(u);
+        this.targets = this.targetsFrom(u, u.tx, u.ty);
+        this._emit();
+        return;
+      }
+      if (this.targetsFrom(u, u.tx, u.ty).length) {
+        this.enterAct(u);
+        return;
+      }
+    }
     if (
       !u.dead &&
       u.T.shootMove &&
