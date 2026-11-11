@@ -676,6 +676,10 @@ kept apart from the original data so that everything else stays checkable agains
   | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 400, elite | Sun Magic |
   | Feathered Serpent | 7, flying | Gale 2-4 (Lightning Storm, +10), Fangs | Feathered Hide | 4 | 300 | Tailwind, Shoot and Move |
 
+- **Hidden for now** (user decision): the Unicorn, Efreet, Naga and Skeletons. Their data, rules, art and tests
+  stay (`BONUS_HIDDEN` in `data/bonus-units.js`), but the game offers none of them: no camp or Field Manual card, no
+  upgrade branch, no reward, no place in any battle or in the veteran army. What is written of them below describes
+  the units as built.
 - **Tezcal and the upgrade rule** (the fourth wave; art supplied by the user). A sixth region, the Jungles of
   Tezcal (map ids 5994-5998: three story battles, two raids), opens after the Mirror Sea; its marker is east of the
   Mirror Sea, between Satoshi and Tilicia. *Jungle Stride* (Jaguar and Eagle Warriors): woods (terrain types 4, 28)

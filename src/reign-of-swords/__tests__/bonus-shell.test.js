@@ -132,7 +132,7 @@ describe("Resume Episode II (⚙ Settings)", () => {
     for (const k of [...ALL_TYPES, ...EP2_ORDER, ...BONUS_ORDER].filter((u) => u !== "sapper" && u !== "bodyguard"))
       expect(got.units[k], k).toBe(8);
     expect(got.units.sapper).toBeUndefined();
-    expect(Object.keys(got.units).length).toBe(52);
+    expect(Object.keys(got.units).length).toBe(48);
     expect(got.spoils).toEqual({ Medal: 8, Armor: 8, Weapons: 8, Beasts: 8, Spirit: 8, Lore: 8 });
   });
   it("…and resuming with it marks every battle of every campaign won, the bonus ones included", () => {

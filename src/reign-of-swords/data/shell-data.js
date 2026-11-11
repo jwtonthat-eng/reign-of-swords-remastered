@@ -1539,4 +1539,4 @@ export const BONUS_ABILITY_HELP = BONUS_SKILLS.map((skill) => ({
   title: skill.n,
   text: skill.d,
   units: BONUS_ORDER.filter((u) => (UNIT_TYPES[u] || {})[skill.flag]),
-}));
+})).filter((help) => help.units.length); // (an ability only hidden units have is not listed)

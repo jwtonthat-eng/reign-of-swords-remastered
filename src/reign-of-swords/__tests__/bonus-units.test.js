@@ -1,10 +1,12 @@
 // The six BONUS units (Tilicia & Isoluccia — ours, data/bonus-units.js) and their abilities: Climb, Nullify,
 // Unyielding, Amphibious, Pavise and Chain Lightning. Played on Episode II's own maps.
 import { describe, it, expect } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { loadEpisode, makeGame, startBattle, spawn, only, settle, step, nextRound } from "./battle.js";
 import { UNIT_TYPES, DEPLOY_COST } from "../data/game-data.js";
 import { WEAPON_DMG, UNIT_COMBAT } from "../data/combat-data.js";
-import { BONUS_ORDER, BONUS_WEAPONS, BONUS_UPGRADES } from "../data/bonus-units.js";
+import { BONUS_ORDER, BONUS_WEAPONS, BONUS_UPGRADES, BONUS_UPGRADES_ALL, BONUS_HIDDEN } from "../data/bonus-units.js";
 import { UNIT_META, unitSkills, upgradeOffered, upgradeGate, bonusOpen, UPGRADE_FROM } from "../data/shell-data.js";
 import { DEPLOY_ELITE, DEPLOY_ORDER } from "../data/missions.js";
 import { moveType } from "../rules/terrain.js";
@@ -38,7 +40,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("twenty-four units, each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("twenty units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -56,10 +58,6 @@ describe("bonus units: the data", () => {
       "tengu",
       "alchemist",
       "golem",
-      "unicorn",
-      "efreet",
-      "naga",
-      "skeleton",
       "jaguar",
       "eagle",
       "sunpriest",
@@ -114,10 +112,6 @@ describe("bonus units: upgrade paths", () => {
       ["beastmaster", "tengu", "Spirit"],
       ["priests", "alchemist", "Lore"],
       ["sentinel", "golem", "Armor"],
-      ["beastmaster", "unicorn", "Lore"],
-      ["beastmaster", "efreet", "Weapons"],
-      ["beastmaster", "naga", "Beasts"],
-      ["beastmaster", "skeleton", "Armor"],
       ["pikemen", "jaguar", "Beasts"],
       ["archers", "eagle", "Lore"],
       ["cavalry", "serpent", "Spirit"],
@@ -900,20 +894,34 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
     g._applyHit(skeleton, foe, 150, false);
     expect(skeleton.dead).toBe(true);
   });
-  it("each has its price, its upgrade and the battle that opens it", () => {
+  it("each has its price; Alchemist and Golem have their upgrade and the battle that opens it", () => {
     const cost = (k) => DEPLOY_COST[k];
     expect(["alchemist", "golem", "unicorn", "efreet", "naga", "skeleton"].map(cost)).toEqual([
       250, 400, 275, 350, 300, 500,
     ]);
-    for (const [unit, gate] of [
-      ["alchemist", 5925],
-      ["golem", 5905],
-      ["unicorn", 5971],
-      ["efreet", 5983],
-      ["naga", 5981],
-      ["skeleton", 5903],
-    ])
-      expect(upgradeGate(unit, true)).toBe(gate);
+    expect(upgradeGate("alchemist", true)).toBe(5925);
+    expect(upgradeGate("golem", true)).toBe(5905);
+  });
+  it("Unicorn, Efreet, Naga and Skeletons are hidden for now: built, but nowhere in the game", () => {
+    expect(BONUS_HIDDEN).toEqual(["unicorn", "efreet", "naga", "skeleton"]);
+    for (const unit of BONUS_HIDDEN) {
+      expect(UNIT_TYPES[unit]).toBeTruthy(); // the unit itself still works (the tests above)
+      expect(BONUS_ORDER).not.toContain(unit);
+      expect(DEPLOY_ORDER).not.toContain(unit);
+      expect(UNIT_META[unit]).toBeUndefined(); // no camp or Field Manual card
+      expect(UPGRADE_FROM[unit]).toBeUndefined(); // no upgrade branch
+      expect(BONUS_UPGRADES.some((u) => u.to === unit || u.from === unit)).toBe(false);
+    }
+    const veteran = JSON.parse(readFileSync(join("public", "games", "reign-of-swords-2", "veteran-army.json"), "utf8"));
+    const bonus = JSON.parse(readFileSync(join("public", "games", "reign-of-swords-2", "bonus.json"), "utf8"));
+    for (const unit of BONUS_HIDDEN) expect(veteran.army[unit]).toBeUndefined();
+    for (const level of bonus.levels) {
+      const fielded = [...level.player, ...level.allies, ...level.enemy].map((u) => u[0]);
+      const spawned = level.script.actions.filter((a) => a.op === 0).map((a) => a.key);
+      for (const unit of BONUS_HIDDEN) expect([...fielded, ...spawned]).not.toContain(unit);
+    }
+    for (const reward of Object.values(bonus.rewards))
+      for (const unit of BONUS_HIDDEN) expect((reward.units || {})[unit]).toBeUndefined();
   });
 });
 
@@ -1030,8 +1038,9 @@ describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathe
     expect(T.fly && T.al === 0 && T.shootMove).toBe(true);
     expect([T.minRange, T.range]).toEqual([1, 4]);
   });
-  it("the Beast Master's tree: Tengu, Unicorn, Efreet, Naga and Skeletons are all made from a Beast Master", () => {
-    const tree = BONUS_UPGRADES.filter((u) => u.from === "beastmaster").map((u) => [u.to, u.need]);
+  it("the Beast Master's tree: Tengu, and (hidden for now) Unicorn, Efreet, Naga and Skeletons", () => {
+    expect(BONUS_UPGRADES.filter((u) => u.from === "beastmaster").map((u) => u.to)).toEqual(["tengu"]);
+    const tree = BONUS_UPGRADES_ALL.filter((u) => u.from === "beastmaster").map((u) => [u.to, u.need]);
     expect(tree).toEqual([
       ["tengu", "Spirit"],
       ["unicorn", "Lore"],
@@ -1039,7 +1048,7 @@ describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathe
       ["naga", "Beasts"],
       ["skeleton", "Armor"],
     ]);
-    for (const [to] of tree) expect(UPGRADE_FROM[to].from).toBe("beastmaster");
+    expect(UPGRADE_FROM.tengu.from).toBe("beastmaster");
     const cost = (k) => DEPLOY_COST[k];
     expect(["jaguar", "eagle", "sunpriest", "serpent"].map(cost)).toEqual([150, 175, 400, 300]);
     expect(upgradeGate("jaguar", true)).toBe(5994);

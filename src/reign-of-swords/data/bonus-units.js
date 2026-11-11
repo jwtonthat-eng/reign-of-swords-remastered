@@ -7,8 +7,12 @@
    Pure literals — no imports (combat-data and game-data both import this file).
    ============================================================ */
 
-// The bonus units, in Field Manual order.
-export const BONUS_ORDER = [
+// HIDDEN FOR NOW (user decision): these units are built — data, rules, art and tests — but the game does not show
+// them: no camp card, upgrade branch, Field Manual entry, reward or place in any battle. Empty this list to bring
+// them back (and put them back in the level files and the veteran army).
+export const BONUS_HIDDEN = ["unicorn", "efreet", "naga", "skeleton"];
+// Every bonus unit, hidden or not (sprites, type tables).
+export const BONUS_ALL = [
   "cragsmen",
   "spellwardens",
   "sentinel",
@@ -34,6 +38,8 @@ export const BONUS_ORDER = [
   "sunpriest",
   "serpent",
 ];
+// The bonus units the game offers, in Field Manual order.
+export const BONUS_ORDER = BONUS_ALL.filter((unit) => !BONUS_HIDDEN.includes(unit));
 // Units a bonus unit calls onto the field: never deployed or owned (the Beast Master's Hounds).
 export const BONUS_SUMMONS = ["hounds", "imp"];
 
@@ -1144,7 +1150,7 @@ export const BONUS_SKILLS = [
 
 // UPGRADE ARMY — each bonus unit hangs off an original unit, in a collectible slot that unit leaves empty, and waits
 // on a bonus battle (the map id) the way Episode II's own units wait on theirs.
-export const BONUS_UPGRADES = [
+export const BONUS_UPGRADES_ALL = [
   { from: "archers", to: "cragsmen", need: "Armor", gate: 5902 }, // Tilicia 2, Ostrak's Bargain
   { from: "swordsmen", to: "spellwardens", need: "Lore", gate: 5904 }, // Tilicia 4, Frostgate
   { from: "craftsmen", to: "sentinel", need: "Spirit", gate: 5906 }, // Tilicia 6, The Empty Tomb
@@ -1171,6 +1177,10 @@ export const BONUS_UPGRADES = [
   { from: "cavalry", to: "serpent", need: "Spirit", gate: 5996 }, // Tezcal 3
   { from: "priests", to: "sunpriest", need: "Medal", gate: 5996 }, // Tezcal 3
 ];
+// …those the game offers (none into or out of a hidden unit)
+export const BONUS_UPGRADES = BONUS_UPGRADES_ALL.filter(
+  (u) => !BONUS_HIDDEN.includes(u.to) && !BONUS_HIDDEN.includes(u.from),
+);
 
 // Camp / Field Manual cards, in the shape of data/shell-data UNIT_META.
 export const BONUS_META = {

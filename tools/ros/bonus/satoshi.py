@@ -440,7 +440,7 @@ LEVELS.append(
             "p": U("pikemen", "E", group=3, hold=True),
             "w": U("swordsmen", "E", group=3, hold=True),
             "H": U("tengu", "E", group=4),
-            "N": U("unicorn", "E", group=4),
+            "N": U("tengu", "E", group=4),
         },
         "camera": (7, 2),
         "intro": [
@@ -456,7 +456,7 @@ LEVELS.append(
         ],
         "victory": [("ishiro", "You have kept faith with gods that are not your own, Commander. It will be remembered.")],
         "defeat": [("officer_hurt", "The shrine is stripped bare, Commander. We came too late.")],
-        "reward": {"units": {"archers": 1, "unicorn": 1}, "spoils": {"Spirit": 2, "Lore": 1}},
+        "reward": {"units": {"archers": 1}, "spoils": {"Spirit": 2, "Lore": 1}},
     }
 )
 

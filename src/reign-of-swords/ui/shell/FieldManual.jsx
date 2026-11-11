@@ -38,7 +38,7 @@ export function UpgradeTree({ ep2: isEp2 = false, bonus = false }) {
   // the visible nodes so the layout grows to fit Ep2's extra branches.
   // …and the bonus units (Tilicia & Isoluccia) only once those campaigns are open (`bonus`).
   const nodes = Object.keys(TREE_COL).filter(
-    (u) => (isEp2 || !(UNIT_META[u] || {}).ep2) && (bonus || !(UNIT_META[u] || {}).bonus),
+    (u) => UNIT_META[u] && (isEp2 || !UNIT_META[u].ep2) && (bonus || !UNIT_META[u].bonus), // (a hidden bonus unit has no card)
   );
   const maxCol = Math.max(...nodes.map((u) => TREE_COL[u]));
   const COL_ROWS = {};
