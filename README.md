@@ -46,11 +46,14 @@ It is a remake, not an exact copy.
 - **The original army.** Knights, Pikemen, Swordsmen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen,
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
-- **Ten fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
+- **Thirteen fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
   Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi, the jungles of Tezcal, Norse
-  Jarnheim, Egyptian Khemret, Polynesian Moananui and the highlands of Coatlan: 30 battles and 22 raids, with
-  thirty-seven new units, each with an ability of its own, and eight culture tokens that pay for their upgrades.
-  `docs/images/all-units.png` shows every unit; `docs/unit-balance.md` has the balance numbers.
+  Jarnheim, Egyptian Khemret, Polynesian Moananui, the highlands of Coatlan, and three factions with ground of their
+  own: the Trench Brood of Thalassar, the Clockwork Syndicate of Brasshaven and the Saurian Exiles of the Amber
+  Reach. 39 battles and 28 raids, with forty-nine new units, each with an ability of its own; eleven culture tokens
+  that pay for their upgrades; and nineteen new terrain tiles, from conveyor belts to black ice.
+  `docs/images/all-units.png` shows every unit, `docs/images/bonus-tiles.png` the tiles; `docs/unit-balance.md` has
+  the balance numbers.
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.
@@ -138,7 +141,7 @@ public/games/
   reign-of-swords-2/        Episode II data (shares Episode I's sprites and audio)
 public/ros-atlas/           the interactive map and animation atlases (Story & Assets)
 tools/ros/                  Python tools that extracted and audited the data from the original iOS games
-tools/ros/bonus/            the ten fan-made bonus campaigns: level sources, sprite-sheet and token importers and their builder
+tools/ros/bonus/            the thirteen fan-made bonus campaigns: level sources, sprite-sheet, token and tile importers, their builder
 docs/images/                the screenshots in this README, and all-units.png: every unit the game offers
                             (rebuilt by tools/ros/bonus/unit_gallery.py)
 ```

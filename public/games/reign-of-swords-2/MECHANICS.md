@@ -622,13 +622,14 @@ not on this list is meant to match the binaries — a difference that is not lis
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
 
-### The bonus campaigns: ten regions after Episode II (Episode II only)
+### The bonus campaigns: thirteen regions after Episode II (Episode II only)
 
-Ten fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+Thirteen fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
 kept apart from the original data so that everything else stays checkable against the binaries.
 
 - **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
-  beside it) holds the ten regions, their 30 story battles and 22 raids (map ids 5902-5913 Tilicia, 5914-5918 Jarnheim,
+  beside it) holds the thirteen regions, their 39 story battles and 28 raids (map ids 5964-5968 Thalassar, 5973-5977 Brasshaven,
+  5984-5988 the Amber Reach — see "The three factions" below — and 5902-5913 Tilicia, 5914-5918 Jarnheim,
   5924-5933 Isoluccia, 5934-5938 Khemret, 5941-5952 Mare Nostra, 5944-5948 Moananui, 5954-5958 Coatlan, 5961-5972
   Satoshi, 5981-5992 the Mirror Sea, 5994-5998 Tezcal), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
@@ -851,6 +852,124 @@ kept apart from the original data so that everything else stays checkable agains
   map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
   battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the
   muster roster) in a side column on the right. Phones keep their own layout.
+
+### The three factions and the bonus terrain tiles (Episode II only)
+
+Three more regions, twelve units, three upgrade tokens and nineteen kinds of ground, all ours (designs and art
+supplied by the user). Where a design asked for something the engine does not have, the user chose how it plays;
+those choices are marked.
+
+- **Where it lives.** The regions are `tools/ros/bonus/thalassar.py`, `brasshaven.py` and `amber_reach.py` (three
+  story battles and two raids each, opening with the bonus campaigns beside Tilicia). The units are in
+  `data/bonus-units.js` with the rest; their blows are `_factionStrike` and its neighbours in `rules/combat.js`,
+  their skills in `rules/abilities.js`. The tiles are `rules/tiles.js`; `tools/ros/bonus/import_tiles.py` cuts their
+  art and writes their tables. Tests: `faction-units.test.js`, `bonus-tiles.test.js`.
+- **Tokens with a gift.** Abyssal Pearl, Overclocked Mainspring and Amber Catalyst are collectibles like the other
+  culture tokens: won two at a time in their region's battles, spent one per unit to make that faction's units, kept
+  off the Merchant's counter. Each also names a gift, and every unit made with the token carries it (user decision:
+  the faction's own units, not a second upgrade tier):
+  - *Crush Depth* (the Trench Brood): the foe a Trench unit strikes is Snared — no movement on its next turn. It is
+    the Naga's hold (`_held`), so it ends with the victim's own turn, a blow landed during the victim's turn holds
+    nothing, and a Cleansing Touch or a Zen Sand Garden lifts it. War engines and the Immovable are not held.
+  - *Overdrive* (the Clockwork Syndicate): a skill armed before the unit acts. When its action ends it takes a
+    second full action (move and attack again); when that ends it loses 25 HP, straight off its health. Armed and
+    then let down before acting, it costs nothing; a second action never finished is still paid for as the turn
+    ends. The computer winds up a unit above half health that has a foe it can strike this turn.
+  - *Apex Roar* (the Saurian Exiles): when a Saurian strikes a foe down, every friend within 2 tiles gains +15 on
+    its attack rating until the end of its next turn.
+- **Twelve units**, each on an original weapon row and armour column like the rest:
+
+  | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
+  |---|---|---|---|---|---|---|
+  | Carapace Scuttler | 3, skirmish | Crusher Claw (Spear) | Heavy & Shield, shown as Carapace | 3 | 225 | Carapace, Amphibious, Crush Depth |
+  | Siren Channeler | 5, skirmish | Coral Trident (Spear) | Holy Vestment | 4 | 225 | Lure, Wayfinder, Crush Depth |
+  | Brine Hurler | 4, formation | Toxic Coral 3-7 (Rock), Short Sword | Breastplate | 3 | 250 | Flooded Ground, Move or Shoot, Crush Depth |
+  | Trench Behemoth | 4, formation | Sweeping Bite (Halberd) | Heavy (-10 taken), shown as Shark Hide | 5 | 500, elite | Sweeping Bite, Immovable, Lurker of the Deep, Fear, Crush Depth |
+  | Brass Phalanx | 3, formation | Piston Mace (Sword) | Heavy & Shield | 4 | 225 | Shield Lock, Formation, Overdrive |
+  | Arc Caster | 5, skirmish | Arc Bolt 2-4 (Lightning Storm), Short Sword | Breastplate | 4 | 225 | Chain Arc, Shoot and Move, Overdrive |
+  | Caltrop Gyrocopter | 8, flies | Caltrops 2-4 (Short Bow) | Feathered Hide | 3 | 175 | Caltrops, Shoot and Move, Overdrive |
+  | Volatile Automaton | 5, formation | Ram (Spear) | Light | 2 | 100 | Volatile, Unyielding, Fearless, Overdrive |
+  | Raptor Skirmisher | 7, skirmish | Sickle Claws (Wizard Blade) | Light | 4 | 200 | Pack Hunter, Apex Roar |
+  | Ankylosaur Juggernaut | 3, formation | Tail Club (Sword) | Heavy & Shield (-10 taken), shown as Spiked Shell | 3 | 325 | Spiked Shell, Apex Roar |
+  | Pterosaur Bombardier | 7, flies | Dropped Stone 2-3 (Rock), Talon | Feathered Hide | 4 | 250 | Harvest, Shoot and Move, Apex Roar |
+  | Theropod Tyrant | 4, formation | Tyrant Jaws (Greatsword; 120 wood, 90 stone) | Heavy (-15 taken), shown as Tyrant Hide | 5 | 700, elite | Devastation, Fear, Fearless, Apex Roar |
+
+- **Their abilities.**
+  - *Carapace* and *Pack Hunter* — **there is no unit facing in the game**, so "the rear" is the original's own
+    pincer (user decision): a blow hand to hand while another unit of the attacker's side stands directly opposite
+    (the +30 case of the flank bonus). The Scuttler's shell turns 40% of every other blow; a pincered blow at a
+    Scuttler, and any pincered blow by a Raptor, reads the weapon's No Armour column and ignores cover, Formation
+    and the -N taken. Nothing reaches the underside of a Bulwark.
+  - *Lure* (Siren): a skill in place of her attack, at 2-4 tiles on a visible foe. The foe is dragged up to 2 tiles
+    towards her — a step at a time along the longer side of the gap first, onto ground it could stand on, stopping at
+    anything in the way — and is Snared. No damage. What it is dragged onto does its work (quicksand, caltrops, the
+    tiles below). The design gave her no attack at all; she carries a Coral Trident so that a squad of Sirens can
+    finish what it drags in (in the arena a Siren with no weapon lost to the Dune Sirens she is made from). The
+    computer sings when her trident can reach nobody this turn.
+  - *Flooded Ground* (Brine Hurler): the tile its coral lands on — under a foe or on empty ground — is Flooded for
+    the rest of the battle: ground units not of the Trench pay double to enter it and take 20% more damage on it.
+    Not on deep water or cliffs.
+  - **The Behemoth and the Tyrant occupy one tile** (user decision): the designs' 2x2 body would have needed every
+    unit-per-tile assumption in the engine rewritten. They are drawn large, and keep the rest: *Immovable* (no
+    Gale, Lure or conveyor moves a Behemoth) and *Sweeping Bite* (the target in full, the foes on either side of
+    it across the line of the blow at 75%).
+  - *Shield Lock*: a Brass Phalanx beside another takes 30% less from every ranged attack (from any side: no
+    facing). *Chain Arc*: the bolt leaps at half strength to one foe beside its target — any, if the target stands
+    in shallows, deep water or on a Flooded tile; otherwise only one in Heavy, Heavy & Shield, War Engine or Relic
+    armour.
+  - *Caltrops*: the tile a Gyrocopter shoots at (a foe's, or empty ground) is strewn for the rest of the battle, by
+    side. An enemy ground unit that steps on them stops there (a dead end in its reach, as quicksand) and loses 10
+    HP. Fliers and the strewer's own side are not troubled. Any ground unit on or beside the enemy's caltrops can
+    spend its action to clear those under and beside it; the computer does so with a unit they stopped that has
+    nobody to strike. (The design gave it no attack: its caltrops fall on the Short Bow's row so that the computer
+    can use them as a shot.)
+  - *Volatile*: when an Automaton falls it bursts on the eight tiles around it, friend or foe, structures too —
+    a Boiler Blast (the Fireball's row, a fire weapon) priced as fired by the Automaton at full health. One burst
+    can set off the next.
+  - *Spiked Shell*: whoever strikes an Ankylosaur hand to hand takes back 30% of the damage done.
+  - *Harvest* (Pterosaur): an action that lifts caltrops (either side's), quicksand, a Flooded tile or loose
+    boulders from its own tile or one beside it. Its next Dropped Stone falls 25 stronger on the cell, bursts at
+    60% on the four tiles around its target (friend or foe), and leaves what it carried there. The designs named a
+    Sapper's trap; the game's Sappers lay none, so caltrops stand in. The computer does not harvest.
+  - *Devastation* (Tyrant): any structure its jaws close on — a wood, a barricade, a wall, a tower, the Jungle
+    Ruins — goes straight to its last stage and stays there. It may attack such a tile directly.
+- **Nineteen terrain tiles** (tiles 260-284, terrain types 30-48). Their move costs, cover and healing are rows of
+  the same tables the original's terrain uses (`movement.json`); what a table cannot say is in `rules/tiles.js`.
+  **The game has no miss chance**, so the designs' "evasion" is a share of the damage (user decision).
+
+  | Tile | Enter (skirmish / formation / cavalry / engine) | What it does |
+  |---|---|---|
+  | Conveyor Belt | 1 / 1 / 1 / 1 | As each round ends, what stands on it is carried a tile the way it runs — a full belt as one. Not fliers, not the Immovable. |
+  | Vent Grate | 1 / 1 / 1 / 1 | No shot can be aimed across it (the tiles the straight line passes through). War engines lob over. |
+  | Abyssal Muck | 2 / 2 / 2 / 3 | 25% more from every shot ("evasion to 0"). The Trench Brood pays 1 and is not exposed. |
+  | Thermal Chimney | 2 / 2 / 3 / no | 30% less from every shot; 8 HP off its occupant as each of its turns begins. |
+  | Tar Pit | 2 / 2 / no / no | A unit on foot stops in it, cannot move on its next turn and takes 10% more damage. Saurians pay 1 and are not held. |
+  | Giant Fern Canopy | 2 / 2 / 3 / no | Any unit under it hides as an Ambush unit does: untargetable until a foe steps beside it, and then it strikes first. 10% cover. |
+  | Black Ice | 1 / 1 / 1 / 1 | A unit that steps on slides on the way it came, across the ice and onto the first ground beyond; a wall or the map's edge stops it short, another unit costs both 5 HP. |
+  | Runic Monolith | no | Every unit on the eight tiles around it mends 5 HP a turn. |
+  | Quicksand Sinkhole | 1 / 1 / 1 / 1 | A unit that steps in stops. Its next turn is the climb out: one tile, no attack. Fliers and Dune Sirens are immune. |
+  | Mirage Sand | 1 / 1 / 1 / 1 | Half damage from every shot ("+50% evasion"); nothing hand to hand. |
+  | Sacrificial Altar Steps | 1 / 1 / 2 / no | Whoever strikes a unit down on them is healed 20 HP. |
+  | Overgrown Jungle Ruins | no | A structure of two stages that any weapon damages (at least 30 on the table); it falls to rubble. |
+  | Razor Coral | 2 / 3 / 3 / no | Shallows; 5 HP for every tile of it a ground unit crosses. Not the units of Moananui, nor the Trench Brood. |
+  | Cenote | 2 / 2 / 2 / no | A move ends here. A unit in one can Dive to any other free cenote, once a turn, as the rest of its move — straight after walking in, or on a later turn. The computer does not dive. |
+  | Astral Glyph | 1 / 1 / 1 / 1 | +2 to the reach of a ranged weapon fired from it; 25% more from every shot aimed back. |
+  | Chinampa | 2 / 2 / 2 / no | Heals 10 HP a turn (the table's own heal field). |
+  | Obsidian Spikes | 2 / 2 / 3 / no | 5 HP for every tile crossed; heavy armour shatters: +10 on every blow but magic at it, for the rest of the battle. |
+  | Bamboo Thicket | 2 / 2 / no / no | Troops on foot take 40% less from every shot. Any fire weapon burns the tile to open ash and costs whoever is inside 10 HP. |
+  | Zen Sand Garden | 1 / 1 / 1 / 1 | Stepping in clears acid, venom, snares, chill, blindness and shattered armour; a unit in it cannot be dragged or thrown. |
+
+  Five of them came without art and are drawn from the game's own tiles (Vent Grate, Thermal Chimney, Mirage Sand,
+  Altar Steps, Jungle Ruins). The rest are the supplied isometric drawings squared up: the top face of each block
+  becomes the ground, and what stands on it (a monolith, bamboo, fern tops) is cut out and stood back upright.
+- **Where the tiles are.** Thalassar has muck, chimneys and coral; Brasshaven belts and vents; the Amber Reach tar
+  and ferns. The older regions' existing maps were re-laid with their cultures' tiles (user decision): Jarnheim ice
+  and monoliths, Khemret sinkholes and mirage, Moananui coral, Coatlan altar steps, ruins, chinampas and obsidian,
+  Satoshi bamboo and zen gardens. There is no Mayan campaign: its two tiles, the Cenote and the Astral Glyph, went
+  to Tezcal (user decision). The map runner rates those thirty battles as before; the Raven Pass musters 250 points
+  more to stay where it was.
+- **What the computer does not do.** It does not harvest, dive, or avoid a tile for what it does: it walks onto ice,
+  tar, caltrops and belts as onto any ground it can cross. The Autopilot plays your side the same way.
 
 ### Not reproduced
 

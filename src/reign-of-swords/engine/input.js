@@ -702,7 +702,8 @@ export class InputMethods {
     // A PRIEST that walked up keeps its PRAYERS: Unit::isAbilityAvailable (iOS Ep2 @0x74e94) puts no condition on
     // Shield / Retribution, so the menu offers them whenever the priest has not acted. A Heal-only unit stays in act
     // mode only with a wounded ally in range; with nothing to do (and no enemy in reach) its turn ends like any other.
-    const canPray = !u.acted && (!!u.T.prayer || this._canHealNow(u));
+    // (BONUS: a unit that has just walked into a Cenote keeps its turn open, so it can Dive)
+    const canPray = !u.acted && (!!u.T.prayer || this._canHealNow(u) || this._cenoteExits(u).length > 0);
     if (this.targets.length || canPray) {
       this.mode = "act";
       this.selected = u;

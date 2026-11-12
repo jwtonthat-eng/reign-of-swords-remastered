@@ -157,9 +157,10 @@ export class AiMethods {
   }
 
   // ===== BONUS — the three factions under the computer =================================================================
-  // OVERDRIVE: a Clockwork unit above half health with a foe it could reach in two actions winds itself up — it is put
-  // back in the queue after the last unit of its group, takes its second action when it comes round again, and pays
-  // as its side's turn ends (grid _endTurnHide → _overdriveSettle).
+  // OVERDRIVE: a Clockwork unit above half health with a foe it can strike this turn winds itself up — it is put back
+  // in the queue after the last unit of its group, takes its second action when it comes round again, and pays as its
+  // side's turn ends (grid _endTurnHide → _overdriveSettle). A unit with nothing to strike (a garrison standing its
+  // ground) never winds up: it would pay for an action it does not take.
   _aiOverdrive(u, enemies) {
     const game = this.game,
       od = u._od && u._od.turn === game.turn ? u._od : null;
@@ -167,9 +168,7 @@ export class AiMethods {
       if (od.stage === 0 && u.acted) game._overdriveRewind(u);
       return;
     }
-    if (!u.T.overdrive || u.hp <= 50) return;
-    const reachDist = game.moveOf(u) * 2 + (u.T.range || 1);
-    if (!enemies.some((e) => manhattan(e, u) <= reachDist)) return;
+    if (!u.T.overdrive || u.hp <= 50 || !enemies.length || !this._aiHasTarget(u)) return;
     u._od = { turn: game.turn, stage: 0 };
     let at = game.aiQueue.length;
     while (at > 0 && (game.aiQueue[at - 1].group || 0) !== (u.group || 0)) at--;

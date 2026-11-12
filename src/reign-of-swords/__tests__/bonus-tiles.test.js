@@ -296,8 +296,8 @@ describe("bonus tiles: the older regions", () => {
     const diver = spawn(g, "footmen", "blue", 5, 5);
     moveTo(g, diver, 6, 5);
     expect(g._cenoteExits(diver)).toEqual([{ x: 12, y: 7 }]);
-    diver.acted = false; // (with no foe in reach its turn ended where it stopped)
-    g.select(diver);
+    // with no foe in reach its turn would have ended where it stopped: in a cenote it stays open, for the dive
+    expect([diver.acted, g.selected === diver]).toEqual([false, true]);
     expect(g.aimSkills().map((skill) => skill.id)).toContain("dive");
     g.aimSkill("dive");
     g.click({ tx: 12, ty: 7 });

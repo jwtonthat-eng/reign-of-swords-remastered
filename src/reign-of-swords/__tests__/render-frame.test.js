@@ -116,6 +116,24 @@ describe("terrain", () => {
     expect(qs[0].args.slice(5)).toEqual([R.x0 * g.tile, R.y0 * g.tile, g.tile, g.tile]);
   });
 
+  it("BONUS: a Flooded tile gets a brine wash and two ripples, caltrops five iron stars in their side's tint", () => {
+    const g = battle();
+    const ctx = rig(g);
+    const R = g.renderer.visibleRange();
+    g.flooded.add(key(R.x0, R.y0));
+    g.flooded.add(key(R.x0, R.y1 + 3)); // below the screen: skipped
+    g.caltrops.set(key(R.x0 + 1, R.y0), "red");
+    g.caltrops.set(key(R.x0 + 2, R.y0), "blue");
+    g.clock = 1.5;
+    g.renderer._drawTerrain(ctx);
+    const wash = ops(ctx, "fillRect").filter((e) => e.fill === "rgba(36,150,140,0.42)");
+    expect(wash.map((e) => e.args)).toEqual([[R.x0 * g.tile, R.y0 * g.tile, g.tile, g.tile]]);
+    const strokes = ops(ctx, "stroke").map((e) => e.stroke);
+    expect(strokes.filter((c) => c === "rgba(190,255,235,0.55)")).toHaveLength(2);
+    expect(strokes.filter((c) => c === "#ffd0c4")).toHaveLength(5);
+    expect(strokes.filter((c) => c === "#cfe0ff")).toHaveLength(5);
+  });
+
   it("without the quicksand strip a sandy wash stands in, deeper the more rounds are left", () => {
     const g = battle();
     const ctx = rig(g, { fxWithout: ["quicksand"] });
