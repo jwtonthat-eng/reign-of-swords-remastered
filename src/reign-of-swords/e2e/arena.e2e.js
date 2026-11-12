@@ -10,6 +10,8 @@
 // against a mounted army (cavalry), holding a castle against a storming party with Catapults (castle), and standing
 // behind a rank of Pikemen with Archers behind it while the block advances on a mixed army (line). And the UPGRADE
 // rule: six of a unit against six of the unit it is upgraded from, one for one — an upgrade must win (upgrade).
+// And the ORIGINAL FINALS: the last battle of every original kingdom fought with an army of the unit, to see whether a
+// new unit steamrolls the original game; the original units run the same battles as the yardstick (finals).
 //
 //   npm run e2e:arena                      every bonus unit and every basket unit
 //   ROS_ARENA_TYPES=castle,line …          only these battle types (open, cavalry, castle, line)
@@ -22,14 +24,16 @@ import { dirname, join } from "node:path";
 import { loadEpisode, makeGame, startBattle, only, spawn, step } from "../__tests__/battle.js";
 import { DEPLOY_COST } from "../data/game-data.js";
 import { BONUS_ORDER, BONUS_UPGRADES } from "../data/bonus-units.js";
-import { seedBattle } from "../engine/sim.js";
+import { seedBattle, simulateBattle } from "../engine/sim.js";
+import { missionList } from "../engine/engine.js";
 import { moveType } from "../rules/terrain.js";
 
 const ON = process.env.ROS_ARENA === "1";
 // which battle types to run: open (the duels), cavalry, castle, line — all of them by default
-const WANTED = (process.env.ROS_ARENA_TYPES || "open,cavalry,castle,line,upgrade").split(",");
+const WANTED = (process.env.ROS_ARENA_TYPES || "open,cavalry,castle,line,upgrade,finals").split(",");
 const OPEN = WANTED.includes("open"),
-  TYPES = ["cavalry", "castle", "line", "upgrade"].filter((t) => WANTED.includes(t));
+  TYPES = ["cavalry", "castle", "line", "upgrade"].filter((t) => WANTED.includes(t)),
+  FINALS = WANTED.includes("finals");
 export const BASKET = [
   "footmen",
   "swordsmen",
@@ -204,6 +208,27 @@ function upgradeFight(unit, seed, asBlue) {
   const r = fight(blue, red, 6, 6, seed);
   return asBlue ? r.blueLeft - r.redLeft : r.redLeft - r.blueLeft;
 }
+// FINALS — does a unit steamroll the original game? The last story battle of every original kingdom of Episode II
+// (those that let you muster an army), played by the Autopilot with as many of the unit as the battle's points and
+// the elite rule allow and Swordsmen, then Militiamen, for whatever is left. A battle scores the share of the army's
+// points it kept on a victory, −1 on a defeat, 0 if it ran out of turns. The original units run the same battles: they
+// are the yardstick (a unit far above every original one is power creep).
+function finalBattles() {
+  const last = {};
+  for (const m of missionList()) if (m.mapId < 5900 && m.group === "story") last[m.kingdom] = m.mapId;
+  return Object.values(last);
+}
+async function finalsFight(unit, mapId, seed) {
+  const r = await simulateBattle({
+    mapId,
+    army: { [unit]: 99, swordsmen: 99, militiamen: 99 },
+    strategy: "attack",
+    seed,
+    yieldMs: 0,
+  });
+  if (!r.spent) return null; // a battle fought with a given force: nothing of ours is in it
+  return r.result === "victory" ? r.kept / 100 : r.result === "defeat" ? -1 : 0;
+}
 function lineFight(unit, seed) {
   const squad = Array(squadOf(unit)).fill(unit),
     ranks = Math.ceil(squad.length / 6);
@@ -272,27 +297,54 @@ it.skipIf(!ON)("unit arena", async () => {
       });
     }
   }
+  if (FINALS) {
+    const maps = finalBattles();
+    for (const unit of units) {
+      const scores = [];
+      for (const mapId of maps) {
+        const score = await finalsFight(unit, mapId, SEEDS[0]);
+        if (score != null) scores.push(score);
+      }
+      if (scores.length)
+        rows.push({
+          scenario: "finals",
+          unit,
+          foe: "finals",
+          margin: scores.reduce((a, b) => a + b, 0) / scores.length,
+          wins: scores.filter((x) => x > 0).length,
+          fights: scores.length,
+        });
+    }
+  }
   const out = process.env.ROS_ARENA_OUT || join("reports", "ros-arena", `arena-${shard}.json`);
   mkdirSync(dirname(out), { recursive: true });
   writeFileSync(out, JSON.stringify(rows));
   // …and the same as a table: a unit's mean margin in the duels and in each battle type, best first
+  const show = (n) => (n == null ? "" : (n > 0 ? "+" : "") + n.toFixed(2));
   const table = units.map((unit) => {
     const of = (scenario) => rows.filter((r) => r.unit === unit && r.scenario === scenario).map((r) => r.margin);
     const mean = (list) => (list.length ? list.reduce((a, b) => a + b, 0) / list.length : null);
     const cells = ["open", "cavalry", "castle", "line"].map((scenario) => mean(of(scenario)));
-    return { unit, cells, all: mean(cells.filter((c) => c != null)), base: BASE_OF[unit], beats: mean(of("upgrade")) };
+    const finals = rows.find((r) => r.unit === unit && r.scenario === "finals");
+    return {
+      unit,
+      cells,
+      all: mean(cells.filter((c) => c != null)),
+      base: BASE_OF[unit],
+      beats: mean(of("upgrade")),
+      finals: finals ? `${show(finals.margin)} (${finals.wins}/${finals.fights})` : "",
+    };
   });
-  const show = (n) => (n == null ? "" : (n > 0 ? "+" : "") + n.toFixed(2));
   writeFileSync(
     out.replace(/\.json$/, "") + ".md",
     [
-      "| Unit | Points | All | Duels | Cavalry | Castle | Spear line | Upgraded from | One for one |",
-      "|---|---|---|---|---|---|---|---|---|",
+      "| Unit | Points | All | Duels | Cavalry | Castle | Spear line | Upgraded from | One for one | Original finals (won) |",
+      "|---|---|---|---|---|---|---|---|---|---|",
       ...table
         .sort((a, b) => b.all - a.all)
         .map(
           (t) =>
-            `| ${t.unit} | ${DEPLOY_COST[t.unit]} | ${show(t.all)} | ${t.cells.map(show).join(" | ")} | ${t.base || ""} | ${show(t.beats)} |`,
+            `| ${t.unit} | ${DEPLOY_COST[t.unit]} | ${show(t.all)} | ${t.cells.map(show).join(" | ")} | ${t.base || ""} | ${show(t.beats)} | ${t.finals} |`,
         ),
     ].join("\n") + "\n",
   );

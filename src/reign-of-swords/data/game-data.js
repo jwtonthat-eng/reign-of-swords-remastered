@@ -646,6 +646,10 @@ for (const k in UNIT_TYPES) {
   for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
   for (const flag of ["shadowStep", "quake", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
   for (const flag of ["flask", "constrict", "bulwark", "forestWalk", "eagleEye", "sunPriest"]) T[flag] = !!c[flag];
+  for (const flag of ["shoreStride", "aquatic", "venom", "seize", "vanguard"]) T[flag] = !!c[flag]; // Moananui, Coatlan
+  for (const flag of ["opening", "skyHunter", "karakia", "lurker", "drain"]) T[flag] = c[flag] || 0;
+  for (const flag of ["frost", "desertStride", "hook"]) T[flag] = !!c[flag]; // Jotunn, Medjay, Khopesh Warriors
+  for (const flag of ["rage", "shieldWall", "valhalla", "judgement", "devour"]) T[flag] = c[flag] || 0;
   for (const flag of ["pounce", "sunbeam", "tailwind"]) T[flag] = c[flag] || 0; // Jaguar, Sun Priest, Feathered Serpent // Alchemist, Naga
   for (const flag of ["stoneskin", "purity", "burn", "undying"]) T[flag] = c[flag] || 0; // Golem, Unicorn, Efreet, Skeleton
   T.sutra = c.sutra || 0; // Sohei: HP mended by each friend beside it at the start of its turn

@@ -37,6 +37,22 @@ export const BONUS_ALL = [
   "eagle",
   "sunpriest",
   "serpent",
+  "berserker", // Jarnheim (the Norse)
+  "shieldmaiden",
+  "einherjar",
+  "jotunn",
+  "medjay", // Khemret (the Egyptians)
+  "khopesh",
+  "anubis",
+  "ammit",
+  "toa", // Moananui (the Polynesians)
+  "tahuanui",
+  "tohunga",
+  "taniwha",
+  "coatecpatl", // Coatlan (the second Aztec region)
+  "ahuizotl",
+  "chieftain",
+  "tzitzimitl",
 ];
 // The bonus units the game offers, in Field Manual order.
 export const BONUS_ORDER = BONUS_ALL.filter((unit) => !BONUS_HIDDEN.includes(unit));
@@ -252,11 +268,137 @@ export const BONUS_WEAPONS = {
     tags: [8], // Shoot and Move
     desc: "The Feathered Serpent's Gale is a blast of wind at short range: steady damage against every armor.",
   },
+  64: {
+    name: "Twin Axes",
+    row: 10, // Halberd
+    range: [1, 1],
+    tags: [],
+    desc: "Twin Axes cut deep into every armor, and deeper the more blood their wielder has lost.",
+  },
+  65: {
+    name: "Bearded Axe",
+    row: 10, // Halberd
+    range: [1, 1],
+    tags: [],
+    desc: "A Bearded Axe cuts deep into every armor, and deepest into the lightest.",
+  },
+  66: {
+    name: "Arming Sword",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "An Arming Sword delivers good damage against all armor types, but is less effective against the heaviest armors.",
+  },
+  67: {
+    name: "Ice Club",
+    row: 13, // Greatsword
+    range: [1, 1],
+    tags: [],
+    desc: "An Ice Club delivers crushing melee damage and chills everything around the place it lands.",
+  },
+  68: {
+    name: "Composite Bow",
+    row: 16, // Longbow
+    range: [2, 7],
+    tags: [7], // Move or Shoot
+    desc: "A Composite Bow outranges the Longbow by a tile: a volley of arrows for good damage against lighter armors.",
+  },
+  69: {
+    name: "Khopesh",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Khopesh is a sickle-sword made to hook a shield aside: a foe's shield counts for nothing against it.",
+  },
+  70: {
+    name: "Soulfire",
+    row: 25, // Fireball
+    range: [2, 6],
+    tags: [],
+    desc: "Soulfire is a bolt of violet flame on a single foe, which burns hotter the nearer its victim is to death.",
+  },
+  71: {
+    name: "Jackal Staff",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Jackal Staff is a last resort: weak against everything but the unarmoured.",
+  },
+  72: {
+    name: "Jaws",
+    row: 4, // Antlers
+    range: [1, 1],
+    tags: [],
+    desc: "The Ammit's Jaws tear at lightly armoured troops, and swallow whole whatever is nearly dead.",
+  },
+  73: {
+    name: "Tao",
+    row: 3, // Spear
+    range: [1, 1],
+    tags: [],
+    desc: "A Tao is a long hardwood spear: decent damage against all but the heaviest armor, and its first thrust at a fresh foe is its best.",
+  },
+  74: {
+    name: "Hunting Spear",
+    row: 15, // Lance
+    range: [1, 1],
+    tags: [],
+    desc: "A Hunting Spear driven home from the back of a great hawk: at its worst for archers and war engines.",
+  },
+  75: {
+    name: "Spirit Wisps",
+    row: 26, // Lightning Storm
+    range: [2, 5],
+    tags: [],
+    desc: "Spirit Wisps are ancestors sent against a foe: steady damage against every armor.",
+  },
+  76: {
+    name: "Carved Staff",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Carved Staff is a last resort: weak against everything but the unarmoured.",
+  },
+  77: {
+    name: "Maw",
+    row: 13, // Greatsword
+    range: [1, 1],
+    tags: [],
+    desc: "The Taniwha's Maw delivers crushing damage, and more when the beast strikes from the water.",
+  },
+  78: {
+    name: "Obsidian Blade",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "An Obsidian Blade smeared with serpent venom: good damage, and the wound goes on bleeding 5 HP a turn for 3 turns.",
+  },
+  79: {
+    name: "Tlacochtli",
+    row: 3, // Spear (as the Javelin)
+    range: [2, 4],
+    tags: [8], // Shoot and Move
+    desc: "A Tlacochtli is a heavy war dart: decent damage at a short distance against all but the heaviest armor.",
+  },
+  80: {
+    name: "Starfire",
+    row: 25, // Fireball
+    range: [2, 5],
+    tags: [],
+    desc: "Starfire is a bolt of violet flame that feeds the spectre: half of what it burns away returns to it as health.",
+  },
+  81: {
+    name: "Fangs and Claw",
+    row: 4, // Antlers
+    range: [1, 1],
+    tags: [],
+    desc: "The Ahuizotl bites, and the hand on its tail holds on: the foe it strikes cannot attack on its next turn.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
-export const MAGIC_WEAPONS = [25, 26, 27, 36, 61];
+export const MAGIC_WEAPONS = [25, 26, 27, 36, 61, 70, 75, 80];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
-export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63];
+export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63, 68, 70, 75, 79, 80];
 // the Alchemist's flask, and the acid it leaves: HP a turn, for how many of the victim's turns
 export const FLASK_WEAPON = 50;
 export const ACID = { damage: 5, turns: 3 };
@@ -300,6 +442,22 @@ export const BONUS_AL = {
   eagle: 1,
   sunpriest: 2,
   serpent: 0,
+  berserker: 1,
+  shieldmaiden: 2,
+  einherjar: 2,
+  jotunn: 2,
+  medjay: 1,
+  khopesh: 2,
+  anubis: 2,
+  ammit: 1,
+  toa: 1,
+  tahuanui: 0,
+  tohunga: 2,
+  taniwha: 1,
+  coatecpatl: 1,
+  ahuizotl: 1,
+  chieftain: 1,
+  tzitzimitl: 0,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -585,6 +743,151 @@ export const BONUS_COMBAT = {
     tailwind: 1,
     dmgBonus: 10,
   },
+  // JARNHEIM. rage: +1 on the cell of its blows for every this-many HP it has lost. shieldWall: the share of a blow
+  // hand to hand that a friend beside it is spared (%). valhalla: HP it regains when it strikes a foe down.
+  // frost: its blow chills its target and every other enemy beside that target (half movement on their next turn).
+  berserker: {
+    move: 5,
+    weapon: 64,
+    weapon2: 0,
+    armour: 3,
+    rating: 4,
+    rf: 100,
+    abilities: [4],
+    rage: 2,
+    armourBonus: 5,
+  },
+  shieldmaiden: {
+    move: 4,
+    weapon: 66,
+    weapon2: 0,
+    armour: 10,
+    rating: 4,
+    rf: 100,
+    abilities: [5],
+    formation: true,
+    shieldWall: 25,
+  },
+  einherjar: {
+    move: 4,
+    weapon: 65,
+    weapon2: 0,
+    armour: 10,
+    rating: 4,
+    rf: 100,
+    abilities: [4],
+    valhalla: 50,
+    armourBonus: 5,
+  },
+  jotunn: {
+    move: 3,
+    weapon: 67,
+    weapon2: 0,
+    armour: 10,
+    rating: 5,
+    rf: 115,
+    abilities: [14, 4],
+    frost: true,
+    armourName: "Frost Hide",
+    armourBonus: 10,
+  },
+  // KHEMRET. desertStride: desert brush, tall grass, scrub and rocks (terrain types 28, 3, 22, 27) cost 1. hook: a foe's shield counts
+  // for nothing against its blows. judgement: +1 on the cell of its Soulfire for every this-many HP its target has
+  // lost. devour: a foe its bite leaves with this many HP or fewer is killed outright.
+  medjay: { move: 5, weapon: 68, weapon2: 8, armour: 3, rating: 3, rf: 90, abilities: [7], desertStride: true },
+  khopesh: { move: 4, weapon: 69, weapon2: 0, armour: 10, rating: 4, rf: 100, abilities: [], hook: true },
+  anubis: {
+    move: 4,
+    weapon: 70,
+    weapon2: 71,
+    armour: 9,
+    rating: 4,
+    rf: 100,
+    abilities: [],
+    judgement: 3,
+    dmgBonus: 10,
+  },
+  ammit: {
+    move: 6,
+    weapon: 72,
+    weapon2: 0,
+    armour: 4,
+    rating: 5,
+    rf: 115,
+    abilities: [14],
+    devour: 20,
+    armourBonus: 10,
+  },
+  // MOANANUI. opening: +N on the cell of a blow at a foe still at full health. shoreStride: shallows cost 1.
+  // skyHunter: +N on the cell against archers, casters and war engines. karakia: HP the most wounded friend within
+  // 3 tiles mends at the start of its turn. aquatic: deep water and shallows cost 1 and it fights from them;
+  // lurker: +N on the cell when it strikes from water.
+  toa: { move: 5, weapon: 73, weapon2: 0, armour: 6, rating: 3, rf: 90, abilities: [], opening: 20, shoreStride: true },
+  tahuanui: { move: 8, weapon: 74, weapon2: 0, armour: 7, rating: 4, rf: 100, abilities: [], fly: true, skyHunter: 25 },
+  tohunga: { move: 4, weapon: 75, weapon2: 76, armour: 9, rating: 3, rf: 90, abilities: [], karakia: 20 },
+  taniwha: {
+    move: 5,
+    weapon: 77,
+    weapon2: 0,
+    armour: 8,
+    rating: 5,
+    rf: 115,
+    abilities: [14],
+    aquatic: true,
+    lurker: 20,
+    armourName: "Scaled Hide",
+    armourBonus: 10,
+  },
+  // COATLAN. venom: its blows leave the flask's acid (5 HP a turn, 3 turns). seize: the foe it strikes cannot attack
+  // on its next turn. vanguard: friends beside it strike first. drain: the share (%) of its Starfire's damage it
+  // takes back as health.
+  coatecpatl: {
+    move: 5,
+    weapon: 78,
+    weapon2: 0,
+    armour: 6,
+    rating: 5,
+    rf: 115,
+    abilities: [],
+    forestWalk: true,
+    venom: true,
+    armourBonus: 5,
+  },
+  ahuizotl: {
+    move: 6,
+    weapon: 81,
+    weapon2: 0,
+    armour: 4,
+    rating: 5,
+    rf: 115,
+    abilities: [],
+    amphibious: true,
+    seize: true,
+  },
+  chieftain: {
+    move: 5,
+    weapon: 79,
+    weapon2: 59,
+    armour: 5,
+    rating: 4,
+    rf: 100,
+    abilities: [8, 11],
+    standard: true,
+    vanguard: true,
+    forestWalk: true,
+  },
+  tzitzimitl: {
+    move: 5,
+    weapon: 80,
+    weapon2: 0,
+    armour: 2,
+    rating: 5,
+    rf: 115,
+    abilities: [14],
+    fly: true,
+    drain: 50,
+    dmgBonus: 10,
+  },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -613,6 +916,22 @@ export const BONUS_COURAGE = {
   eagle: 3,
   sunpriest: 4,
   serpent: 4,
+  berserker: 5,
+  shieldmaiden: 4,
+  einherjar: 5,
+  jotunn: 5,
+  medjay: 3,
+  khopesh: 3,
+  anubis: 4,
+  ammit: 5,
+  toa: 4,
+  tahuanui: 4,
+  tohunga: 4,
+  taniwha: 5,
+  coatecpatl: 4,
+  ahuizotl: 4,
+  chieftain: 5,
+  tzitzimitl: 5,
 };
 export const BONUS_COST = {
   cragsmen: 175,
@@ -641,6 +960,22 @@ export const BONUS_COST = {
   eagle: 175,
   sunpriest: 400,
   serpent: 300,
+  berserker: 175,
+  shieldmaiden: 200,
+  einherjar: 275,
+  jotunn: 425,
+  medjay: 150,
+  khopesh: 175,
+  anubis: 275,
+  ammit: 275,
+  toa: 150,
+  tahuanui: 250,
+  tohunga: 200,
+  taniwha: 375,
+  coatecpatl: 200,
+  ahuizotl: 175,
+  chieftain: 250,
+  tzitzimitl: 250,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
 export const BONUS_ELITE = { battlemage: true, dragonrider: true, sunpriest: true };
@@ -944,6 +1279,195 @@ export const BONUS_TYPES = {
     shotSpell: "ice",
     ability: "Tailwind — friends beside it move 1 further. Gale at 2–4 tiles, and may still move. Flies.",
   },
+  berserker: {
+    name: "Berserkers",
+    sprite: "berserker",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Rage — hits harder the more it is wounded. Fearless.",
+  },
+  shieldmaiden: {
+    name: "Shieldmaidens",
+    sprite: "shieldmaiden",
+    frames: 4,
+    frameW: 128,
+    frameH: 88,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Shield Wall — friends beside it take a quarter less in melee. Formation.",
+  },
+  einherjar: {
+    name: "Einherjar",
+    sprite: "einherjar",
+    frames: 4,
+    frameW: 96,
+    frameH: 88,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Chosen of the Slain — regains 50 HP for each foe it strikes down. Fearless.",
+  },
+  jotunn: {
+    name: "Jotunn",
+    sprite: "jotunn",
+    frames: 4,
+    frameW: 160,
+    frameH: 104,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Frost Slam — chills its target and the enemies beside it (half movement next turn). Fear, Fearless.",
+  },
+  medjay: {
+    name: "Medjay",
+    sprite: "medjay",
+    ...both(4, 2),
+    kind: "ranged",
+    projectile: "arrow",
+    ability: "Desert Stride — crosses desert brush, scrub and rocks as open ground. Composite Bow at 2–7 tiles.",
+  },
+  khopesh: {
+    name: "Khopesh Warriors",
+    sprite: "khopesh",
+    frames: 4,
+    frameW: 128,
+    frameH: 88,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Shield Hook — a foe's shield counts for nothing against its blows.",
+  },
+  // shotHue: its bolt is the Fireball turned violet
+  anubis: {
+    name: "Anubis Priest",
+    sprite: "anubis",
+    frames: 4,
+    frameW: 104,
+    frameH: 88,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotHue: 250,
+    ability: "Weighing of the Heart — its Soulfire (2–6 tiles) burns hotter the more wounded its target.",
+  },
+  ammit: {
+    name: "Ammit",
+    sprite: "ammit",
+    frames: 4,
+    frameW: 112,
+    frameH: 88,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Devourer — a foe its bite leaves with 20 HP or fewer is swallowed whole. Fear.",
+  },
+  toa: {
+    name: "Toa Warriors",
+    sprite: "toa",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "First Thrust — hits harder at a foe still at full health. Wayfinder — wades shallows as open ground.",
+  },
+  tahuanui: {
+    name: "Tahuanui Riders",
+    sprite: "tahuanui",
+    frames: 4,
+    frameW: 144,
+    frameH: 104,
+    hitFrame: 2,
+    kind: "cavalry",
+    ability: "Sky Hunter — hits harder against archers, casters and war engines. Flies.",
+  },
+  tohunga: {
+    name: "Tohunga",
+    sprite: "tohunga",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotSpell: "ice",
+    ability: "Karakia — each turn the most wounded friend within 3 tiles mends 20 HP. Spirit Wisps at 2–5 tiles.",
+  },
+  taniwha: {
+    name: "Taniwha",
+    sprite: "taniwha",
+    frames: 4,
+    frameW: 160,
+    frameH: 104,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Lurker of the Deep — swims any water, fights from it, and strikes harder out of it. Fear.",
+  },
+  coatecpatl: {
+    name: "Coatecpatl Warriors",
+    sprite: "coatecpatl",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Serpent Venom — the foe it strikes loses 5 HP a turn for 3 turns. Jungle Stride.",
+  },
+  ahuizotl: {
+    name: "Ahuizotl",
+    sprite: "ahuizotl",
+    frames: 4,
+    frameW: 128,
+    frameH: 88,
+    hitFrame: 2,
+    kind: "melee",
+    ability: "Drowning Grasp — the foe it strikes cannot attack on its next turn. Amphibious.",
+  },
+  chieftain: {
+    name: "Cuahchic Chieftain",
+    sprite: "chieftain",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "bolt",
+    ability: "Vanguard — friends beside it strike first. Battle Standard. War darts at 2–4 tiles, and may still move.",
+  },
+  tzitzimitl: {
+    name: "Tzitzimitl",
+    sprite: "tzitzimitl",
+    frames: 4,
+    frameW: 96,
+    frameH: 96,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotHue: 250,
+    ability: "Star Hunger — half the damage of its Starfire (2–5 tiles) returns to it as health. Fear. Flies.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -971,6 +1495,108 @@ export const BONUS_SKILLS = [
     n: "Unyielding",
     icon: "skill_unyielding",
     d: "Living stone: a Priest's Heal does nothing for it and quicksand neither stops nor hurts it. Craftsmen can Repair it like a war engine.",
+  },
+  {
+    flag: "opening",
+    n: "First Thrust",
+    icon: "skill_first",
+    d: "Its blow at a foe still at full health is 20 stronger on the weapon and armour table.",
+  },
+  {
+    flag: "shoreStride",
+    n: "Wayfinder",
+    icon: "skill_amphibious",
+    d: "Wades shallows at 1 movement a tile, as if they were open ground.",
+  },
+  {
+    flag: "skyHunter",
+    n: "Sky Hunter",
+    icon: "skill_charge",
+    d: "Stoops on what cannot fight back up close: 25 stronger on the table against archers, casters and war engines.",
+  },
+  {
+    flag: "karakia",
+    n: "Karakia",
+    icon: "skill_nullify",
+    d: "At the start of its turn the most wounded friendly unit within 3 tiles mends 20 HP, without costing the Tohunga its action.",
+  },
+  {
+    flag: "aquatic",
+    n: "Lurker of the Deep",
+    icon: "skill_amphibious",
+    d: "Swims deep water and shallows at 1 movement a tile and fights from them; a blow struck from water is 20 stronger on the table.",
+  },
+  {
+    flag: "venom",
+    n: "Serpent Venom",
+    icon: "skill_chain",
+    d: "Its blade is poisoned: the foe it strikes loses 5 HP at the start of each of its next 3 turns.",
+  },
+  {
+    flag: "seize",
+    n: "Drowning Grasp",
+    icon: "skill_amphibious",
+    d: "The hand on its tail holds on: the foe it strikes in its own turn cannot attack on its next turn, though it can still move.",
+  },
+  {
+    flag: "vanguard",
+    n: "Vanguard",
+    icon: "skill_first",
+    d: "Leads from the front: friendly units standing beside it strike first.",
+  },
+  {
+    flag: "drain",
+    n: "Star Hunger",
+    icon: "skill_unyielding",
+    d: "Half of the damage its Starfire deals returns to it as health.",
+  },
+  {
+    flag: "rage",
+    n: "Rage",
+    icon: "skill_first",
+    d: "The more it bleeds the harder it hits: every 3 HP it has lost adds 1 to its blow on the weapon and armour table.",
+  },
+  {
+    flag: "shieldWall",
+    n: "Shield Wall",
+    icon: "skill_pavise",
+    d: "Every friendly unit standing beside it takes a quarter less from blows hand to hand.",
+  },
+  {
+    flag: "valhalla",
+    n: "Chosen of the Slain",
+    icon: "skill_unyielding",
+    d: "Each foe it strikes down gives it back 50 HP.",
+  },
+  {
+    flag: "frost",
+    n: "Frost Slam",
+    icon: "skill_chain",
+    d: "Its blow chills its target and every other enemy beside that target: on their next turn they move at half pace.",
+  },
+  {
+    flag: "desertStride",
+    n: "Desert Stride",
+    icon: "skill_climb",
+    d: "Crosses desert brush, scrub and rocks at 1 movement a tile, as if they were open ground.",
+  },
+  {
+    flag: "hook",
+    n: "Shield Hook",
+    icon: "skill_first",
+    d: "Its khopesh hooks a shield aside: a foe's shield counts for nothing against its blows.",
+  },
+  {
+    flag: "judgement",
+    n: "Weighing of the Heart",
+    icon: "skill_chain",
+    d: "Its Soulfire burns hotter on the wounded: every 4 HP its target has lost adds 1 to the bolt on the weapon and armour table.",
+  },
+  {
+    flag: "devour",
+    n: "Devourer",
+    icon: "skill_unyielding",
+    d: "A foe its bite leaves with 20 HP or fewer is swallowed whole. War engines are not to its taste.",
   },
   {
     flag: "forestWalk",
@@ -1151,31 +1777,61 @@ export const BONUS_SKILLS = [
 // UPGRADE ARMY — each bonus unit hangs off an original unit, in a collectible slot that unit leaves empty, and waits
 // on a bonus battle (the map id) the way Episode II's own units wait on theirs.
 export const BONUS_UPGRADES_ALL = [
+  // The first bonus units keep the game's own collectibles.
   { from: "archers", to: "cragsmen", need: "Armor", gate: 5902 }, // Tilicia 1, Ostrak's Bargain
   { from: "swordsmen", to: "spellwardens", need: "Lore", gate: 5904 }, // Tilicia 2, Frostgate
   { from: "craftsmen", to: "sentinel", need: "Spirit", gate: 5906 }, // Tilicia 3, The Empty Tomb
-  { from: "footmen", to: "marines", need: "Spirit", gate: 5924 }, // Isoluccia 1, The Harbour Chain
   { from: "crossbowmen", to: "pavisiers", need: "Armor", gate: 5924 }, // Isoluccia 1, The Harbour Chain
   { from: "wizards", to: "battlemage", need: "Medal", gate: 5926 }, // Isoluccia 3, Reign of the Battlemage
-  { from: "halberdiers", to: "gladiator", need: "Weapons", gate: 5942 }, // Mare Nostra 2
-  { from: "swordsmen", to: "samurai", need: "Spirit", gate: 5962 }, // Satoshi 2
-  { from: "griffon", to: "dragonrider", need: "Medal", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
-  { from: "militiamen", to: "beastmaster", need: "Medal", gate: 5982 }, // the Mirror Sea 2
-  { from: "shamans", to: "sohei", need: "Armor", gate: 5961 }, // Satoshi 1 (Armor: the one slot Shamans leave empty)
-  { from: "rangers", to: "shinobi", need: "Lore", gate: 5962 }, // Satoshi 2
-  { from: "greatswordsmen", to: "oni", need: "Spirit", gate: 5963 }, // Satoshi 3
-  { from: "beastmaster", to: "tengu", need: "Spirit", gate: 5963 }, // Satoshi 3
-  { from: "priests", to: "alchemist", need: "Lore", gate: 5925 }, // Isoluccia 2, The Arsenal
-  { from: "sentinel", to: "golem", need: "Armor", gate: 5912 }, // Tilicia raid 2, Quarry of Giants
-  // the Beast Master's tree (user decision): its creatures are all made from a Beast Master
+  // THE CULTURE TOKENS (art supplied by the user; user decision). Every other bonus unit is made with its culture's own
+  // token, won only in that culture's bonus battles, in place of one of the six original collectibles. That does three
+  // things: a unit can carry one branch per token without crowding its six original slots; a culture's first unit
+  // hangs straight off the Militia (or another early unit), so the road to it is short; and since the tokens exist
+  // only after Episode II is won, no bonus unit can be carried back to steamroll the original campaigns early.
+  // Triton's Anchor — the naval regions
+  { from: "militiamen", to: "marines", need: "Anchor", gate: 5924 }, // Isoluccia 1, The Harbour Chain
+  { from: "footmen", to: "gladiator", need: "Anchor", gate: 5942 }, // Mare Nostra 2
+  { from: "raiders", to: "beastmaster", need: "Anchor", gate: 5982 }, // the Mirror Sea 2
+  // Tsuba of the Shogunate — Satoshi
+  { from: "shamans", to: "sohei", need: "Tsuba", gate: 5961 }, // Satoshi 1
+  { from: "footmen", to: "samurai", need: "Tsuba", gate: 5962 }, // Satoshi 2
+  { from: "archers", to: "shinobi", need: "Tsuba", gate: 5962 }, // Satoshi 2
+  { from: "samurai", to: "oni", need: "Tsuba", gate: 5963 }, // Satoshi 3
+  { from: "beastmaster", to: "tengu", need: "Tsuba", gate: 5963 }, // Satoshi 3
+  // Void Rift Crystal — the fantastical: Tilicia and Isoluccia
+  { from: "griffon", to: "dragonrider", need: "Void", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
+  { from: "priests", to: "alchemist", need: "Void", gate: 5925 }, // Isoluccia 2, The Arsenal
+  { from: "sentinel", to: "golem", need: "Void", gate: 5912 }, // Tilicia raid 2, Quarry of Giants
+  // the Beast Master's creatures, hidden for now (BONUS_HIDDEN)
   { from: "beastmaster", to: "unicorn", need: "Lore", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
   { from: "beastmaster", to: "efreet", need: "Weapons", gate: 5983 }, // the Mirror Sea 3, The Reaver-King
   { from: "beastmaster", to: "naga", need: "Beasts", gate: 5981 }, // the Mirror Sea 1, The Line of Hulls
-  { from: "beastmaster", to: "skeleton", need: "Armor", gate: 5906 }, // (hidden; its first battle, The Sealed Vale, is gone)
-  { from: "pikemen", to: "jaguar", need: "Beasts", gate: 5994 }, // Tezcal 1
-  { from: "archers", to: "eagle", need: "Lore", gate: 5995 }, // Tezcal 2
-  { from: "cavalry", to: "serpent", need: "Spirit", gate: 5996 }, // Tezcal 3
-  { from: "priests", to: "sunpriest", need: "Medal", gate: 5996 }, // Tezcal 3
+  { from: "beastmaster", to: "skeleton", need: "Armor", gate: 5906 }, // (its first battle, The Sealed Vale, is gone)
+  // Sacred Jade Jaguar — Tezcal
+  { from: "militiamen", to: "jaguar", need: "Jade", gate: 5994 }, // Tezcal 1
+  { from: "archers", to: "eagle", need: "Jade", gate: 5995 }, // Tezcal 2
+  { from: "cavalry", to: "serpent", need: "Jade", gate: 5996 }, // Tezcal 3
+  { from: "shamans", to: "sunpriest", need: "Jade", gate: 5996 }, // Tezcal 3
+  // Glacial Bloodstone — Jarnheim
+  { from: "militiamen", to: "berserker", need: "Bloodstone", gate: 5914 }, // Jarnheim 1
+  { from: "footmen", to: "shieldmaiden", need: "Bloodstone", gate: 5915 }, // Jarnheim 2
+  { from: "shieldmaiden", to: "einherjar", need: "Bloodstone", gate: 5916 }, // Jarnheim 3
+  { from: "berserker", to: "jotunn", need: "Bloodstone", gate: 5916 }, // Jarnheim 3
+  // Scarab of the Duat — Khemret
+  { from: "archers", to: "medjay", need: "Scarab", gate: 5934 }, // Khemret 1
+  { from: "militiamen", to: "khopesh", need: "Scarab", gate: 5935 }, // Khemret 2
+  { from: "priests", to: "anubis", need: "Scarab", gate: 5936 }, // Khemret 3
+  { from: "bloodgorgers", to: "ammit", need: "Scarab", gate: 5936 }, // Khemret 3
+  // Carved Whalebone — Moananui
+  { from: "militiamen", to: "toa", need: "Whalebone", gate: 5944 }, // Moananui 1
+  { from: "raiders", to: "tahuanui", need: "Whalebone", gate: 5945 }, // Moananui 2
+  { from: "shamans", to: "tohunga", need: "Whalebone", gate: 5946 }, // Moananui 3
+  { from: "dunesirens", to: "taniwha", need: "Whalebone", gate: 5946 }, // Moananui 3
+  // Smoldering Obsidian — Coatlan
+  { from: "jaguar", to: "coatecpatl", need: "Obsidian", gate: 5954 }, // Coatlan 1
+  { from: "bloodgorgers", to: "ahuizotl", need: "Obsidian", gate: 5955 }, // Coatlan 2
+  { from: "eagle", to: "chieftain", need: "Obsidian", gate: 5956 }, // Coatlan 3
+  { from: "shamans", to: "tzitzimitl", need: "Obsidian", gate: 5956 }, // Coatlan 3
 ];
 // …those the game offers (none into or out of a hidden unit)
 export const BONUS_UPGRADES = BONUS_UPGRADES_ALL.filter(
@@ -1303,6 +1959,86 @@ export const BONUS_META = {
     role: "Winged Serpent",
     kit: "⚔ Gale / Fangs · 🛡 Feathered Hide",
     note: "A feathered serpent of the high temples: the horse-archer of the air. It throws a gale and flies on, and friends beside it are carried a tile further.",
+  },
+  berserker: {
+    role: "Bear-cloak Raider",
+    kit: "⚔ Twin Axes · 🛡 Light Armor",
+    note: "Raiders of Jarnheim in bear skins who fight without shield or fear. Wound a Berserker and it only hits harder.",
+  },
+  shieldmaiden: {
+    role: "Shield-wall Infantry",
+    kit: "⚔ Arming Sword · 🛡 Heavy Armor & Shield",
+    note: "The shield wall of Jarnheim. Friends who stand beside a Shieldmaiden take a quarter less from every blow hand to hand.",
+  },
+  einherjar: {
+    role: "Chosen Dead",
+    kit: "⚔ Bearded Axe · 🛡 Heavy Armor & Shield",
+    note: "Warriors called back from the hall of the slain. Each foe an Einherjar strikes down gives it back 50 HP.",
+  },
+  jotunn: {
+    role: "Frost Giant",
+    kit: "⚔ Ice Club · 🛡 Frost Hide",
+    note: "A giant of the high ice. Slow and fearsome: where its club lands, its target and every foe beside it are chilled to half pace for a turn.",
+  },
+  medjay: {
+    role: "Desert Archer",
+    kit: "⚔ Composite Bow / Short Sword · 🛡 Light Armor",
+    note: "Desert scouts and bowmen of Khemret. Their bows outrange the Longbow, and desert brush and rocks do not slow them.",
+  },
+  khopesh: {
+    role: "Sickle-sword Infantry",
+    kit: "⚔ Khopesh · 🛡 Light Armor & Shield",
+    note: "The line infantry of Khemret. A khopesh hooks a shield aside, so shielded troops are no safer from it than bare ones.",
+  },
+  anubis: {
+    role: "Priest of the Dead",
+    kit: "⚔ Soulfire / Jackal Staff · 🛡 Holy Vestment",
+    note: "A jackal-masked priest who weighs hearts. His violet Soulfire burns hotter the nearer its victim is to death.",
+  },
+  ammit: {
+    role: "Devourer of the Dead",
+    kit: "⚔ Jaws · 🛡 Nature's Cloak",
+    note: "Crocodile, lion and river-horse in one beast. Fast and feared: whatever its bite leaves nearly dead, it swallows whole.",
+  },
+  toa: {
+    role: "Island Spearman",
+    kit: "⚔ Tao · 🛡 Light Armor & Shield",
+    note: "Warriors of the Moananui canoes. A Toa's first thrust at a fresh foe is its hardest, and shallows do not slow it.",
+  },
+  tahuanui: {
+    role: "Hawk Rider",
+    kit: "⚔ Hunting Spear · 🛡 Feathered Hide",
+    note: "Riders of the great sea-hawks. They stoop on archers, casters and war engines, which have no answer up close.",
+  },
+  tohunga: {
+    role: "Keeper of the Spirits",
+    kit: "⚔ Spirit Wisps / Carved Staff · 🛡 Holy Vestment",
+    note: "An elder who speaks for the ancestors. Each turn his karakia mends the most wounded friend within 3 tiles by 20 HP, and his wisps fly at 2–5 tiles.",
+  },
+  taniwha: {
+    role: "Guardian of the Waters",
+    kit: "⚔ Maw · 🛡 Scaled Hide",
+    note: "A serpent-guardian of the lagoons. It swims any water as others walk a road, fights from it, and strikes hardest out of it.",
+  },
+  coatecpatl: {
+    role: "Serpent Order",
+    kit: "⚔ Obsidian Blade · 🛡 Light Armor & Shield",
+    note: "Jaguar Warriors who have taken the serpent's skin. Their blades are poisoned: a wound from one goes on costing 5 HP a turn for 3 turns.",
+  },
+  ahuizotl: {
+    role: "Water Hound",
+    kit: "⚔ Fangs and Claw · 🛡 Nature's Cloak",
+    note: "A lake beast with a hand at the end of its tail. What it bites it holds: the foe cannot attack on its next turn.",
+  },
+  chieftain: {
+    role: "Shorn-one Captain",
+    kit: "⚔ Tlacochtli / Macuahuitl · 🛡 Breastplate",
+    note: "A captain of the shorn ones, sworn never to step back. He carries the banner, throws war darts, and the friends beside him strike first.",
+  },
+  tzitzimitl: {
+    role: "Star Demon",
+    kit: "⚔ Starfire · 🛡 Minor Ward",
+    note: "A skeletal spirit of the dark between the stars. Its violet fire feeds it: half of what it burns away returns to it as health.",
   },
 };
 // Battle ids of the six bonus regions (Tilicia 5902–5913, Isoluccia 5924–5933, Mare Nostra 5941–5952, Satoshi

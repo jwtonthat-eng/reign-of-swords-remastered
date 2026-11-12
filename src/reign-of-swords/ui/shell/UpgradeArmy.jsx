@@ -84,11 +84,11 @@ export function UpgradeArmy({
     upgradeFrom = UPGRADE_FROM[selKey];
   const resbar = (
     <div className="ros-resbar">
-      {COLLECTIBLES.map((c) => (
+      {COLLECTIBLES.filter((c) => !c.token || bonus).map((c) => (
         <span
           key={c.id}
           className={"ros-res" + ((spoils[c.id] || 0) > 0 ? " has" : "")}
-          title={tr(c.id) + " — " + tr("Spoils of War")}
+          title={(c.token ? c.token : tr(c.id)) + " — " + tr("Spoils of War")}
         >
           {RES_ICON[c.id] ? (
             <img className="ros-res-img" src={base + "icons/" + RES_ICON[c.id] + ".png"} alt={c.id} draggable="false" />

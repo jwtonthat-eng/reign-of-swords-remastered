@@ -344,6 +344,11 @@ export class CombatMethods {
     const siegeShot = weapon === 21 || weapon === 23;
     if (siegeShot && defender.T.al === 0) return 0; // Boulder / Cannonball cannot touch a flier (class 0)
     let base = weaponBase(defender, weapon);
+    // BONUS: Shield Hook — against a Khopesh Warrior's blow a shield counts for nothing (the armour column without it)
+    if (attacker.T.hook && dist === 1) {
+      const bare = { 1: 0, 6: 3, 10: 8 }[defender.T.armour];
+      if (bare != null && WEAPON_DMG[weapon]) base = WEAPON_DMG[weapon][bare];
+    }
     if (isFireWeapon(weapon) && defender.T.flammable) base *= 2;
     if (opts.charge && !defender.T.bulwark) base += 30; // the rider's charging flag (BONUS: none against a Bulwark)
     if (attacker._ambushReady && attacker.T.shadowStep) base += 30; // BONUS: a Shinobi striking from hiding
@@ -351,6 +356,17 @@ export class CombatMethods {
     if (base <= 0) return 0;
     if (dist > 1 && this._planted(attacker)) base += 10; // BONUS: a planted Pavisier's braced shot
     if (weapon === 61) base += attacker.T.sunbeam || 0; // BONUS: the Sun Priest's Sunbeam
+    if (attacker.T.opening && dist === 1 && defender.hp >= 100) base += attacker.T.opening; // BONUS: a Toa's First Thrust
+    // BONUS: Sky Hunter — a Tahuanui Rider stooping on archers, casters and war engines
+    if (attacker.T.skyHunter && dist === 1 && (defender.T.al === 4 || (defender.T.range || 1) > 1))
+      base += attacker.T.skyHunter;
+    // BONUS: Lurker of the Deep — a Taniwha striking from water
+    if (attacker.T.lurker && dist === 1 && [5, 19].includes(moveType(this.tileAt(attacker.tx, attacker.ty))))
+      base += attacker.T.lurker;
+    if (attacker.T.rage) base += Math.floor((100 - clamp(attacker.hp, 0, 100)) / attacker.T.rage); // BONUS: a Berserker's Rage
+    // BONUS: Weighing of the Heart — an Anubis Priest's Soulfire on a wounded foe
+    if (weapon === 70 && attacker.T.judgement)
+      base += Math.floor((100 - clamp(defender.hp, 0, 100)) / attacker.T.judgement);
     // BONUS: Pounce — a Jaguar Warrior striking out of woods, tall grass, scrub or rocks
     if (attacker.T.pounce && dist === 1 && [3, 4, 22, 27, 28].includes(moveType(this.tileAt(attacker.tx, attacker.ty))))
       base += attacker.T.pounce;
@@ -377,6 +393,17 @@ export class CombatMethods {
       dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
     else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
     if (attacker._blind) dmg = Math.trunc(dmg / 2); // BONUS: blinded by a Sun Priest's Eclipse
+    // BONUS: Shield Wall — a friend standing beside a Shieldmaiden is spared a share of a blow hand to hand
+    if (dist === 1) {
+      const wall = this.units.reduce(
+        (best, o) =>
+          !o.dead && o !== defender && o.team === defender.team && o.T.shieldWall && manhattan(o, defender) === 1
+            ? Math.max(best, o.T.shieldWall)
+            : best,
+        0,
+      );
+      if (wall) dmg = Math.trunc((dmg * (100 - wall)) / 100);
+    }
     if (defender.T.stoneskin) dmg = Math.min(dmg, toHp256(defender.T.stoneskin)); // BONUS: the Golem's Stoneskin
     return Math.max(0, dmg);
   }
@@ -467,6 +494,9 @@ export class CombatMethods {
   }
   // Ability 1 as Unit::_hasAbility answers it (@0x666e4): First Strike, or a braced Pike Wall (Unit+0x10f).
   _hasFirstStrike(u) {
+    // BONUS: Vanguard — a unit beside a friendly Cuahchic Chieftain strikes first
+    if (this.units.some((o) => !o.dead && o !== u && o.team === u.team && o.T.vanguard && manhattan(o, u) === 1))
+      return true;
     return !!u.T.firstStrike || !!u.walled;
   }
   // Unit::isFirstStrike(a, b) (iOS Ep2 @0x66fb4) as a plain order — true when `a` lands before `b`, with no range test:
@@ -1264,6 +1294,51 @@ export class CombatMethods {
     const damage = shared(this.computeDamage(attacker, defender, opts), pierceShot ? blastShare(28, 0) : 1);
     this._applyHit(defender, attacker, damage, damage >= 55, !!opts.siege, wMain);
     if (wMain === FLASK_WEAPON) this._acidify(defender, attacker); // BONUS: the Alchemist's flask leaves acid
+    if (attacker.T.venom && manhattan(attacker, defender) === 1) this._acidify(defender, attacker); // …and a Coatecpatl's venom
+    // BONUS: Drowning Grasp — the foe an Ahuizotl strikes cannot attack on its next turn (grid targetsFrom; the
+    // grasp ends with that turn, so a blow struck during the victim's own turn holds nothing)
+    if (attacker.T.seize && !defender.dead && manhattan(attacker, defender) === 1 && defender.T.al !== 4) {
+      defender._seized = true;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 8,
+        t: 0,
+        life: 0.9,
+        vy: -14,
+        text: "Seized",
+        crit: true,
+      });
+    }
+    // BONUS: Star Hunger — half of what a Tzitzimitl's Starfire burns away returns to it
+    if (attacker.T.drain && wMain === 80 && !attacker.dead && attacker.hp < 100 && damage > 0) {
+      const before = attacker.hp;
+      attacker.hp = Math.min(100, before + Math.round((damage * attacker.T.drain) / 100));
+      this.floaters.push({
+        x: attacker.px + this.tile / 2,
+        y: attacker.py - 4,
+        t: 0,
+        life: 0.9,
+        vy: -22,
+        text: "+" + Math.round(attacker.hp - before),
+        heal: true,
+      });
+    }
+    // BONUS: Frost Slam — a Jotunn's blow chills its target and every other enemy beside that target: half movement
+    // until their own next turn ends (grid moveOf / _endTurnHide)
+    if (attacker.T.frost && manhattan(attacker, defender) === 1)
+      for (const e of this.units)
+        if (!e.dead && e.team !== attacker.team && e.T.al !== 4 && (e === defender || manhattan(e, defender) === 1)) {
+          e._chilled = true;
+          this.floaters.push({
+            x: e.px + this.tile / 2,
+            y: e.py - 8,
+            t: 0,
+            life: 0.9,
+            vy: -14,
+            text: "Chilled",
+            crit: true,
+          });
+        }
     // BONUS: Constrict — the foe a Naga strikes hand to hand is held: it cannot move on its next turn (the hold ends
     // with that turn — grid _endTurnHide — so a blow struck during the victim's own turn holds nothing)
     if (attacker.T.constrict && !defender.dead && manhattan(attacker, defender) === 1 && defender.T.al !== 4) {
@@ -1814,6 +1889,48 @@ export class CombatMethods {
         });
       }
     }
+    // BONUS: Devourer — a foe an Ammit's bite leaves nearly dead is swallowed whole (not a war engine)
+    if (
+      attacker &&
+      attacker.T.devour &&
+      attacker !== defender &&
+      defender.hp > 0 &&
+      defender.hp <= attacker.T.devour &&
+      defender.T.al !== 4 &&
+      manhattan(attacker, defender) === 1
+    ) {
+      defender.hp = 0;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 10,
+        t: 0,
+        life: 1,
+        vy: -14,
+        text: "Devoured",
+        crit: true,
+      });
+    }
+    // BONUS: Chosen of the Slain — an Einherjar that strikes a foe down takes heart
+    if (
+      defender.hp <= 0 &&
+      attacker &&
+      !attacker.dead &&
+      attacker.T.valhalla &&
+      attacker.team !== defender.team &&
+      attacker.hp < 100
+    ) {
+      const before = attacker.hp;
+      attacker.hp = Math.min(100, before + attacker.T.valhalla);
+      this.floaters.push({
+        x: attacker.px + this.tile / 2,
+        y: attacker.py - 4,
+        t: 0,
+        life: 0.9,
+        vy: -22,
+        text: "+" + Math.round(attacker.hp - before),
+        heal: true,
+      });
+    }
     // BONUS: Rise Again — a Skeleton struck down for the first time gets back up
     if (defender.hp <= 0 && defender.T.undying && !defender._risen) {
       defender._risen = true;
@@ -1870,6 +1987,26 @@ export class CombatMethods {
       this._applyHit(u, by, ACID.damage, false, true);
     }
     if (u.dead) return;
+    // BONUS: Karakia — a Tohunga mends the most wounded friend within 3 tiles as its own turn begins
+    if (u.T.karakia) {
+      const hurt = this.units
+        .filter((o) => !o.dead && o.team === u.team && o.hp < 100 && o.T.al !== 4 && !o.T.unyielding)
+        .filter((o) => Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) <= 3)
+        .sort((a, b) => a.hp - b.hp || a.id - b.id)[0];
+      if (hurt) {
+        const gained = this._healTick(hurt, u.T.karakia);
+        this.spawnFx("spark", hurt.px + this.tile / 2, hurt.py + this.tile * 0.42, {});
+        this.floaters.push({
+          x: hurt.px + this.tile / 2,
+          y: hurt.py,
+          t: 0,
+          life: 0.9,
+          vy: -22,
+          text: "+" + gained,
+          heal: true,
+        });
+      }
+    }
     const efreet = this.units.find((o) => o.team !== u.team && o.T.burn && near(o, 1));
     if (efreet) this._applyHit(u, efreet, efreet.T.burn, false, true);
   }
@@ -2210,6 +2347,7 @@ export class CombatMethods {
       magic: !!u.T.magic,
       spell: u.T.magic ? u.spell || u.T.shotSpell || "fireball" : null, // (shotSpell: the Unicorn's bolt flies as an ice bolt)
       green: !!u.T.greenShot, // the Alchemist's flask
+      hue: u.T.shotHue || 0, // …or any other hue shift (the Anubis Priest's violet Soulfire)
       impactSnd: this._impactSound(u, kind, lobbed, isCannon),
       impactVol: lobbed ? 0.5 : 0.55,
     });
@@ -2286,7 +2424,7 @@ export class CombatMethods {
     } else if (kind === "ball") {
       // Cannon shell & the wizard's FIREBALL burst in fire; ice/lightning do NOT (their own area FX resolve
       // separately in resolveDamage — a blue ice bolt shouldn't explode in flame).
-      const hue = u.T.greenShot ? 80 : 0; // the flask bursts green
+      const hue = u.T.shotHue || (u.T.greenShot ? 80 : 0); // the flask bursts green, Soulfire violet
       if (!u.T.magic || u.spell === "fireball" || (!u.spell && !u.T.shotSpell)) {
         // the Fireball bursts in the explosion (5017 #35, android z_024), the Cannonball in the fire burst (#37) —
         // startAreaAttack's impact strips (@0x72bd6 / @0x72f24)

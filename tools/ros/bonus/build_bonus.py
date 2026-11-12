@@ -65,6 +65,21 @@ SPEAKERS = {
     "itzcal": ("Sun-Speaker Itzcal", "foe", "face064"),
     "itzcal_hurt": ("Sun-Speaker Itzcal", "foe", "face065"),
     "cuali": ("Eagle Captain Cuali", "you", "face075"),
+    # Jarnheim
+    "haldor": ("Jarl Haldor", "foe", "face069"),
+    "haldor_hurt": ("Jarl Haldor", "foe", "face071"),
+    "eirik": ("Eirik the Skald", "you", "face086"),
+    # Khemret
+    "nekhet": ("High Priest Nekhet", "foe", "face072"),
+    "nekhet_hurt": ("High Priest Nekhet", "foe", "face074"),
+    "meryt": ("Captain Meryt", "you", "face078"),
+    # Moananui
+    "matahi": ("Elder Matahi", "foe", "face064"),
+    "matahi_hurt": ("Elder Matahi", "foe", "face065"),
+    "kahu": ("Kahu the Navigator", "you", "face079"),
+    # Coatlan (Eagle Captain Cuali, above, is its guide too)
+    "itzpapal": ("Itzpapal the Star-Eater", "foe", "face083"),
+    "itzpapal_hurt": ("Itzpapal the Star-Eater", "foe", "face083"),
 }
 
 
@@ -251,12 +266,12 @@ OP_SPAWN, OP_SCREEN, OP_CAMERA, OP_COUNTER, OP_SETFLAG = 0, 1, 2, 9, 10
 MOVE_CLASS = {
     "cavalry": 3, "knights": 3, "king": 3, "raiders": 3, "horsebowmen": 3,
     "catapult": 4, "trebuchet": 4, "cannon": 4, "ballistae": 4,
-    "griffon": 0, "dragonrider": 0, "tengu": 0, "imp": 0, "unicorn": 0, "efreet": 0, "serpent": 0, "hounds": 1,
+    "griffon": 0, "dragonrider": 0, "tengu": 0, "imp": 0, "unicorn": 0, "efreet": 0, "serpent": 0, "tahuanui": 0, "tzitzimitl": 0, "hounds": 1,
     "footmen": 2, "swordsmen": 2, "greatswordsmen": 2, "pikemen": 2, "halberdiers": 2, "crossbowmen": 2,
     "musketeers": 2, "conjurer": 2, "bodyguard": 2, "bloodgorgers": 2,
-    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "sohei": 2, "oni": 2, "alchemist": 2, "golem": 2, "skeleton": 2, "sunpriest": 2, "beastmaster": 2,
+    "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "sohei": 2, "oni": 2, "alchemist": 2, "golem": 2, "skeleton": 2, "sunpriest": 2, "tohunga": 2, "shieldmaiden": 2, "einherjar": 2, "jotunn": 2, "khopesh": 2, "anubis": 2, "beastmaster": 2,
 }
-CROSSES = {"cragsmen": 21, "marines": 19, "naga": 19}  # Climb / Amphibious
+CROSSES = {"cragsmen": 21, "marines": 19, "naga": 19, "taniwha": 19, "ahuizotl": 19}  # Climb / Amphibious
 
 
 def U(key, side="E", group=None, hold=False, name=None):
@@ -641,9 +656,24 @@ def main():
     import mirror_sea
     import satoshi
     import tezcal
+    import jarnheim
+    import khemret
+    import moananui
+    import coatlan
 
     data = build(
-        [tilicia.KINGDOM, isoluccia.KINGDOM, mare_nostra.KINGDOM, satoshi.KINGDOM, mirror_sea.KINGDOM, tezcal.KINGDOM]
+        [
+            tilicia.KINGDOM,
+            isoluccia.KINGDOM,
+            mare_nostra.KINGDOM,
+            satoshi.KINGDOM,
+            mirror_sea.KINGDOM,
+            tezcal.KINGDOM,
+            jarnheim.KINGDOM,
+            khemret.KINGDOM,
+            moananui.KINGDOM,
+            coatlan.KINGDOM,
+        ]
     )
     stats = ", ".join("%d %s" % (sum(1 for l in data["levels"] if l["group"] == g), g) for g in ("story", "siege"))
     if "--check" in sys.argv:

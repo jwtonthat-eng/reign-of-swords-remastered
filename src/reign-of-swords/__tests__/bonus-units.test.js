@@ -1,13 +1,24 @@
 // The six BONUS units (Tilicia & Isoluccia — ours, data/bonus-units.js) and their abilities: Climb, Nullify,
 // Unyielding, Amphibious, Pavise and Chain Lightning. Played on Episode II's own maps.
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { loadEpisode, makeGame, startBattle, spawn, only, settle, step, nextRound } from "./battle.js";
 import { UNIT_TYPES, DEPLOY_COST } from "../data/game-data.js";
 import { WEAPON_DMG, UNIT_COMBAT } from "../data/combat-data.js";
 import { BONUS_ORDER, BONUS_WEAPONS, BONUS_UPGRADES, BONUS_UPGRADES_ALL, BONUS_HIDDEN } from "../data/bonus-units.js";
-import { UNIT_META, unitSkills, upgradeOffered, upgradeGate, bonusOpen, UPGRADE_FROM } from "../data/shell-data.js";
+import {
+  UNIT_META,
+  unitSkills,
+  upgradeOffered,
+  upgradeGate,
+  bonusOpen,
+  UPGRADE_FROM,
+  COLLECTIBLES,
+  TRADE_GOODS,
+  RES_ICON,
+  NEED_COLOR,
+} from "../data/shell-data.js";
 import { DEPLOY_ELITE, DEPLOY_ORDER } from "../data/missions.js";
 import { moveType } from "../rules/terrain.js";
 
@@ -40,7 +51,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("twenty units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("thirty-six units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -62,6 +73,22 @@ describe("bonus units: the data", () => {
       "eagle",
       "sunpriest",
       "serpent",
+      "berserker",
+      "shieldmaiden",
+      "einherjar",
+      "jotunn",
+      "medjay",
+      "khopesh",
+      "anubis",
+      "ammit",
+      "toa",
+      "tahuanui",
+      "tohunga",
+      "taniwha",
+      "coatecpatl",
+      "ahuizotl",
+      "chieftain",
+      "tzitzimitl",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -99,23 +126,39 @@ describe("bonus units: upgrade paths", () => {
       ["archers", "cragsmen", "Armor"],
       ["swordsmen", "spellwardens", "Lore"],
       ["craftsmen", "sentinel", "Spirit"],
-      ["footmen", "marines", "Spirit"],
       ["crossbowmen", "pavisiers", "Armor"],
       ["wizards", "battlemage", "Medal"],
-      ["halberdiers", "gladiator", "Weapons"],
-      ["swordsmen", "samurai", "Spirit"],
-      ["griffon", "dragonrider", "Medal"],
-      ["militiamen", "beastmaster", "Medal"],
-      ["shamans", "sohei", "Armor"],
-      ["rangers", "shinobi", "Lore"],
-      ["greatswordsmen", "oni", "Spirit"],
-      ["beastmaster", "tengu", "Spirit"],
-      ["priests", "alchemist", "Lore"],
-      ["sentinel", "golem", "Armor"],
-      ["pikemen", "jaguar", "Beasts"],
-      ["archers", "eagle", "Lore"],
-      ["cavalry", "serpent", "Spirit"],
-      ["priests", "sunpriest", "Medal"],
+      ["militiamen", "marines", "Anchor"],
+      ["footmen", "gladiator", "Anchor"],
+      ["raiders", "beastmaster", "Anchor"],
+      ["shamans", "sohei", "Tsuba"],
+      ["footmen", "samurai", "Tsuba"],
+      ["archers", "shinobi", "Tsuba"],
+      ["samurai", "oni", "Tsuba"],
+      ["beastmaster", "tengu", "Tsuba"],
+      ["griffon", "dragonrider", "Void"],
+      ["priests", "alchemist", "Void"],
+      ["sentinel", "golem", "Void"],
+      ["militiamen", "jaguar", "Jade"],
+      ["archers", "eagle", "Jade"],
+      ["cavalry", "serpent", "Jade"],
+      ["shamans", "sunpriest", "Jade"],
+      ["militiamen", "berserker", "Bloodstone"],
+      ["footmen", "shieldmaiden", "Bloodstone"],
+      ["shieldmaiden", "einherjar", "Bloodstone"],
+      ["berserker", "jotunn", "Bloodstone"],
+      ["archers", "medjay", "Scarab"],
+      ["militiamen", "khopesh", "Scarab"],
+      ["priests", "anubis", "Scarab"],
+      ["bloodgorgers", "ammit", "Scarab"],
+      ["militiamen", "toa", "Whalebone"],
+      ["raiders", "tahuanui", "Whalebone"],
+      ["shamans", "tohunga", "Whalebone"],
+      ["dunesirens", "taniwha", "Whalebone"],
+      ["jaguar", "coatecpatl", "Obsidian"],
+      ["bloodgorgers", "ahuizotl", "Obsidian"],
+      ["eagle", "chieftain", "Obsidian"],
+      ["shamans", "tzitzimitl", "Obsidian"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -492,7 +535,7 @@ describe("Dragon Riders", () => {
     expect(T.firstStrike && T.fear && T.hasCharge && T.twinAttack).toBe(true);
     expect(T.harasser).toBe(false); // the computer flies it in to fight instead of hovering at range
     expect([T.minRange, T.range]).toEqual([1, 8]); // the lance at 1, the breath at 2–8: no dead zone
-    expect(UPGRADE_FROM.dragonrider).toEqual({ from: "griffon", need: "Medal" });
+    expect(UPGRADE_FROM.dragonrider).toEqual({ from: "griffon", need: "Void" });
     expect(upgradeGate("dragonrider", true)).toBe(5943);
     expect(unitSkills("dragonrider").map((s) => s.n)).toEqual(
       expect.arrayContaining(["Dragonfire", "Fire and Lance", "Flight", "Fear"]),
@@ -672,7 +715,7 @@ describe("Gladiators and the Beast Master", () => {
   it("a 250-point Beast Master, upgraded from Militia with a Medal, calls up to two packs of leashed Hounds", () => {
     expect(DEPLOY_COST.beastmaster).toBe(250);
     expect(DEPLOY_ELITE.beastmaster).toBeFalsy();
-    expect(UPGRADE_FROM.beastmaster).toEqual({ from: "militiamen", need: "Medal" });
+    expect(UPGRADE_FROM.beastmaster).toEqual({ from: "raiders", need: "Anchor" });
     expect(upgradeGate("beastmaster", true)).toBe(5982);
     const hounds = UNIT_TYPES.hounds,
       stag = UNIT_TYPES.stag;
@@ -1042,7 +1085,7 @@ describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathe
     expect(BONUS_UPGRADES.filter((u) => u.from === "beastmaster").map((u) => u.to)).toEqual(["tengu"]);
     const tree = BONUS_UPGRADES_ALL.filter((u) => u.from === "beastmaster").map((u) => [u.to, u.need]);
     expect(tree).toEqual([
-      ["tengu", "Spirit"],
+      ["tengu", "Tsuba"],
       ["unicorn", "Lore"],
       ["efreet", "Weapons"],
       ["naga", "Beasts"],
@@ -1055,5 +1098,266 @@ describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathe
     expect(upgradeGate("eagle", true)).toBe(5995);
     expect(upgradeGate("serpent", true)).toBe(5996);
     expect(upgradeGate("sunpriest", true)).toBe(5996);
+  });
+});
+
+describe("Jarnheim and Khemret: the Norse and Egyptian units", () => {
+  const field = () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    return g;
+  };
+  it("Rage: a wounded Berserker's blow lands on a higher cell of the table than the same blow without Rage", () => {
+    const g = field();
+    const berserker = spawn(g, "berserker", "blue", 10, 10),
+      foe = spawn(g, "footmen", "red", 11, 10);
+    const T = berserker.T;
+    const fresh = g._damage256(berserker, foe);
+    berserker.T = { ...T, rage: 0 };
+    expect(g._damage256(berserker, foe)).toBe(fresh); // at full health Rage adds nothing
+    berserker.hp = 40;
+    const calm = g._damage256(berserker, foe);
+    berserker.T = T;
+    expect(g._damage256(berserker, foe)).toBeGreaterThan(calm);
+    expect(UNIT_TYPES.berserker.fearless).toBe(true);
+  });
+  it("Shield Wall: a friend beside a Shieldmaiden takes a quarter less hand to hand, and nothing less from arrows", () => {
+    const g = field();
+    const friend = spawn(g, "berserker", "blue", 10, 10), // (not a Formation unit, whose own rule also counts neighbours)
+      foe = spawn(g, "swordsmen", "red", 11, 10),
+      archer = spawn(g, "archers", "red", 10, 14);
+    const blow = g.computeDamage(foe, friend),
+      shot = g.computeDamage(archer, friend);
+    spawn(g, "shieldmaiden", "blue", 9, 10);
+    expect(g.computeDamage(foe, friend)).toBeLessThan(blow);
+    expect(g.computeDamage(foe, friend)).toBeGreaterThan(blow / 2); // about a quarter off
+    expect(g.computeDamage(archer, friend)).toBe(shot);
+  });
+  it("Chosen of the Slain: an Einherjar regains 50 HP when it strikes a foe down", () => {
+    const g = field();
+    const einherjar = spawn(g, "einherjar", "blue", 10, 10),
+      foe = spawn(g, "footmen", "red", 11, 10);
+    einherjar.hp = 30;
+    g._applyHit(foe, einherjar, 20, false);
+    expect(einherjar.hp).toBe(30); // a wound is not a kill
+    g._applyHit(foe, einherjar, 200, false);
+    expect([foe.dead, einherjar.hp]).toEqual([true, 80]);
+  });
+  it("Frost Slam: a Jotunn's target and the foes beside it move at half pace for a turn", () => {
+    const g = field();
+    const jotunn = spawn(g, "jotunn", "blue", 10, 10),
+      target = spawn(g, "footmen", "red", 11, 10),
+      beside = spawn(g, "footmen", "red", 12, 10),
+      apart = spawn(g, "footmen", "red", 14, 10);
+    g.resolveDamage(jotunn, target, {});
+    expect([g.moveOf(target), g.moveOf(beside), g.moveOf(apart)]).toEqual([2, 2, 4]);
+    g._endTurnHide([target, beside]);
+    expect(g.moveOf(beside)).toBe(4);
+    expect(UNIT_TYPES.jotunn.fear).toBe(true);
+  });
+  it("Medjay: a Composite Bow at 2–7, and desert brush costs them 1", () => {
+    expect([UNIT_TYPES.medjay.minRange, UNIT_TYPES.medjay.range]).toEqual([1, 7]);
+    expect(UNIT_TYPES.archers.range).toBe(6);
+    const g = startBattle(makeGame(5934));
+    only(g);
+    let brush = null;
+    for (let y = 0; y < g.rows && !brush; y++)
+      for (let x = 0; x < g.cols && !brush; x++) if (moveType(g.tileAt(x, y)) === 28) brush = [x, y];
+    expect(brush).toBeTruthy();
+    const medjay = spawn(g, "medjay", "blue", 0, 0),
+      archers = spawn(g, "archers", "blue", 1, 0);
+    expect(g.moveCost(medjay, brush[0], brush[1])).toBe(1);
+    expect(g.moveCost(archers, brush[0], brush[1])).toBeGreaterThan(1);
+  });
+  it("Shield Hook: against a Khopesh a shield counts for nothing; against bare armour it is a plain sword", () => {
+    const g = field();
+    const khopesh = spawn(g, "khopesh", "blue", 10, 10),
+      shielded = spawn(g, "footmen", "red", 11, 10), // Light Armour & Shield
+      bare = spawn(g, "archers", "red", 9, 10); // No Armour: nothing to hook
+    const T = khopesh.T;
+    const hooked = [g._damage256(khopesh, shielded), g._damage256(khopesh, bare)];
+    khopesh.T = { ...T, hook: false };
+    expect(hooked[0]).toBeGreaterThan(g._damage256(khopesh, shielded));
+    expect(hooked[1]).toBe(g._damage256(khopesh, bare));
+  });
+  it("Weighing of the Heart: an Anubis Priest's Soulfire hits a wounded foe harder", () => {
+    const g = field();
+    const anubis = spawn(g, "anubis", "blue", 5, 10),
+      foe = spawn(g, "footmen", "red", 9, 10);
+    expect(g._weaponAt(anubis, 4)).toBe(70);
+    const fresh = g.computeDamage(anubis, foe);
+    foe.hp = 40;
+    expect(g.computeDamage(anubis, foe)).toBeGreaterThan(fresh);
+    expect(UNIT_TYPES.anubis.shotHue).toBe(250);
+  });
+  it("Devourer: an Ammit swallows a foe its bite leaves at 20 HP or fewer; a war engine it does not", () => {
+    const g = field();
+    const ammit = spawn(g, "ammit", "blue", 10, 10),
+      foe = spawn(g, "footmen", "red", 11, 10),
+      tough = spawn(g, "footmen", "red", 10, 11),
+      engine = spawn(g, "catapult", "red", 9, 10);
+    foe.hp = 30;
+    g._applyHit(foe, ammit, 12, false); // 18 left: gone
+    expect(foe.dead).toBe(true);
+    g._applyHit(tough, ammit, 12, false); // 88 left: alive
+    expect([tough.dead, tough.hp]).toEqual([false, 88]);
+    engine.hp = 30;
+    g._applyHit(engine, ammit, 12, false);
+    expect(engine.dead).toBe(false);
+  });
+});
+
+describe("Moananui and Coatlan: the Polynesian and serpent-order units", () => {
+  const field = () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    return g;
+  };
+  const water = (g, type) => {
+    for (let y = 0; y < g.rows; y++)
+      for (let x = 0; x < g.cols; x++) if (moveType(g.tileAt(x, y)) === type && !g.unitAt(x, y)) return [x, y];
+    return null;
+  };
+  it("First Thrust: a Toa hits a foe at full health harder; Wayfinder: shallows cost it 1", () => {
+    const g = startBattle(makeGame(5941)); // a ship map: shallows at its edge
+    only(g);
+    const toa = spawn(g, "toa", "blue", 8, 4),
+      foe = spawn(g, "footmen", "red", 9, 4);
+    const fresh = g._damage256(toa, foe);
+    foe.hp = 99;
+    expect(g._damage256(toa, foe)).toBeLessThan(fresh);
+    const shallows = water(g, 5);
+    expect(shallows).toBeTruthy();
+    const footmen = spawn(g, "footmen", "blue", 8, 5);
+    expect(g.moveCost(toa, shallows[0], shallows[1])).toBe(1);
+    expect(g.moveCost(footmen, shallows[0], shallows[1])).toBeGreaterThan(1);
+  });
+  it("Sky Hunter: a Tahuanui Rider hits archers and war engines harder; infantry it hits as anyone would", () => {
+    const g = field();
+    const rider = spawn(g, "tahuanui", "blue", 10, 10);
+    const archers = spawn(g, "archers", "red", 11, 10),
+      footmen = spawn(g, "footmen", "red", 10, 11),
+      catapult = spawn(g, "catapult", "red", 9, 10);
+    const T = rider.T;
+    const hunting = [archers, catapult, footmen].map((foe) => g._damage256(rider, foe));
+    rider.T = { ...T, skyHunter: 0 };
+    const plain = [archers, catapult, footmen].map((foe) => g._damage256(rider, foe));
+    expect(hunting[0]).toBeGreaterThan(plain[0]);
+    expect(hunting[1]).toBeGreaterThan(plain[1]);
+    expect(hunting[2]).toBe(plain[2]);
+    expect(UNIT_TYPES.tahuanui.fly).toBe(true);
+  });
+  it("Karakia: as its turn begins a Tohunga mends the most wounded friend within 3 tiles by 20", () => {
+    const g = field();
+    spawn(g, "tohunga", "blue", 10, 10);
+    const worst = spawn(g, "footmen", "blue", 12, 10),
+      other = spawn(g, "footmen", "blue", 10, 12),
+      far = spawn(g, "footmen", "blue", 15, 10);
+    worst.hp = 30;
+    other.hp = 60;
+    far.hp = 10;
+    g.healOnKeeps("blue");
+    expect([worst.hp, other.hp, far.hp]).toEqual([50, 60, 10]);
+  });
+  it("Lurker of the Deep: a Taniwha swims deep water at 1, fights from it, and strikes harder out of it", () => {
+    const g = startBattle(makeGame(5941));
+    only(g);
+    const deep = water(g, 19);
+    const taniwha = spawn(g, "taniwha", "blue", 8, 4),
+      marines = spawn(g, "marines", "blue", 9, 4);
+    expect(g.moveCost(taniwha, deep[0], deep[1])).toBe(1);
+    expect(g.moveCost(marines, deep[0], deep[1])).toBe(2);
+    // from the deck, then from the sea beside the same foe
+    const foe = spawn(g, "footmen", "red", 8, 2); // on the north rail; the sea is at (8, 1)
+    expect(moveType(g.tileAt(8, 1))).toBe(19);
+    Object.assign(taniwha, { tx: 8, ty: 3 });
+    const dry = g._damage256(taniwha, foe);
+    Object.assign(taniwha, { tx: 8, ty: 1 });
+    expect(g._damage256(taniwha, foe)).toBeGreaterThan(dry);
+    expect(g.targetsFrom(taniwha, 8, 1, false)).toContain(foe);
+    Object.assign(marines, { tx: 9, ty: 1 });
+    spawn(g, "footmen", "red", 9, 2);
+    expect(g.targetsFrom(marines, 9, 1, false)).toEqual([]); // Marines still cannot attack from the deep
+  });
+  it("Serpent Venom: a Coatecpatl's blow leaves 5 HP a turn of poison for 3 turns", () => {
+    const g = field();
+    const warrior = spawn(g, "coatecpatl", "blue", 10, 10),
+      foe = spawn(g, "knights", "red", 11, 10);
+    g.resolveDamage(warrior, foe, {});
+    expect(foe._acid.turns).toBe(3);
+    const after = foe.hp;
+    for (let turn = 1; turn <= 4; turn++) g.healOnKeeps("red");
+    expect(after - foe.hp).toBe(15);
+    expect(UNIT_TYPES.coatecpatl.forestWalk).toBe(true);
+  });
+  it("Drowning Grasp: the foe an Ahuizotl strikes cannot attack on its next turn, and can after it", () => {
+    const g = field();
+    const beast = spawn(g, "ahuizotl", "blue", 10, 10),
+      foe = spawn(g, "footmen", "red", 11, 10);
+    expect(g.targetsFrom(foe, 11, 10, false)).toContain(beast);
+    g.resolveDamage(beast, foe, {});
+    expect(foe._seized).toBe(true);
+    expect(g.targetsFrom(foe, 11, 10, false)).toEqual([]);
+    expect(g.moveOf(foe)).toBe(4); // it can still walk away
+    g._endTurnHide([foe]);
+    expect(g.targetsFrom(foe, 11, 10, false)).toContain(beast);
+  });
+  it("Vanguard: a unit beside a Cuahchic Chieftain strikes first; the Chieftain carries a Battle Standard", () => {
+    const g = field();
+    const friend = spawn(g, "footmen", "blue", 10, 10);
+    expect(g._hasFirstStrike(friend)).toBe(false);
+    spawn(g, "chieftain", "blue", 10, 11);
+    expect(g._hasFirstStrike(friend)).toBe(true);
+    const apart = spawn(g, "footmen", "blue", 14, 10);
+    expect(g._hasFirstStrike(apart)).toBe(false);
+    expect(UNIT_TYPES.chieftain.standard).toBe(true);
+    expect([UNIT_TYPES.chieftain.minRange, UNIT_TYPES.chieftain.range]).toEqual([1, 4]);
+  });
+  it("Star Hunger: half of what a Tzitzimitl's Starfire burns away returns to it", () => {
+    const g = field();
+    const spectre = spawn(g, "tzitzimitl", "blue", 5, 10),
+      foe = spawn(g, "footmen", "red", 9, 10);
+    spectre.hp = 50;
+    const blow = g.computeDamage(spectre, foe);
+    g.resolveDamage(spectre, foe, {});
+    expect(spectre.hp).toBe(50 + Math.round(blow / 2));
+    expect(UNIT_TYPES.tzitzimitl.fly && UNIT_TYPES.tzitzimitl.fear).toBe(true);
+  });
+});
+
+describe("the eight culture tokens", () => {
+  it("are collectibles of their own: kept off the Merchant's counter, and the price of their culture's units", () => {
+    const tokens = COLLECTIBLES.filter((c) => c.token).map((c) => c.id);
+    expect(tokens).toEqual(["Bloodstone", "Scarab", "Obsidian", "Whalebone", "Anchor", "Tsuba", "Jade", "Void"]);
+    expect(TRADE_GOODS.map((c) => c.id)).toEqual(["Medal", "Armor", "Weapons", "Beasts", "Spirit", "Lore"]);
+    for (const id of tokens) {
+      expect(RES_ICON[id]).toBeTruthy();
+      expect(NEED_COLOR[id]).toBeTruthy();
+      expect(existsSync(join("public", "games", "reign-of-swords", "icons", RES_ICON[id] + ".png"))).toBe(true);
+    }
+    const priceOf = Object.fromEntries(BONUS_UPGRADES.map((u) => [u.to, u.need]));
+    const paid = (token, units) => units.forEach((unit) => expect(priceOf[unit], unit).toBe(token));
+    paid("Bloodstone", ["berserker", "shieldmaiden", "einherjar", "jotunn"]);
+    paid("Scarab", ["medjay", "khopesh", "anubis", "ammit"]);
+    paid("Whalebone", ["toa", "tahuanui", "tohunga", "taniwha"]);
+    paid("Obsidian", ["coatecpatl", "ahuizotl", "chieftain", "tzitzimitl"]);
+    paid("Jade", ["jaguar", "eagle", "sunpriest", "serpent"]);
+    paid("Tsuba", ["samurai", "sohei", "shinobi", "oni", "tengu"]);
+    paid("Anchor", ["marines", "gladiator", "beastmaster"]);
+    paid("Void", ["dragonrider", "alchemist", "golem"]);
+    // the first bonus units keep the game's own collectibles
+    expect([priceOf.cragsmen, priceOf.spellwardens, priceOf.sentinel, priceOf.pavisiers, priceOf.battlemage]).toEqual([
+      "Armor",
+      "Lore",
+      "Spirit",
+      "Armor",
+      "Medal",
+    ]);
+    // a culture's later units come from its earlier ones
+    expect(UPGRADE_FROM.einherjar.from).toBe("shieldmaiden");
+    expect(UPGRADE_FROM.jotunn.from).toBe("berserker");
+    expect(UPGRADE_FROM.coatecpatl.from).toBe("jaguar");
+    expect(UPGRADE_FROM.chieftain.from).toBe("eagle");
+    expect(UPGRADE_FROM.golem.from).toBe("sentinel");
   });
 });

@@ -26,7 +26,7 @@ const idx = (id) => camp.kingdoms.findIndex((k) => k.id === id);
 const storyOf = (id) => camp.kingdoms[idx(id)].missions.map((m) => m.mapId);
 
 describe("bonus kingdoms on the campaign map", () => {
-  it("are six extra regions with their story battles and raids, each with a place on the Episode II map", () => {
+  it("are ten extra regions with their story battles and raids, each with a place on the Episode II map", () => {
     expect(bonus.kingdoms.map((k) => k.id)).toEqual([
       "tilicia",
       "isoluccia",
@@ -34,15 +34,23 @@ describe("bonus kingdoms on the campaign map", () => {
       "satoshi",
       "mirror-sea",
       "tezcal",
+      "jarnheim",
+      "khemret",
+      "moananui",
+      "coatlan",
     ]);
     expect(bonus.kingdoms.map((k) => k.name).slice(2)).toEqual([
       "Mare Nostra",
       "The Isles of Satoshi",
       "The Mirror Sea",
       "The Jungles of Tezcal",
+      "The Holds of Jarnheim",
+      "The Sands of Khemret",
+      "The Isles of Moananui",
+      "The Highlands of Coatlan",
     ]);
     for (const kingdom of bonus.kingdoms) {
-      const small = ["mare-nostra", "satoshi", "mirror-sea", "tezcal"].includes(kingdom.id); // 2 raids; the first two have 3
+      const small = !["tilicia", "isoluccia"].includes(kingdom.id); // 2 raids; the first two have 3
       expect(kingdom.bonus).toBe(true);
       expect(kingdom.missions.length).toBe(3); // three story battles in every bonus region
       expect(kingdomRaids(levels, kingdom).length).toBe(small ? 2 : 3);
@@ -79,6 +87,25 @@ describe("bonus kingdoms on the campaign map", () => {
     const mirrorDone = new Set([...seaDone, ...storyOf("mirror-sea")]);
     expect(kingdomUnlocked(camp, idx("tezcal"), mirrorDone)).toBe(true);
   });
+  it("Jarnheim, Khemret, Moananui and Coatlan open with the bonus campaigns, beside Tilicia, and nothing waits on them", () => {
+    const beforeLast = new Set([...progressBefore(original, levels, -1)].filter((id) => id !== 5432));
+    const done = progressBefore(original, levels, -1);
+    for (const id of ["jarnheim", "khemret", "moananui", "coatlan"]) {
+      expect(camp.kingdoms[idx(id)].unlockAfter).toEqual(camp.kingdoms[idx("tilicia")].unlockAfter);
+      expect(kingdomUnlocked(camp, idx(id), beforeLast)).toBe(false);
+      expect(kingdomUnlocked(camp, idx(id), done)).toBe(true); // with no bonus battle fought yet
+      expect(missionUnlocked(camp, idx(id), 0, done)).toBe(true);
+      expect(missionUnlocked(camp, idx(id), 1, done)).toBe(false);
+      const name = camp.kingdoms[idx(id)].name.replace("Kingdom of ", "");
+      expect(camp.kingdoms.some((k) => (k.unlockAfter || []).includes(name))).toBe(false);
+      // two raids: the first after the second battle, the second after the third
+      const story = storyOf(id);
+      expect(raidUnlocked(camp, idx(id), 0, new Set([...done, story[0]]))).toBe(false);
+      expect(raidUnlocked(camp, idx(id), 0, new Set([...done, story[0], story[1]]))).toBe(true);
+      expect(raidUnlocked(camp, idx(id), 1, new Set([...done, story[0], story[1]]))).toBe(false);
+      expect(raidUnlocked(camp, idx(id), 1, new Set([...done, ...story]))).toBe(true);
+    }
+  });
   it("their raids open as the story advances, like the Eastern Kingdoms' (raid n after story battle n + 1)", () => {
     const done = progressBefore(original, levels, -1);
     const story = storyOf("tilicia");
@@ -108,6 +135,18 @@ describe("bonus kingdoms on the campaign map", () => {
       [5994, "jaguar"],
       [5995, "eagle"],
       [5996, "serpent"],
+      [5914, "berserker"],
+      [5915, "shieldmaiden"],
+      [5916, "einherjar"],
+      [5934, "medjay"],
+      [5935, "khopesh"],
+      [5936, "anubis"],
+      [5944, "toa"],
+      [5945, "tahuanui"],
+      [5946, "tohunga"],
+      [5954, "coatecpatl"],
+      [5955, "ahuizotl"],
+      [5956, "chieftain"],
     ]) {
       expect(gives(mapId)).toContain(unit);
       expect(unlocksOf(mapId, true)).toContain(unit);
@@ -139,8 +178,23 @@ describe("Resume Episode II (⚙ Settings)", () => {
     for (const k of [...ALL_TYPES, ...EP2_ORDER, ...BONUS_ORDER].filter((u) => u !== "sapper" && u !== "bodyguard"))
       expect(got.units[k], k).toBe(8);
     expect(got.units.sapper).toBeUndefined();
-    expect(Object.keys(got.units).length).toBe(48);
-    expect(got.spoils).toEqual({ Medal: 8, Armor: 8, Weapons: 8, Beasts: 8, Spirit: 8, Lore: 8 });
+    expect(Object.keys(got.units).length).toBe(64);
+    expect(got.spoils).toEqual({
+      Medal: 8,
+      Armor: 8,
+      Weapons: 8,
+      Beasts: 8,
+      Spirit: 8,
+      Lore: 8,
+      Bloodstone: 8,
+      Scarab: 8,
+      Obsidian: 8,
+      Whalebone: 8,
+      Anchor: 8,
+      Tsuba: 8,
+      Jade: 8,
+      Void: 8,
+    });
   });
   it("…and resuming with it marks every battle of every campaign won, the bonus ones included", () => {
     const won = progressBefore(camp, levels, -1);

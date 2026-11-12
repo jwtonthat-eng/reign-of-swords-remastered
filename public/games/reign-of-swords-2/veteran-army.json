@@ -50,7 +50,23 @@
   "jaguar": 8,
   "eagle": 8,
   "sunpriest": 8,
-  "serpent": 8
+  "serpent": 8,
+  "berserker": 8,
+  "shieldmaiden": 8,
+  "einherjar": 8,
+  "jotunn": 8,
+  "medjay": 8,
+  "khopesh": 8,
+  "anubis": 8,
+  "ammit": 8,
+  "toa": 8,
+  "tahuanui": 8,
+  "tohunga": 8,
+  "taniwha": 8,
+  "coatecpatl": 8,
+  "ahuizotl": 8,
+  "chieftain": 8,
+  "tzitzimitl": 8
  },
  "spoils": {
   "Medal": 8,
@@ -58,6 +74,14 @@
   "Weapons": 8,
   "Beasts": 8,
   "Spirit": 8,
-  "Lore": 8
+  "Lore": 8,
+  "Bloodstone": 8,
+  "Scarab": 8,
+  "Obsidian": 8,
+  "Whalebone": 8,
+  "Anchor": 8,
+  "Tsuba": 8,
+  "Jade": 8,
+  "Void": 8
  }
 }

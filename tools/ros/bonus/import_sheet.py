@@ -26,7 +26,8 @@ ART = os.path.join(ROOT, "tools", "ros", "bonus", "art")
 SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.jpg", "dragon": "dragon-rider-sheet.jpg",
           "beasts": "beastmaster-hounds-sheet.jpg", "satoshi": "satoshi-units-sheet.jpg",
           "alchemy": "alchemy-units-sheet.jpg", "mythic": "mythic-units-sheet.jpg",
-          "aztec": "aztec-units-sheet.jpg"}  # a unit's "sheet" (default first)
+          "aztec": "aztec-units-sheet.jpg", "north": "norse-egypt-units-sheet.jpg",
+          "ocean": "polynesian-units-sheet.jpg", "aztec2": "aztec2-units-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -235,6 +236,126 @@ UNITS = {
         "stand": 0, "walk": None, "attack": [0, 1, 3, 1], "height": 72, "team": False,
         "frame": (144, 104), "lift": 0,
     },
+    # The Norse and Egyptian sheet. Its rows are packed, with each unit's label printed over the left of its row, so
+    # every pose is a box measured by eye (the boxes start below the label where a pose stands under it).
+    "berserker": {
+        "sheet": "north",
+        "boxes": [(18, 92, 269, 302), (271, 92, 467, 302), (469, 92, 746, 302), (809, 92, 986, 302),
+                  (1104, 42, 1455, 302), (1490, 42, 1658, 302), (1716, 42, 1880, 302), (1971, 42, 2125, 302)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [0, 5, 4, 6], "height": 64, "team": False,
+        "frame": (128, 96),
+    },
+    "einherjar": {
+        "sheet": "north",
+        "boxes": [(40, 362, 190, 540), (245, 362, 395, 540), (597, 345, 742, 540), (901, 345, 1065, 540),
+                  (1190, 308, 1410, 540), (1482, 308, 1674, 540), (1714, 330, 1869, 540)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 6], "height": 62, "team": False,
+        "frame": (96, 88),
+    },
+    "shieldmaiden": {
+        "sheet": "north",
+        "boxes": [(40, 594, 200, 740), (240, 594, 400, 740), (650, 575, 745, 740), (899, 560, 1051, 740),
+                  (1175, 560, 1457, 740), (1487, 560, 1649, 740), (1727, 560, 1865, 740)],
+        "stand": 0, "walk": [1, 3, 1, 3], "attack": [0, 5, 4, 5], "height": 56, "team": False,
+        "frame": (128, 88),
+    },
+    "jotunn": {
+        "sheet": "north",
+        "boxes": [(13, 796, 215, 1000), (238, 796, 430, 1000), (534, 742, 740, 1000), (880, 760, 1086, 1000),
+                  (1257, 742, 1801, 1000), (1928, 760, 2106, 1000)],
+        "anchors": [110, 335, 650, 985, 1380, 2015],
+        "stand": 0, "walk": [3, 5, 3, 5], "attack": [0, 2, 4, 5], "height": 76, "team": False,
+        "frame": (160, 104), "lift": 0,
+    },
+    "medjay": {
+        "sheet": "north",
+        "boxes": [(55, 1054, 185, 1190), (240, 1054, 380, 1190), (607, 1014, 741, 1190), (912, 1040, 1072, 1190),
+                  (1232, 1014, 1420, 1190), (1948, 1030, 2068, 1190)],
+        "stand": 0, "walk": [3, 1, 3, 1], "attack": [1, 2, 4, 2], "height": 58, "team": False,
+    },
+    "khopesh": {
+        "sheet": "north",
+        # (its two standing poses are printed under the label; the ready pose with the khopesh raised stands in)
+        "boxes": [(939, 1195, 1079, 1348), (1242, 1160, 1470, 1348), (1931, 1195, 2089, 1348)],
+        "stand": 2, "walk": [0, 2, 0, 2], "attack": [2, 0, 1, 2], "height": 64, "team": False,
+        "frame": (128, 88),
+    },
+    "anubis": {
+        "sheet": "north",
+        "boxes": [(68, 1402, 180, 1514), (236, 1402, 365, 1514), (932, 1380, 1062, 1514), (1223, 1350, 1410, 1514),
+                  (1926, 1360, 2087, 1514)],
+        "stand": 0, "walk": [2, 0, 2, 0], "attack": [1, 4, 3, 4], "height": 58, "team": False,
+        "frame": (104, 88),
+    },
+    # (no walk sheet: the beast is longer than a walk frame, so it glides like the Dragon Rider)
+    "ammit": {
+        "sheet": "north",
+        "boxes": [(526, 1535, 812, 1690), (1192, 1535, 1520, 1690), (1895, 1525, 2102, 1690)],
+        "stand": 0, "walk": None, "attack": [0, 2, 1, 0], "height": 46, "team": False,
+        "frame": (112, 88),
+    },
+    # The Polynesian sheet and the second Aztec sheet (a darker ground; boxes by eye again).
+    "toa": {
+        "sheet": "ocean", "ground": (61, 78, 64),
+        "boxes": [(60, 110, 278, 378), (308, 110, 516, 378), (570, 130, 845, 378), (875, 130, 1065, 378),
+                  (1120, 90, 1470, 378), (1482, 130, 1778, 378), (1822, 130, 2045, 378)],
+        "stand": 0, "walk": [3, 2, 3, 2], "attack": [1, 5, 4, 6], "height": 82, "team": False,
+        "frame": (128, 96),
+    },
+    "tahuanui": {
+        "sheet": "ocean", "ground": (61, 78, 64),
+        "boxes": [(13, 500, 362, 860), (385, 500, 735, 860), (740, 560, 1190, 860), (1175, 590, 1660, 860),
+                  (1668, 500, 2030, 860)],
+        "anchors": [200, 573, 973, 1440, 1867],
+        "solo": [4],
+        "stand": 0, "walk": None, "attack": [0, 2, 3, 4], "height": 84, "team": False,
+        "frame": (144, 104), "lift": 0,
+    },
+    "tohunga": {
+        "sheet": "ocean", "ground": (61, 78, 64),
+        "boxes": [(520, 985, 660, 1285), (687, 985, 910, 1285), (913, 985, 1135, 1285), (1133, 985, 1395, 1285),
+                  (1390, 960, 1800, 1285), (1815, 985, 2038, 1285)],
+        "stand": 0, "walk": [1, 2, 1, 2], "attack": [0, 3, 4, 5], "height": 64, "team": False,
+        "frame": (128, 96),
+    },
+    "taniwha": {
+        "sheet": "ocean", "ground": (61, 78, 64),
+        "boxes": [(13, 1500, 402, 1785), (405, 1425, 722, 1785), (722, 1600, 1162, 1785), (1195, 1440, 1740, 1785),
+                  (1745, 1440, 2030, 1785)],
+        "anchors": [200, 573, 933, 1507, 1893],
+        "stand": 0, "walk": None, "attack": [0, 1, 3, 4], "height": 70, "team": False,
+        "frame": (160, 104), "lift": 0,
+    },
+    "coatecpatl": {
+        "sheet": "aztec2", "ground": (61, 78, 64),
+        "boxes": [(45, 105, 295, 398), (300, 105, 548, 398), (548, 105, 735, 398), (735, 130, 1000, 398),
+                  (1000, 85, 1400, 398), (1825, 100, 2050, 398)],
+        "solo": [2, 3],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 5, 4, 1], "height": 66, "team": False,
+        "frame": (128, 96),
+    },
+    "chieftain": {
+        "sheet": "aztec2", "ground": (61, 78, 64),
+        "boxes": [(45, 515, 243, 838), (298, 515, 490, 838), (500, 515, 800, 838), (802, 515, 1182, 838),
+                  (1187, 515, 1585, 838), (1810, 560, 2015, 838)],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [1, 2, 4, 1], "height": 78, "team": False,
+        "frame": (128, 96),
+    },
+    "tzitzimitl": {
+        "sheet": "aztec2", "ground": (61, 78, 64),
+        "boxes": [(80, 965, 300, 1305), (340, 965, 560, 1305), (587, 985, 875, 1305), (878, 985, 1205, 1305),
+                  (1207, 945, 1470, 1305), (1470, 945, 1770, 1305)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 4], "height": 74, "team": False,
+        "frame": (96, 96),
+    },
+    "ahuizotl": {
+        "sheet": "aztec2", "ground": (61, 78, 64),
+        "boxes": [(38, 1490, 335, 1772), (358, 1490, 655, 1772), (730, 1550, 1162, 1772), (1205, 1480, 1760, 1772),
+                  (1765, 1490, 1990, 1772)],
+        "anchors": [187, 507, 960, 1453, 1867],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [0, 2, 3, 4], "height": 50, "team": False,
+        "frame": (128, 88), "lift": 0,
+    },
 }
 
 
@@ -268,12 +389,12 @@ def largest_shape(cell):
                 px[x, y] = (0, 0, 0, 0)
 
 
-def cut(sheet, box, solo=False):
+def cut(sheet, box, solo=False, ground=GROUND):
     """One pose, its ground flood-filled to transparent from the cell's edges."""
     cell = sheet.crop(box).convert("RGBA")
     w, h = cell.size
     px = cell.load()
-    near = lambda c: abs(c[0] - GROUND[0]) + abs(c[1] - GROUND[1]) + abs(c[2] - GROUND[2]) < 46
+    near = lambda c: abs(c[0] - ground[0]) + abs(c[1] - ground[1]) + abs(c[2] - ground[2]) < 46
     seen = [[False] * w for _ in range(h)]
     queue = deque()
     for x in range(w):
@@ -361,12 +482,14 @@ def framed(pose, width, height, at):
 
 def build(sheet, key):
     unit = UNITS[key]
+    ground = unit.get("ground", GROUND)  # (the later sheets stand on a darker green)
     if "boxes" in unit:
-        poses = [cut(sheet, box) for box in unit["boxes"]]
+        poses = [cut(sheet, box, i in unit.get("solo", ()), ground) for i, box in enumerate(unit["boxes"])]
     else:
         top, bottom = unit["rows"]
         poses = [
-            cut(sheet, (x0, top, x1, bottom), i in unit.get("solo", ())) for i, (x0, x1) in enumerate(unit["cells"])
+            cut(sheet, (x0, top, x1, bottom), i in unit.get("solo", ()), ground)
+            for i, (x0, x1) in enumerate(unit["cells"])
         ]
     scale = unit["height"] / poses[unit["stand"]].height
     small = [scaled(p, scale, unit["team"]) for p in poses]

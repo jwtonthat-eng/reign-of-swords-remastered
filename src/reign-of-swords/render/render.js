@@ -1914,6 +1914,7 @@ export class Renderer {
       return;
     }
     if (shot.green) g.filter = "hue-rotate(80deg)"; // BONUS: the Alchemist's flask (the caller restores the context)
+    else if (shot.hue) g.filter = `hue-rotate(${shot.hue}deg)`; // …and the Anubis Priest's Soulfire
     const frameW = isFire ? 64 : 28,
       frames = 5;
     const frame = isFire ? Math.floor(shot.t * 22) % frames : Math.min(frames - 1, Math.floor(flight * frames));

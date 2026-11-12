@@ -154,6 +154,22 @@ export const UNIT_CATEGORY = {
   eagle: "Missile",
   sunpriest: "Casters",
   serpent: "Flying",
+  berserker: "Infantry",
+  shieldmaiden: "Infantry",
+  einherjar: "Infantry",
+  jotunn: "Infantry",
+  medjay: "Missile",
+  khopesh: "Infantry",
+  anubis: "Casters",
+  ammit: "Infantry",
+  toa: "Infantry",
+  tahuanui: "Flying",
+  tohunga: "Casters",
+  taniwha: "Infantry",
+  coatecpatl: "Infantry",
+  ahuizotl: "Infantry",
+  chieftain: "Missile",
+  tzitzimitl: "Casters",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

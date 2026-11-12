@@ -96,6 +96,10 @@ export const KINGDOM_POS_EP2 = {
   "mirror-sea": { left: "80%", top: "31%" }, // on the northern sea the map names, under its label
   satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
   tezcal: { left: "93%", top: "27%" }, // the land east of the Mirror Sea's shore, between Satoshi and Tilicia
+  jarnheim: { left: "46%", top: "8%" }, // the northern mountain range, between Hunewold and Rukiev
+  khemret: { left: "92%", top: "92%" }, // the east bank of the great river, in the south-east corner
+  moananui: { left: "37%", top: "70%" }, // the chain of small islands on the west side of Mare Nostra
+  coatlan: { left: "93%", top: "59%" }, // the eastern mountains, south-east of Tilicia
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -204,7 +208,20 @@ export const COLLECTIBLES = [
   { id: "Beasts", icon: "🐾" },
   { id: "Spirit", icon: "✨" },
   { id: "Lore", icon: "📜" },
+  // BONUS (ours; art supplied by the user): one upgrade token per culture, won only in that culture's bonus battles
+  // and spent to make its units. `token` keeps them off the Merchant's counter and out of sight until the bonus
+  // campaigns open.
+  { id: "Bloodstone", icon: "🧊", token: "Glacial Bloodstone", culture: "Jarnheim" },
+  { id: "Scarab", icon: "🪲", token: "Scarab of the Duat", culture: "Khemret" },
+  { id: "Obsidian", icon: "🌋", token: "Smoldering Obsidian", culture: "Tezcal and Coatlan" },
+  { id: "Whalebone", icon: "🦴", token: "Carved Whalebone", culture: "Moananui" },
+  { id: "Anchor", icon: "⚓", token: "Triton's Anchor", culture: "Mare Nostra and the Mirror Sea" },
+  { id: "Tsuba", icon: "🏵", token: "Tsuba of the Shogunate", culture: "Satoshi" },
+  { id: "Jade", icon: "🐆", token: "Sacred Jade Jaguar", culture: "Tezcal" },
+  { id: "Void", icon: "🔮", token: "Void Rift Crystal", culture: "Tilicia and Isoluccia" },
 ];
+// The game's own six (what the Merchant trades in).
+export const TRADE_GOODS = COLLECTIBLES.filter((c) => !c.token);
 // The Merchant (MenuScreen::handlePopUpEvent, popup 61 "Confirm Purchase" — iOS Ep1 @0x3ed2a, Ep2 @0x4ab1c; Android
 // a_m): a collectible costs THREE of one other kind (spendItem ×3; the player picks the kind, a Medal included), a
 // Militiaman one Armor, one Weapons and one Lore (spendItem 1, 2, 5). An upgrade costs one collectible per unit.
@@ -599,13 +616,23 @@ export const ARMY_GROUPS = [
       "naga",
       "skeleton",
       "jaguar",
+      "berserker",
+      "shieldmaiden",
+      "einherjar",
+      "jotunn",
+      "khopesh",
+      "ammit",
+      "toa",
+      "taniwha",
+      "coatecpatl",
+      "ahuizotl",
     ],
   },
   {
     id: "ranged",
     label: "Ranged",
     icon: "skill_ranged",
-    units: ["archers", "crossbowmen", "rangers", "musketeers", "cragsmen", "pavisiers"],
+    units: ["archers", "crossbowmen", "rangers", "musketeers", "cragsmen", "pavisiers", "medjay", "chieftain"],
   },
   {
     id: "cavalry",
@@ -628,6 +655,9 @@ export const ARMY_GROUPS = [
       "beastmaster",
       "alchemist",
       "sunpriest",
+      "anubis",
+      "tohunga",
+      "tzitzimitl",
     ],
   },
   {
@@ -640,7 +670,7 @@ export const ARMY_GROUPS = [
     id: "fly",
     label: "Flyers",
     icon: "class_fly",
-    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet", "serpent"],
+    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet", "serpent", "tahuanui"],
   },
 ];
 export const ORDER = [
@@ -1102,10 +1132,18 @@ export const RES_ICON = {
   Beasts: "beasts",
   Spirit: "spirit",
   Lore: "lore",
+  Bloodstone: "bloodstone", // the four campaign tokens (tools/ros/bonus/import_tokens.py)
+  Scarab: "scarab",
+  Obsidian: "obsidian",
+  Whalebone: "whalebone",
+  Anchor: "anchor",
+  Tsuba: "tsuba",
+  Jade: "jade",
+  Void: "void",
 };
 
 export const GET_OPTIONS = [
-  ...COLLECTIBLES.filter((c) => c.id !== "Medal"),
+  ...TRADE_GOODS.filter((c) => c.id !== "Medal"),
   { id: "militiamen", icon: "🗡️", unit: true, label: "Militiaman" },
 ];
 
@@ -1353,29 +1391,45 @@ export const TREE_COL = {
   ballistae: 3,
   // the bonus units (shown once the bonus campaigns are open): one column past the unit each is upgraded from
   cragsmen: 2,
-  marines: 2,
   spellwardens: 3,
-  pavisiers: 3,
   sentinel: 3,
+  marines: 1,
+  pavisiers: 3,
   battlemage: 3,
-  gladiator: 3,
-  samurai: 3,
+  gladiator: 2,
+  samurai: 2,
   dragonrider: 4,
-  beastmaster: 1,
+  beastmaster: 2,
   sohei: 2,
-  shinobi: 3,
-  oni: 4,
-  tengu: 2,
+  shinobi: 2,
+  oni: 3,
+  tengu: 3,
   alchemist: 3,
   golem: 4,
-  unicorn: 2,
-  efreet: 2,
-  naga: 2,
-  skeleton: 2,
-  jaguar: 4,
+  unicorn: 3,
+  efreet: 3,
+  naga: 3,
+  skeleton: 3,
+  jaguar: 1,
   eagle: 2,
-  sunpriest: 3,
+  sunpriest: 2,
   serpent: 3,
+  berserker: 1,
+  shieldmaiden: 2,
+  einherjar: 3,
+  jotunn: 2,
+  medjay: 2,
+  khopesh: 1,
+  anubis: 3,
+  ammit: 4,
+  toa: 1,
+  tahuanui: 2,
+  tohunga: 2,
+  taniwha: 3,
+  coatecpatl: 2,
+  ahuizotl: 4,
+  chieftain: 3,
+  tzitzimitl: 2,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1406,30 +1460,47 @@ export const TREE_ROW = {
   conjurer: 12,
   bloodgorgers: 6,
   ballistae: 7,
+  // the bonus units: the first free rows of their columns
   cragsmen: 13,
-  marines: 14,
   spellwardens: 8,
-  pavisiers: 9,
-  sentinel: 10,
+  sentinel: 9,
+  marines: 5,
+  pavisiers: 10,
   battlemage: 11,
-  gladiator: 12,
-  samurai: 13,
-  dragonrider: 3,
-  beastmaster: 15,
-  sohei: 15,
-  shinobi: 15,
-  oni: 0,
-  tengu: 16,
-  alchemist: 16,
-  golem: 5,
-  unicorn: 18,
-  efreet: 19,
-  naga: 20,
-  skeleton: 21,
-  jaguar: 7,
-  eagle: 17,
+  gladiator: 14,
+  samurai: 15,
+  dragonrider: 0,
+  beastmaster: 16,
+  sohei: 17,
+  shinobi: 18,
+  oni: 12,
+  tengu: 13,
+  alchemist: 14,
+  golem: 2,
+  unicorn: 15,
+  efreet: 16,
+  naga: 17,
+  skeleton: 18,
+  jaguar: 6,
+  eagle: 19,
   sunpriest: 20,
-  serpent: 21,
+  serpent: 19,
+  berserker: 7,
+  shieldmaiden: 21,
+  einherjar: 20,
+  jotunn: 22,
+  medjay: 23,
+  khopesh: 8,
+  anubis: 21,
+  ammit: 3,
+  toa: 9,
+  tahuanui: 24,
+  tohunga: 25,
+  taniwha: 22,
+  coatecpatl: 26,
+  ahuizotl: 4,
+  chieftain: 23,
+  tzitzimitl: 27,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",
@@ -1438,6 +1509,14 @@ export const NEED_COLOR = {
   Spirit: "#9070b8",
   Lore: "#3a9c9c",
   Medal: "#d2a53a",
+  Bloodstone: "#7fc4e8",
+  Scarab: "#3b5fd0",
+  Obsidian: "#e0622a",
+  Whalebone: "#cfd8c8",
+  Anchor: "#3fb8a8",
+  Tsuba: "#c9a23a",
+  Jade: "#3f9a5a",
+  Void: "#9a5ce0",
 };
 
 // The heraldic tincture ramps, field/symbol/frame art tables, per-faction crests and the HeraldryShield component

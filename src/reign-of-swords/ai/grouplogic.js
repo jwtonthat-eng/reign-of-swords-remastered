@@ -171,6 +171,22 @@ const RANK = {
   eagle: 5,
   sunpriest: 7,
   serpent: 5,
+  berserker: 3,
+  shieldmaiden: 2,
+  einherjar: 2,
+  jotunn: 2,
+  medjay: 5,
+  khopesh: 2,
+  anubis: 7,
+  ammit: 3,
+  toa: 3,
+  tahuanui: 4,
+  tohunga: 7,
+  taniwha: 2,
+  coatecpatl: 3,
+  ahuizotl: 3,
+  chieftain: 5,
+  tzitzimitl: 7,
 };
 const slotRank = (u) => (RANK[u.type] != null ? RANK[u.type] : -1);
 // Row width for one rank category (the C.119 map: ranks 0–6 → category 0, ranks 7–8 → category 1): five exactly →
