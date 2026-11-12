@@ -26,6 +26,14 @@ import {
   BONUS_RANGED,
   BEAM_WEAPONS,
   BEAM_SHARE,
+  CORAL_WEAPON,
+  ARC_WEAPON,
+  CALTROP_WEAPON,
+  STONE_WEAPON,
+  FLOOD,
+  CALTROP_DAMAGE,
+  CARGO,
+  HEAVY_ARMOUR,
 } from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
 
@@ -349,6 +357,11 @@ export class CombatMethods {
       const bare = { 1: 0, 6: 3, 10: 8 }[defender.T.armour];
       if (bare != null && WEAPON_DMG[weapon]) base = WEAPON_DMG[weapon][bare];
     }
+    // BONUS: a blow that reaches the soft underside (_exposed) reads the weapon's No Armour column, and no cover,
+    // formation or hide softens it
+    const exposed = dist === 1 && this._exposed(attacker, defender);
+    if (exposed && WEAPON_DMG[weapon]) base = WEAPON_DMG[weapon][0];
+    if (weapon === STONE_WEAPON && attacker._cargo) base += CARGO.bonus; // BONUS: a Pterosaur's harvested load
     if (isFireWeapon(weapon) && defender.T.flammable) base *= 2;
     if (opts.charge && !defender.T.bulwark) base += 30; // the rider's charging flag (BONUS: none against a Bulwark)
     if (attacker._ambushReady && attacker.T.shadowStep) base += 30; // BONUS: a Shinobi striking from hiding
@@ -372,16 +385,18 @@ export class CombatMethods {
       base += attacker.T.pounce;
     if (weapon === CHAIN_WEAPON) base += CHAIN_BONUS; // BONUS: the Battlemage's bolt, and each of its leaps
     // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
-    base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (defender.T.armourBonus || 0));
+    base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (exposed ? 0 : defender.T.armourBonus || 0));
     // BONUS — Breach (Marines): the cover of a fortification (palisade, rampart, gate, tower, wall — terrain types
     // 6, 8, 10, 12, 14, 16) counts for nothing against them
     const fortified =
       attacker.T.breach && [6, 8, 10, 12, 14, 16].includes(moveType(this.tileAt(defender.tx, defender.ty)));
-    const open = fortified || (attacker.T.eagleEye && dist > 1); // BONUS: Eagle Eye — no cover turns an Eagle Warrior's dart
+    const open = fortified || exposed || (attacker.T.eagleEye && dist > 1); // BONUS: Eagle Eye — no cover turns an Eagle Warrior's dart
     const tileDef = open ? 100 : Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
-    let cover = tileDef - (defender.T.formation && !siegeShot ? 10 * this.formationAllies(defender) : 0);
+    let cover = tileDef - (defender.T.formation && !siegeShot && !exposed ? 10 * this.formationAllies(defender) : 0);
     if (siegeShot && tileDef <= 80) cover += Math.trunc((100 - tileDef) / 2);
+    if (this._floodedFor(defender)) cover += FLOOD.damage; // BONUS: Flooded ground (a Brine Hurler's coral)
     let rating = (attacker.T.rf || 75) + this.ratingAura(attacker);
+    if (attacker._roar) rating += attacker._roar; // BONUS: Apex Roar (the Saurian Exiles)
     if (dist === 1 && !defender.T.bulwark) rating += this._flankBonus(attacker, defender); // calcFlankBonuses: +30 opposite, +15 on a side
     const skill = (Math.trunc((rating * 256) / 100) * toHp256(clamp(attacker.hp, 0, 100))) >> 8;
     let dmg = (Math.trunc((cover * 256) / 100) * Math.trunc((base * 256) / 100)) >> 8;
@@ -405,8 +420,244 @@ export class CombatMethods {
       );
       if (wall) dmg = Math.trunc((dmg * (100 - wall)) / 100);
     }
+    // BONUS: Carapace — the Scuttler's shell turns a share of every blow that does not reach the underside
+    if (defender.T.carapace && !exposed) dmg = Math.trunc((dmg * (100 - defender.T.carapace)) / 100);
+    // BONUS: Shield Lock — a Brass Phalanx beside another is spared a share of every shot
+    if (dist > 1 && defender.T.shieldLock && this._shieldLocked(defender))
+      dmg = Math.trunc((dmg * (100 - defender.T.shieldLock)) / 100);
     if (defender.T.stoneskin) dmg = Math.min(dmg, toHp256(defender.T.stoneskin)); // BONUS: the Golem's Stoneskin
     return Math.max(0, dmg);
+  }
+  // BONUS — the soft underside: a Carapace Scuttler struck hand to hand, or anyone struck by a Raptor's Pack Hunter
+  // blow, while another unit of the attacker's side stands directly opposite (the pincer the flank bonus counts +30
+  // for). Nothing reaches the underside of a Bulwark.
+  _exposed(attacker, defender) {
+    if (!defender.T || defender._phantom || defender.T.bulwark) return false;
+    if (!defender.T.carapace && !attacker.T.flankCrit) return false;
+    const other = this.unitAt(defender.tx * 2 - attacker.tx, defender.ty * 2 - attacker.ty);
+    return !!other && !other.dead && other.id !== attacker.id && other.team === attacker.team;
+  }
+  _shieldLocked(u) {
+    return this.units.some((o) => !o.dead && o !== u && o.team === u.team && o.T.shieldLock && manhattan(o, u) === 1);
+  }
+  // ===== BONUS — THE THREE FACTIONS (the Trench Brood, the Clockwork Syndicate, the Saurian Exiles; designs supplied
+  // by the user, MECHANICS.md §13) ======================================================================================
+  // SNARE (Crush Depth, a Siren's Lure, a Tar Pit): no movement on the unit's next turn. It is the Naga's hold, so
+  // it ends with that turn (grid _endTurnHide) and a Cleansing Touch lifts it. Not a war engine, nor the immovable.
+  _snare(e) {
+    if (!e || e.dead || e._phantom || !e.T || e.T.al === 4 || e.T.anchored) return false;
+    e._held = true;
+    this.floaters.push({
+      x: e.px + this.tile / 2,
+      y: e.py - 8,
+      t: 0,
+      life: 0.9,
+      vy: -14,
+      text: "Snared",
+      crit: true,
+    });
+    return true;
+  }
+  // Damage nothing softens (Overdrive, caltrops, a Spiked Shell, hazard tiles): straight off the shown HP.
+  _rawDamage(u, amount, by) {
+    if (!u || u.dead || !(amount > 0)) return 0;
+    const before = u.hp;
+    if (u._hidden) this._setHidden(u, false);
+    u.hp = clamp(before - amount, 0, 100);
+    u.flash = 0.16;
+    this.floaters.push({
+      x: u.px + this.tile / 2,
+      y: u.py - 2,
+      t: 0,
+      life: 0.9,
+      vy: -22,
+      text: Math.round(before - u.hp),
+    });
+    if (u.hp <= 0) {
+      u.dead = true;
+      u.dieT = 0;
+      if (u.T.conjure) this._killConjuredChildren(u);
+      this._onFall(u, by || null);
+    }
+    return before - u.hp;
+  }
+  // What a unit's fall sets off: its killer's Apex Roar, and a Volatile Automaton's boiler.
+  _onFall(u, killer) {
+    if (killer && !killer.dead && killer.T && killer.T.apexRoar && killer.team !== u.team) this._apexRoar(killer);
+    if (u.T.volatile && !u._burst) this._volatileBurst(u);
+  }
+  // APEX ROAR: every friend within 2 tiles of the killer gains its roar on the attack rating until the end of its
+  // next turn (a friend that has already acted this turn keeps it through the next one).
+  _apexRoar(killer) {
+    this.spawnFx("spirit", killer.px + this.tile / 2, killer.py - this.tile * 0.15, { flip: killer.face < 0 });
+    for (const a of this.units) {
+      if (a.dead || a === killer || a.team !== killer.team || manhattan(a, killer) > 2) continue;
+      a._roar = killer.T.apexRoar;
+      a._roarKeep = this._onOwnTurn(a) && !!a.acted;
+      this.floaters.push({
+        x: a.px + this.tile / 2,
+        y: a.py - 8,
+        t: 0,
+        life: 1,
+        vy: -14,
+        text: "Roar +" + killer.T.apexRoar,
+        crit: true,
+        heal: true,
+      });
+    }
+  }
+  // VOLATILE: the fallen Automaton's boiler bursts on the eight tiles around it — every unit, friend or foe, and
+  // every structure. The blast is priced as its weapon (T.volatile) fired by the Automaton at full health.
+  _volatileBurst(u) {
+    u._burst = true;
+    const tile = this.tile,
+      weapon = u.T.volatile;
+    const blaster = Object.assign(Object.create(Object.getPrototypeOf(u)), u, { hp: 100, dead: false });
+    this.spawnFx("explosion", u.px + tile / 2, u.py + tile * 0.42, {});
+    this._burst(u.px + tile / 2, u.py + tile * 0.42, {
+      big: true,
+      colors: ["#ffb347", "#ff6a1a", "#5f3c14", "#ffe08a"],
+    });
+    this.audio.play("detonate", 0.6);
+    for (let dy = -1; dy <= 1; dy++)
+      for (let dx = -1; dx <= 1; dx++) {
+        if (!dx && !dy) continue;
+        const x = u.tx + dx,
+          y = u.ty + dy;
+        if (!this.inBounds(x, y)) continue;
+        const e = this.unitAt(x, y);
+        if (e && !e.dead) this._applyHit(e, blaster, this.computeDamage(blaster, e, { weapon }), true, false);
+        this._areaStructureHit(blaster, x, y, 1, weapon);
+      }
+  }
+  // FLOODED GROUND (the Brine Hurler's coral): kept per battle, for the rest of it. It does not form on deep water
+  // or cliffs. It troubles every ground unit that is not of the Trench.
+  _flood(tx, ty) {
+    if (!this.inBounds(tx, ty) || [19, 21].includes(moveType(this.tileAt(tx, ty)))) return false;
+    if (!this.flooded) this.flooded = new Set();
+    this.flooded.add(tx + "," + ty);
+    this.spawnFx("sand_puff", tx * this.tile + this.tile / 2, ty * this.tile + this.tile * 0.5, { hue: 150 });
+    return true;
+  }
+  _floodedAt(tx, ty) {
+    return !!this.flooded && this.flooded.has(tx + "," + ty);
+  }
+  _floodedFor(u) {
+    return (
+      !!this.flooded &&
+      !!u.T &&
+      !u._phantom &&
+      this.flooded.has(u.tx + "," + u.ty) &&
+      u.T.culture !== "trench" &&
+      u.T.al !== 0 &&
+      !u.T.fly
+    );
+  }
+  // Water an Arc Bolt leaps through: shallows, deep water, a Flooded tile.
+  _inWater(tx, ty) {
+    return [5, 19].includes(moveType(this.tileAt(tx, ty))) || this._floodedAt(tx, ty);
+  }
+  // CALTROPS (the Gyrocopter's): a tile strewn by one side, for the rest of the battle or until the other side clears
+  // it. An enemy ground unit that steps on them stops there (grid _walkReach) and is hurt (_hazardEnter).
+  _layCaltrops(tx, ty, team) {
+    if (!this.inBounds(tx, ty) || [19, 21].includes(moveType(this.tileAt(tx, ty)))) return false;
+    if (!this.caltrops) this.caltrops = new Map();
+    this.caltrops.set(tx + "," + ty, team);
+    return true;
+  }
+  _caltropsAt(tx, ty) {
+    return this.caltrops ? this.caltrops.get(tx + "," + ty) || null : null;
+  }
+  _caltropsAgainst(u, tx, ty) {
+    const team = this._caltropsAt(tx, ty);
+    return !!team && team !== u.team && u.T.al !== 0 && !u.T.fly;
+  }
+  // The end of a move, for the hazards a unit walks into: enemy caltrops.
+  _hazardEnter(u) {
+    if (!u || u.dead) return;
+    if (this._caltropsAgainst(u, u.tx, u.ty)) {
+      this._commitMove(u); // stepped on caltrops: no undo
+      this.spawnFx("slash", u.px + this.tile / 2, u.py + this.tile * 0.42, {});
+      this._rawDamage(u, CALTROP_DAMAGE, null);
+    }
+  }
+  // What the three factions' blows do besides their damage (resolveDamage, after the main hit).
+  _factionStrike(attacker, defender, wMain, opts) {
+    const tile = this.tile,
+      dist = manhattan(attacker, defender),
+      T = attacker.T;
+    if (T.crush && !defender.dead) this._snare(defender); // CRUSH DEPTH (the Abyssal Pearl)
+    if (wMain === CORAL_WEAPON && T.flood) this._flood(defender.tx, defender.ty);
+    if (wMain === CALTROP_WEAPON && T.caltrops) this._layCaltrops(defender.tx, defender.ty, attacker.team);
+    // SWEEPING BITE: the foes on either side of the target, across the line of the blow
+    if (T.sweep && dist === 1 && opts.weapon == null && !defender._phantom) {
+      const sides =
+        attacker.tx === defender.tx
+          ? [
+              [1, 0],
+              [-1, 0],
+            ]
+          : [
+              [0, 1],
+              [0, -1],
+            ];
+      for (const [dx, dy] of sides) {
+        const e = this.unitAt(defender.tx + dx, defender.ty + dy);
+        if (!e || e.dead || e.team === attacker.team || this._isHidden(e)) continue;
+        this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), T.sweep / 100), false, false, wMain);
+        if (T.crush && !e.dead) this._snare(e);
+      }
+    }
+    // CHAIN ARC: the bolt, then one leap — to any foe beside a target that stands in water, else to a heavily
+    // armoured foe beside it (the heavy first, then the weakest)
+    if (wMain === ARC_WEAPON) {
+      this.spawnFx("bolt", defender.tx * tile + tile / 2, defender.ty * tile - tile * 0.08, {});
+      this.audio.play("thunder", 0.4, 1.2);
+      if (T.arcChain && !defender._phantom) {
+        const wet = this._inWater(defender.tx, defender.ty),
+          heavy = (e) => HEAVY_ARMOUR.includes(e.T.armour);
+        const next = this.units
+          .filter((e) => !e.dead && e !== defender && e.team !== attacker.team && !this._isHidden(e))
+          .filter((e) => manhattan(e, defender) === 1 && (wet || heavy(e)))
+          .sort((a, b) => heavy(b) - heavy(a) || a.hp - b.hp || a.id - b.id)[0];
+        if (next)
+          this._after(0.12, () => {
+            if (next.dead) return;
+            this.spawnFx("bolt", next.tx * tile + tile / 2, next.ty * tile - tile * 0.08, {});
+            const blow = this.computeDamage(attacker, next, { weapon: ARC_WEAPON });
+            this._applyHit(next, attacker, shared(blow, T.arcChain / 100), false);
+          });
+      }
+    }
+    // A PTEROSAUR'S LOAD: the stone it drops bursts on the four tiles around its target, friend or foe, and what
+    // it carried stays where it landed
+    if (wMain === STONE_WEAPON && attacker._cargo) {
+      const cargo = attacker._cargo;
+      const cells = [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ]
+        .map(([dx, dy]) => [defender.tx + dx, defender.ty + dy])
+        .filter(([x, y]) => this.inBounds(x, y));
+      const blows = cells.map(([x, y]) => {
+        const e = this.unitAt(x, y);
+        return e && !e.dead && e !== attacker
+          ? [e, shared(this.computeDamage(attacker, e, { weapon: STONE_WEAPON }), CARGO.share)]
+          : null;
+      });
+      attacker._cargo = null;
+      this.spawnFx("explosion", defender.tx * tile + tile / 2, defender.ty * tile + tile * 0.42, {});
+      cells.forEach(([x, y], i) => {
+        this.spawnFx("dust", x * tile + tile / 2, y * tile + tile * 0.45, { delay: 0.05 });
+        if (blows[i]) this._applyHit(blows[i][0], attacker, blows[i][1], false, true);
+        this._areaStructureHit(attacker, x, y, CARGO.share, STONE_WEAPON);
+      });
+      if (cargo === "caltrops") this._layCaltrops(defender.tx, defender.ty, attacker.team);
+      else if (cargo === "flood") this._flood(defender.tx, defender.ty);
+      else if (cargo === "quicksand") this._layQuicksand(defender.tx, defender.ty);
+    }
   }
   // PRAYER MARKS — the Shield prayer and Unit::retribution push the casting Priest's TILE on a per-group list on the
   // map (Map+0x130 shields, +0x158 retributions); GameScreen::startTurn (iOS Ep2 @0x27a66 / @0x27a7a) empties that
@@ -580,6 +831,7 @@ export class CombatMethods {
     if ((u.type === "trebuchet" || u.type === "cannon") && (target.type === "griffon" || target.type === "greateagle"))
       return true;
     const weapon = weaponAt(u, dist);
+    if (weapon === CALTROP_WEAPON && target.T.al === 0) return true; // BONUS: caltrops cannot touch a flier
     return (weapon === 21 || weapon === 23) && target.T.al === 0;
   }
   // Flank / pincer (Unit::calcFlankBonuses @0x6ac50, called by getSkill for a MELEE blow only): the attack's axis is
@@ -746,6 +998,52 @@ export class CombatMethods {
         icon: "status_bless",
         name: "Retribution",
         desc: "Guarded by a Priest's Retribution: an enemy that strikes it in melee on its own turn is smitten for about 10 HP, armour ignored.",
+      });
+    // BONUS: the three factions
+    if (u._held)
+      out.push({
+        icon: "status_slowed",
+        name: "Snared",
+        desc: "Held fast: it cannot move on its next turn, though it can still fight.",
+      });
+    if (this._floodedFor(u))
+      out.push({
+        icon: "skill_quicksand",
+        name: "On Flooded ground",
+        desc: "A Brine Hurler's coral has flooded this tile: it takes 20% more damage here, and ground units pay double to enter. The Trench Brood and fliers are not troubled.",
+      });
+    if (this._caltropsAt(u.tx, u.ty) && this._caltropsAgainst(u, u.tx, u.ty))
+      out.push({
+        icon: "skill_ambush",
+        name: "On caltrops",
+        desc: "Enemy caltrops lie here. They hurt as it stepped on them; it can walk off, or spend its action to clear them.",
+      });
+    if (u._roar)
+      out.push({
+        icon: "status_rally",
+        name: "Apex Roar +" + u._roar,
+        desc: "A Saurian nearby struck a foe down: +{n} attack until the end of its next turn.",
+        vars: { n: u._roar },
+      });
+    if (u._od && u._od.turn === this.turn && u._od.stage < 2)
+      out.push({
+        icon: "skill_charge",
+        name: "Overdrive",
+        desc: "Wound past its limit: it takes two full actions this turn, and loses 25 HP when the second ends.",
+      });
+    if (u._cargo)
+      out.push({
+        icon: "skill_fly",
+        name:
+          "Carrying " +
+          { caltrops: "caltrops", flood: "brine", quicksand: "quicksand", boulder: "a boulder" }[u._cargo],
+        desc: "Its next Dropped Stone falls 25 stronger, bursts on the four tiles around its target, and leaves what it carries where it lands.",
+      });
+    if (u.T.shieldLock && this._shieldLocked(u))
+      out.push({
+        icon: "skill_formation",
+        name: "Shields locked",
+        desc: "Another Brass Phalanx stands beside it: it takes 30% less from every ranged attack.",
       });
     if (u.walled)
       out.push({
@@ -986,7 +1284,11 @@ export class CombatMethods {
       u &&
       u.T &&
       !u.T.canLightning &&
-      (u.T.abilities || []).some((a) => a === 25 || a === 26 || a === 29 || a === 13)
+      // (BONUS: a Brine Hurler floods, a Gyrocopter strews and a loaded Pterosaur bombs empty ground too)
+      (u.T.flood ||
+        u.T.caltrops ||
+        (u.T.harvest && u._cargo) ||
+        (u.T.abilities || []).some((a) => a === 25 || a === 26 || a === 29 || a === 13))
     );
   }
   _aimShot(u) {
@@ -1354,6 +1656,7 @@ export class CombatMethods {
         crit: true,
       });
     }
+    this._factionStrike(attacker, defender, wMain, opts); // BONUS: the three factions (snare, flood, caltrops, sweep, arc)
     // The struck cell's STRUCTURE takes the blow too (Unit::onTick → Map::applyDamage on the attack location) — a
     // unit sheltering in a house or on a rampart, or a shot aimed at the empty building itself.
     this._structureBlow(attacker, defender.tx, defender.ty, pierceShot ? blastShare(28, 0) : 1, wMain);
@@ -1395,7 +1698,7 @@ export class CombatMethods {
             this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.5), false, false, wMain);
       // BONUS: Gale — the Tengu's foe is thrown one tile straight back (so it is out of reach to strike back), unless
       // it is a war engine or the tile behind is taken or no ground it could stand on
-      if (attacker.T.gale && !defender.dead && defender.T.al !== 4 && !defender.T.bulwark) {
+      if (attacker.T.gale && !defender.dead && defender.T.al !== 4 && !defender.T.bulwark && !defender.T.anchored) {
         const bx = defender.tx * 2 - attacker.tx,
           by = defender.ty * 2 - attacker.ty;
         if (this.inBounds(bx, by) && !this.unitAt(bx, by) && this.moveCost(defender, bx, by) < 99) {
@@ -1886,6 +2189,17 @@ export class CombatMethods {
         });
       }
     }
+    // BONUS: Spiked Shell — whoever strikes an Ankylosaur hand to hand takes back a share of the blow
+    if (
+      defender.T.thorns &&
+      attacker &&
+      !attacker.dead &&
+      attacker !== defender &&
+      weapon != null &&
+      !RANGED_WEAPONS.has(weapon) &&
+      manhattan(attacker, defender) === 1
+    )
+      this._rawDamage(attacker, Math.round((Math.min(damage, hpBefore) * defender.T.thorns) / 100), defender);
     // BONUS: Devourer — a foe an Ammit's bite leaves nearly dead is swallowed whole (not a war engine)
     if (
       attacker &&
@@ -1948,6 +2262,7 @@ export class CombatMethods {
       defender.dead = true;
       defender.dieT = 0; // no death sound / fall animation — the unit just leaves the field
       if (defender.T.conjure) this._killConjuredChildren(defender); // Ep2 Leashing: a slain Conjurer's summons wink out
+      this._onFall(defender, attacker); // BONUS: Apex Roar, a Volatile Automaton's boiler
     }
   }
   // EPISODE II — Leashing (iOS killConjurerChild @0x7fdcc): when a Conjurer falls, every unit it conjured
@@ -2101,13 +2416,16 @@ export class CombatMethods {
     if (nextTile == null) return false;
     const centerX = tx * this.tile + this.tile / 2,
       centerY = ty * this.tile + this.tile * 0.45;
-    if (!((old === 256 && damage > 0) || hp < 0)) {
+    const raze = !!(u.T && u.T.raze) && damage > 0; // BONUS: a Theropod Tyrant's Devastation brings it straight down
+    if (!((old === 256 && damage > 0) || hp < 0 || raze)) {
       // chipped, no stage change
       if (damage > 0) this.spawnFx("dust", centerX, centerY, {});
       return false;
     }
-    this.tiles[ty * this.cols + tx] = nextTile; // the cell's tile becomes its next damage stage (Map::tag redraws it)
-    const destroyed = structTrans(nextTile) == null;
+    let stage = nextTile;
+    if (raze) while (structTrans(stage) != null) stage = structTrans(stage);
+    this.tiles[ty * this.cols + tx] = stage; // the cell's tile becomes its next damage stage (Map::tag redraws it)
+    const destroyed = structTrans(stage) == null;
     if (destroyed) this.razed.add(k);
     const stone = armor === 14;
     const colors = stone ? ["#8a8278", "#6b655c", "#4a453e", "#b9b0a2"] : ["#7a5a36", "#5b3f22", "#a07a4a", "#3e2a16"];

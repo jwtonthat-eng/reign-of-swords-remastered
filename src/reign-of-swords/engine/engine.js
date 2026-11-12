@@ -422,6 +422,8 @@ class Game {
     // the Craftsmen's villages.
     this.quicksand = new Map();
     this.builtVillages = new Map();
+    this.flooded = new Set(); // BONUS: tiles a Brine Hurler's coral has flooded (rules/combat _flood)
+    this.caltrops = new Map(); // BONUS: key -> the team whose Gyrocopter strewed them (rules/combat _layCaltrops)
     const objs = new Set((this.mission.objectives || []).map(([x, y]) => key(x, y)));
     const areaOf = new Map();
     (this.mission.objectiveAreas || []).forEach((tiles, i) => tiles.forEach(([x, y]) => areaOf.set(key(x, y), i)));

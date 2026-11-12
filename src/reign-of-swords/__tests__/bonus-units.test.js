@@ -58,7 +58,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("thirty-seven units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("forty-nine units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -97,6 +97,19 @@ describe("bonus units: the data", () => {
       "chieftain",
       "tzitzimitl",
       "warden",
+      // the three factions (their own tests: faction-units.test.js)
+      "scuttler",
+      "siren",
+      "brinehurler",
+      "behemoth",
+      "phalanx",
+      "arccaster",
+      "gyrocopter",
+      "automaton",
+      "raptor",
+      "ankylosaur",
+      "pterosaur",
+      "tyrant",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -168,6 +181,18 @@ describe("bonus units: upgrade paths", () => {
       ["bloodgorgers", "ahuizotl", "Obsidian"],
       ["eagle", "chieftain", "Obsidian"],
       ["shamans", "tzitzimitl", "Obsidian"],
+      ["militiamen", "scuttler", "Pearl"],
+      ["dunesirens", "siren", "Pearl"],
+      ["crossbowmen", "brinehurler", "Pearl"],
+      ["scuttler", "behemoth", "Pearl"],
+      ["militiamen", "automaton", "Mainspring"],
+      ["footmen", "phalanx", "Mainspring"],
+      ["crossbowmen", "arccaster", "Mainspring"],
+      ["horsebowmen", "gyrocopter", "Mainspring"],
+      ["militiamen", "raptor", "Amber"],
+      ["pikemen", "ankylosaur", "Amber"],
+      ["raiders", "pterosaur", "Amber"],
+      ["ankylosaur", "tyrant", "Amber"],
     ]);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
       const branches = UNIT_META[from].upgrades;
@@ -1334,10 +1359,22 @@ describe("Moananui and Coatlan: the Polynesian and serpent-order units", () => {
   });
 });
 
-describe("the eight culture tokens", () => {
+describe("the culture tokens", () => {
   it("are collectibles of their own: kept off the Merchant's counter, and the price of their culture's units", () => {
     const tokens = COLLECTIBLES.filter((c) => c.token).map((c) => c.id);
-    expect(tokens).toEqual(["Bloodstone", "Scarab", "Obsidian", "Whalebone", "Anchor", "Tsuba", "Jade", "Void"]);
+    expect(tokens).toEqual([
+      "Bloodstone",
+      "Scarab",
+      "Obsidian",
+      "Whalebone",
+      "Anchor",
+      "Tsuba",
+      "Jade",
+      "Void",
+      "Pearl", // the three factions' (faction-units.test.js)
+      "Mainspring",
+      "Amber",
+    ]);
     expect(TRADE_GOODS.map((c) => c.id)).toEqual(["Medal", "Armor", "Weapons", "Beasts", "Spirit", "Lore"]);
     for (const id of tokens) {
       expect(RES_ICON[id]).toBeTruthy();

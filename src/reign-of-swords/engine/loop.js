@@ -280,6 +280,7 @@ export class LoopMethods {
       };
       this.anim = null;
       this._quicksandEnter(mover); // stepped into quicksand: stopped there, 5 damage
+      this._hazardEnter(mover); // BONUS: stepped on enemy caltrops: stopped there, 10 damage
       if (this._bumpAmbush(mover, finish)) return;
       // EPISODE II warp portals: a move that ENDS on a usable portal pad warps the unit out beside the exit pad
       // (engine/grid _portalWarp, per Unit::onTick / getPortalOutput); the after-move step runs once it has landed.

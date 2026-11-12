@@ -19,6 +19,11 @@
 import { manhattan } from "../util/util.js";
 import { moveType } from "./terrain.js";
 import { UNIT_TYPES } from "../data/game-data.js";
+import { OVERDRIVE_COST } from "../data/bonus-units.js";
+
+// the tiles a Pterosaur can lift as loose boulders, and the open sand they leave
+const BOULDER_TILES = [136, 137],
+  BOULDER_LEFT = 133;
 
 export const AbilityMethods = {
   // Skill-row entries for the selected player unit's Ep2 abilities (null if none apply right now).
@@ -161,6 +166,65 @@ export const AbilityMethods = {
           desc: "Sacrifice the Bodyguard: its Conjurer ignores 100% of the damage from the next attack (one hit, then the buff is spent).",
         });
     }
+    // BONUS — the three factions. Lure (Siren Channeler): her "attack"
+    if (unit.T.lure)
+      out.push({
+        id: "lure",
+        name: "Lure",
+        icon: "skill_shroud",
+        min: 2,
+        max: unit.T.lure,
+        desc: "Sing a foe 2 to 4 tiles away towards her: it is dragged up to 2 tiles and Snared (no movement on its next turn). No damage.",
+      });
+    // Overdrive (every Clockwork unit): armed before it acts, it buys a second full action for 25 HP
+    if (unit.T.overdrive) {
+      const od = unit._od && unit._od.turn === this.turn ? unit._od : null;
+      out.push({
+        id: "overdrive",
+        name: "Overdrive",
+        icon: "skill_charge",
+        min: 0,
+        max: 0,
+        count: od ? (od.stage ? "2nd" : "ON") : undefined,
+        countTitle: "wound up this turn",
+        disabled: !!od && od.stage > 0,
+        desc:
+          od && od.stage
+            ? "Its second action. When it ends, the mechanism fails for 25 HP."
+            : od
+              ? "Wound up: after this action it acts again, then loses 25 HP. Tap again to let the spring down."
+              : "Wind it past its limit: this turn it takes a second full action — move and attack again — and loses 25 HP when the second ends.",
+      });
+    }
+    // Harvest (Pterosaur Bombardier): lift what lies under or beside it
+    if (unit.T.harvest) {
+      const any = this._abilityCells(unit, "harvest").length > 0;
+      out.push({
+        id: "harvest",
+        name: "Harvest",
+        icon: "skill_fly",
+        min: 0,
+        max: 1,
+        count: unit._cargo ? "1/1" : "0/1",
+        countTitle: "loads carried",
+        disabled: !!unit._cargo || !any,
+        desc: unit._cargo
+          ? "It is carrying a load already: drop it with its next stone."
+          : any
+            ? "Lift caltrops, quicksand, a Flooded tile or loose boulders from under or beside it. Its next Dropped Stone carries them."
+            : "Nothing to lift here: it needs caltrops, quicksand, a Flooded tile or loose boulders under or beside it.",
+      });
+    }
+    // Clear Caltrops: any ground unit standing on or beside the enemy's
+    if (this._caltropsNear(unit).length)
+      out.push({
+        id: "sweep_caltrops",
+        name: "Clear Caltrops",
+        icon: "skill_repair",
+        min: 0,
+        max: 1,
+        desc: "Spend its action to clear the enemy caltrops under and beside it.",
+      });
     if (unit.T.detonate)
       out.push({
         id: "detonate",
@@ -188,6 +252,14 @@ export const AbilityMethods = {
     }
     if (id === "absorb") {
       this._castAbsorb(sel);
+      return true;
+    }
+    if (id === "overdrive") {
+      this._overdriveToggle(sel);
+      return true;
+    }
+    if (id === "sweep_caltrops") {
+      this._castAnim(sel, null, () => this._clearCaltrops(sel), "build");
       return true;
     }
     if (this.aimMode && this._abilityAim === id) {
@@ -246,6 +318,22 @@ export const AbilityMethods = {
         this._castEclipse(sel, foe);
         return true;
       }
+    }
+    if (id === "lure") {
+      const foe = this.unitAt(tx, ty);
+      if (this._lureTarget(sel, foe)) {
+        this._castAnim(sel, foe, () => this._lure(sel, foe), "shroud");
+        return true;
+      }
+    }
+    if (id === "harvest" && this._harvestable(sel, tx, ty)) {
+      this._castAnim(
+        sel,
+        { tx, ty, px: tx * this.tile, py: ty * this.tile },
+        () => this._harvest(sel, tx, ty),
+        "build",
+      );
+      return true;
     }
     if (id === "grapple" && this._grappleTile(sel, tx, ty)) {
       this._castGrapple(sel, tx, ty);
@@ -547,6 +635,11 @@ export const AbilityMethods = {
           Math.abs(e.tx - unit.tx) + Math.abs(e.ty - unit.ty) <= 5
         )
           push(e.tx, e.ty);
+    } else if (id === "lure") {
+      for (const e of this.units) if (this._lureTarget(unit, e)) push(e.tx, e.ty);
+    } else if (id === "harvest") {
+      for (const [dx, dy] of [[0, 0], ...ORTHO])
+        if (this._harvestable(unit, unit.tx + dx, unit.ty + dy)) push(unit.tx + dx, unit.ty + dy);
     } else if (id === "grapple") {
       for (let dy = -unit.T.grapple; dy <= unit.T.grapple; dy++)
         for (let dx = -unit.T.grapple; dx <= unit.T.grapple; dx++)
@@ -568,6 +661,165 @@ export const AbilityMethods = {
       for (const [x, y] of line) if (this._canLayQuicksand(x, y)) push(x, y);
     }
     return out;
+  },
+  // ===== BONUS — THE THREE FACTIONS (rules/combat has their blows) =====================================================
+  // LURE (Siren Channeler): a visible foe 2 to `lure` tiles away, not a war engine and not immovable. It is dragged up
+  // to 2 tiles towards her, a step at a time along the longer side of the gap first, onto ground it could stand on,
+  // and stops at anything in the way; then it is Snared. No damage. What it is dragged onto does its work
+  // (quicksand, caltrops).
+  _lureTarget(u, foe) {
+    if (!u.T.lure || !foe || foe.dead || foe.team === u.team || this._isHidden(foe)) return false;
+    if (foe.T.al === 4 || foe.T.anchored) return false;
+    const dist = Math.abs(foe.tx - u.tx) + Math.abs(foe.ty - u.ty);
+    return dist >= 2 && dist <= u.T.lure;
+  },
+  _lurePath(u, foe) {
+    const path = [];
+    let x = foe.tx,
+      y = foe.ty;
+    for (let i = 0; i < 2; i++) {
+      const dx = u.tx - x,
+        dy = u.ty - y;
+      if (Math.abs(dx) + Math.abs(dy) <= 1) break; // beside her: no farther
+      const along = [Math.sign(dx), 0],
+        across = [0, Math.sign(dy)];
+      const steps = Math.abs(dx) >= Math.abs(dy) ? [along, across] : [across, along];
+      const step = steps.find(
+        ([sx, sy]) =>
+          (sx || sy) &&
+          this.inBounds(x + sx, y + sy) &&
+          !this.unitAt(x + sx, y + sy) &&
+          this.moveCost(foe, x + sx, y + sy) < 99,
+      );
+      if (!step) break;
+      x += step[0];
+      y += step[1];
+      path.push({ tx: x, ty: y });
+    }
+    return path;
+  },
+  _lure(u, foe) {
+    if (foe.dead) return;
+    const path = this._lurePath(u, foe),
+      end = path[path.length - 1];
+    if (end) {
+      this.spawnFx("sand_puff", foe.px + this.tile / 2, foe.py + this.tile * 0.5, {});
+      Object.assign(foe, { tx: end.tx, ty: end.ty, px: end.tx * this.tile, py: end.ty * this.tile });
+      if (foe.T.pavise) foe.planted = false; // a dragged pavise is not planted
+      foe.walled = false;
+      this._quicksandEnter(foe);
+      this._hazardEnter(foe);
+    }
+    this._snare(foe);
+  },
+  // OVERDRIVE (every Clockwork unit). Armed before the unit acts (u._od = { turn, stage: 0 }); when its action ends,
+  // finishUnit hands it a second full one (stage 1); when that ends it pays (stage 2). A second action that is never
+  // finished is paid for as the side's turn ends (grid _endTurnHide).
+  _overdriveToggle(u) {
+    if (!u.T.overdrive) return;
+    const od = u._od && u._od.turn === this.turn ? u._od : null;
+    if (od && od.stage > 0) return;
+    u._od = od ? null : { turn: this.turn, stage: 0 };
+    this.audio.play("click", 0.4);
+    if (u._od)
+      this.floaters.push({
+        x: u.px + this.tile / 2,
+        y: u.py - 8,
+        t: 0,
+        life: 0.9,
+        vy: -14,
+        text: "Overdrive!",
+        crit: true,
+        heal: true,
+      });
+    this._emit();
+  },
+  // The unit as it was before it acted this turn.
+  _overdriveRewind(u) {
+    u._od.stage = 1;
+    u.acted = false;
+    u.attackedTurn = false;
+    u._movedTurn = null;
+    u.chargeDir = null;
+    u._rodeOn = null;
+    if (this._undoFrom && this._undoFrom.u === u) this._undoFrom = null;
+  },
+  // Called by finishUnit: true when the unit goes on to its second action instead of ending its turn.
+  _overdriveStep(u) {
+    const od = u._od;
+    if (!od || od.turn !== this.turn || u.dead) return false;
+    if (od.stage === 0) {
+      this._overdriveRewind(u);
+      if (u.team === "blue" && !u.ally && this.phase === "player") {
+        this.select(u);
+        return true;
+      }
+      return false;
+    }
+    if (od.stage === 1) this._overdrivePay(u);
+    return false;
+  },
+  _overdrivePay(u) {
+    u._od.stage = 2;
+    this.spawnFx("dust", u.px + this.tile / 2, u.py + this.tile * 0.3, {});
+    this._rawDamage(u, OVERDRIVE_COST, null);
+  },
+  _overdriveSettle(u) {
+    if (u._od && u._od.turn === this.turn && u._od.stage === 1 && !u.dead) this._overdrivePay(u);
+  },
+  // CALTROPS a unit could clear: the enemy's, under it or on the four tiles beside it (a ground unit only).
+  _caltropsNear(u) {
+    if (!this.caltrops || !this.caltrops.size || u.T.al === 0 || u.T.fly) return [];
+    return [
+      [0, 0],
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]
+      .map(([dx, dy]) => [u.tx + dx, u.ty + dy])
+      .filter(([x, y]) => {
+        const team = this._caltropsAt(x, y);
+        return !!team && team !== u.team;
+      });
+  },
+  _clearCaltrops(u) {
+    for (const [x, y] of this._caltropsNear(u)) {
+      this.caltrops.delete(x + "," + y);
+      this.spawnFx("dust", x * this.tile + this.tile / 2, y * this.tile + this.tile * 0.45, {});
+    }
+  },
+  // HARVEST (Pterosaur Bombardier): what it can lift from its own tile or one beside it — caltrops (either side's),
+  // quicksand, a Flooded tile, loose boulders. Null when there is nothing, or it is loaded already.
+  _harvestable(u, tx, ty) {
+    if (!u.T.harvest || u._cargo || !this.inBounds(tx, ty)) return null;
+    if (Math.abs(tx - u.tx) + Math.abs(ty - u.ty) > 1) return null;
+    if (this._caltropsAt(tx, ty)) return "caltrops";
+    if (this._quicksandAt(tx, ty) > 0) return "quicksand";
+    if (this._floodedAt(tx, ty)) return "flood";
+    if (BOULDER_TILES.includes(this.tileAt(tx, ty)) && !this.unitAt(tx, ty)) return "boulder";
+    return null;
+  },
+  _harvest(u, tx, ty) {
+    const kind = this._harvestable(u, tx, ty);
+    if (!kind) return;
+    const k = tx + "," + ty;
+    if (kind === "caltrops") this.caltrops.delete(k);
+    else if (kind === "quicksand") this.quicksand.delete(k);
+    else if (kind === "flood") this.flooded.delete(k);
+    else this.tiles[ty * this.cols + tx] = BOULDER_LEFT;
+    u._cargo = kind;
+    this.spawnFx("dust", tx * this.tile + this.tile / 2, ty * this.tile + this.tile * 0.45, {});
+    this.floaters.push({
+      x: u.px + this.tile / 2,
+      y: u.py - 8,
+      t: 0,
+      life: 1,
+      vy: -14,
+      text: "Harvested",
+      crit: true,
+      heal: true,
+    });
   },
   // Leashing (help 592): conjured units left farther than 8 from their living Conjurer die as their side's turn ends.
   _leashCheck(team) {

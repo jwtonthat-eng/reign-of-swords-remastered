@@ -1458,6 +1458,9 @@ export default {
   Tsuba: "Цуба",
   Jade: "Нефрит",
   Void: "Кристал Безодні",
+  Pearl: "Перлина Безодні",
+  Mainspring: "Заводна пружина",
+  Amber: "Бурштин",
   Slowed: "Сповільнений",
   "An Ice Field cuts its movement to three quarters until the end of its next turn.":
     "Крижане поле скорочує його рух до трьох чвертей до кінця його наступного ходу.",

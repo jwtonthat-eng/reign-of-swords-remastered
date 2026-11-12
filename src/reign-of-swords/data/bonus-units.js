@@ -54,6 +54,18 @@ export const BONUS_ALL = [
   "chieftain",
   "tzitzimitl",
   "warden", // the Primal Warden (a hero unit: Druids + a Void Rift Crystal)
+  "scuttler", // Thalassar (the Trench Brood)
+  "siren",
+  "brinehurler",
+  "behemoth",
+  "phalanx", // Brasshaven (the Clockwork Syndicate)
+  "arccaster",
+  "gyrocopter",
+  "automaton",
+  "raptor", // the Amber Reach (the Saurian Exiles)
+  "ankylosaur",
+  "pterosaur",
+  "tyrant",
 ];
 // The bonus units the game offers, in Field Manual order.
 export const BONUS_ORDER = BONUS_ALL.filter((unit) => !BONUS_HIDDEN.includes(unit));
@@ -447,11 +459,118 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "A Void Beam is a lance of starlight that goes on through three tiles beyond its target at full strength, friend or foe.",
   },
+  // THE TRENCH BROOD, THE CLOCKWORK SYNDICATE, THE SAURIAN EXILES (designs supplied by the user)
+  89: {
+    name: "Crusher Claw",
+    row: 3, // Spear
+    range: [1, 1],
+    tags: [],
+    desc: "A Crusher Claw delivers decent damage against all but the heaviest armor, and does not let go.",
+  },
+  91: {
+    name: "Toxic Coral",
+    row: 20, // Rock
+    range: [3, 7],
+    tags: [7], // Move or Shoot
+    desc: "Toxic Coral is lobbed at 3 to 7 tiles. Where it lands the ground stays Flooded for the rest of the battle.",
+  },
+  92: {
+    name: "Sweeping Bite",
+    row: 10, // Halberd
+    range: [1, 1],
+    tags: [],
+    desc: "A Sweeping Bite tears at its target and at the foes on either side of it.",
+  },
+  93: {
+    name: "Piston Mace",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Piston Mace delivers good damage against all armor types, but is less effective against the heaviest armors.",
+  },
+  94: {
+    name: "Arc Bolt",
+    row: 26, // Lightning Storm
+    range: [2, 4],
+    tags: [8], // Shoot and Move
+    desc: "An Arc Bolt is a lightning discharge at 2 to 4 tiles: steady damage against every armor. It leaps on from a target standing in water, or to a heavily armoured foe beside it.",
+  },
+  95: {
+    name: "Caltrops",
+    row: 8, // Short Sword
+    range: [1, 2],
+    tags: [8], // Shoot and Move
+    desc: "Caltrops are scattered at 1 to 2 tiles. They do little harm as they fall, and stay where they land until an enemy clears them.",
+  },
+  96: {
+    name: "Ram",
+    row: 3, // Spear
+    range: [1, 1],
+    tags: [],
+    desc: "A Ram delivers decent damage against all but the heaviest armor.",
+  },
+  97: {
+    name: "Boiler Blast",
+    row: 25, // Fireball
+    range: [1, 1],
+    tags: [13], // a fire weapon
+    desc: "A Boiler Blast is what is left when a Volatile Automaton fails: fire on every tile around it, friend or foe.",
+  },
+  98: {
+    name: "Sickle Claws",
+    row: 7, // Wizard Blade
+    range: [1, 1],
+    tags: [],
+    desc: "Sickle Claws do modest damage, unless the prey is caught between the Raptor and a friend.",
+  },
+  99: {
+    name: "Tail Club",
+    row: 5, // Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Tail Club delivers good damage against all armor types, but is less effective against the heaviest armors.",
+  },
+  100: {
+    name: "Dropped Stone",
+    row: 20, // Rock
+    range: [2, 3],
+    tags: [8], // Shoot and Move
+    desc: "A Dropped Stone falls on a foe 2 to 3 tiles away. Whatever else the Pterosaur is carrying falls with it.",
+  },
+  101: {
+    name: "Tyrant Jaws",
+    row: 13, // Greatsword
+    patch: { 13: 120, 14: 90 }, // …and they go through timber and masonry
+    range: [1, 1],
+    tags: [],
+    desc: "Tyrant Jaws deliver crushing melee damage, and bring down whatever the prey was hiding in.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
 export const MAGIC_WEAPONS = [25, 26, 27, 36, 61, 70, 75, 80, 82, 84, 88];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
-export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63, 68, 70, 75, 79, 80, 82, 84, 86, 88];
+export const BONUS_RANGED = [
+  35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63, 68, 70, 75, 79, 80, 82, 84, 86, 88, 91, 94, 95, 97, 100,
+];
+// THE THREE FACTIONS. The Brine Hurler's coral (it floods the tile it lands on), the Arc Caster's bolt (it chains),
+// the Gyrocopter's caltrops (they stay) and the Pterosaur's stone (it carries what was harvested).
+export const CORAL_WEAPON = 91;
+export const ARC_WEAPON = 94;
+export const CALTROP_WEAPON = 95;
+export const STONE_WEAPON = 100;
+// A Flooded tile: every ground unit not of the Trench pays this many times the tile's move cost and takes this much
+// more damage there (%).
+export const FLOOD = { cost: 2, damage: 20 };
+// Caltrops: HP they cost an enemy ground unit that steps on them (it also stops there).
+export const CALTROP_DAMAGE = 10;
+// Overdrive: HP a Clockwork unit loses after its second action (a quarter of full health, nothing softens it).
+export const OVERDRIVE_COST = 25;
+// What a Pterosaur's harvested load adds when it is dropped: to the cell of the stone, and the share of the blow
+// the four tiles around the target take.
+export const CARGO = { bonus: 25, share: 0.6 };
+// The armours that count as heavy (an Arc Bolt leaps to them; Obsidian Spikes shatter them): Heavy Armour, Heavy
+// Armour & Shield, War Engine, Relic Armour.
+export const HEAVY_ARMOUR = [8, 10, 12, 15];
 // the Alchemist's flask, and the acid it leaves: HP a turn, for how many of the victim's turns
 export const FLASK_WEAPON = 50;
 export const ACID = { damage: 5, turns: 3 };
@@ -516,6 +635,18 @@ export const BONUS_AL = {
   panther: 3,
   tortoise: 2,
   manta: 0,
+  scuttler: 1,
+  siren: 1,
+  brinehurler: 2,
+  behemoth: 2,
+  phalanx: 2,
+  arccaster: 1,
+  gyrocopter: 0,
+  automaton: 2,
+  raptor: 1,
+  ankylosaur: 2,
+  pterosaur: 0,
+  tyrant: 2,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -880,10 +1011,44 @@ export const BONUS_COMBAT = {
   // skyHunter: +N on the cell against archers, casters and war engines. karakia: HP the most wounded friend within
   // 3 tiles mends at the start of its turn. aquatic: deep water and shallows cost 1 and it fights from them;
   // lurker: +N on the cell when it strikes from water.
-  toa: { move: 5, weapon: 73, weapon2: 0, armour: 6, rating: 3, rf: 90, abilities: [], opening: 20, shoreStride: true },
-  tahuanui: { move: 8, weapon: 74, weapon2: 0, armour: 7, rating: 4, rf: 100, abilities: [], fly: true, skyHunter: 25 },
-  tohunga: { move: 4, weapon: 75, weapon2: 76, armour: 9, rating: 3, rf: 90, abilities: [], karakia: 15 },
+  // (culture: Razor Coral does not cut the people of the reef)
+  toa: {
+    move: 5,
+    weapon: 73,
+    weapon2: 0,
+    armour: 6,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    opening: 20,
+    shoreStride: true,
+    culture: "moananui",
+  },
+  tahuanui: {
+    move: 8,
+    weapon: 74,
+    weapon2: 0,
+    armour: 7,
+    rating: 4,
+    rf: 100,
+    abilities: [],
+    fly: true,
+    skyHunter: 25,
+    culture: "moananui",
+  },
+  tohunga: {
+    move: 4,
+    weapon: 75,
+    weapon2: 76,
+    armour: 9,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    karakia: 15,
+    culture: "moananui",
+  },
   taniwha: {
+    culture: "moananui",
     move: 5,
     weapon: 77,
     weapon2: 0,
@@ -955,6 +1120,181 @@ export const BONUS_COMBAT = {
   tortoise: { move: 2, weapon: 86, weapon2: 87, armour: 10, rating: 5, rf: 115, abilities: [7], physicalHalf: true },
   // the Astral Manta: a flier whose beam pierces a line
   manta: { move: 7, weapon: 88, weapon2: 0, armour: 7, rating: 5, rf: 115, abilities: [], fly: true },
+  // THE TRENCH BROOD (designs supplied by the user). culture: whose ground it is at home on (Flooded tiles, Razor
+  // Coral, Abyssal Muck). crush — CRUSH DEPTH, the Abyssal Pearl's gift to every unit of the Brood: the foe it strikes
+  // is Snared (no movement on its next turn). carapace: the share (%) of every blow its shell turns, unless the
+  // attacker has a friend directly opposite — then the blow ignores armour and cover. lure: the reach of the Siren's
+  // pull (it drags a foe 2 tiles towards her). flood: its coral floods the tile it lands on. anchored: nothing moves
+  // it. sweep: the share (%) of its bite the foes on either side of its target take.
+  scuttler: {
+    move: 3,
+    weapon: 89,
+    weapon2: 0,
+    armour: 10,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    culture: "trench",
+    crush: true,
+    carapace: 40,
+    amphibious: true,
+    armourName: "Carapace",
+  },
+  siren: {
+    move: 5,
+    weapon: 1,
+    weapon2: 0,
+    armour: 9,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    culture: "trench",
+    crush: true,
+    lure: 4,
+    shoreStride: true,
+  },
+  brinehurler: {
+    move: 4,
+    weapon: 91,
+    weapon2: 8,
+    armour: 5,
+    rating: 3,
+    rf: 90,
+    abilities: [7],
+    culture: "trench",
+    crush: true,
+    flood: true,
+  },
+  behemoth: {
+    move: 4,
+    weapon: 92,
+    weapon2: 0,
+    armour: 8,
+    rating: 5,
+    rf: 115,
+    abilities: [14],
+    culture: "trench",
+    crush: true,
+    anchored: true,
+    sweep: 75,
+    aquatic: true,
+    armourName: "Shark Hide",
+    armourBonus: 10,
+  },
+  // THE CLOCKWORK SYNDICATE. overdrive — OVERDRIVE, the Overclocked Mainspring's gift to every Clockwork unit: a
+  // second full action in the turn, then that many HP of damage nothing softens. shieldLock: the share (%) of every
+  // shot it is spared while another Brass Phalanx stands beside it. arcChain: the share (%) of its bolt that leaps
+  // on. caltrops: what it shoots stays on the ground. volatile: the weapon it bursts with when it falls, on all eight
+  // tiles around it, friend or foe.
+  phalanx: {
+    move: 3,
+    weapon: 93,
+    weapon2: 0,
+    armour: 10,
+    rating: 4,
+    rf: 100,
+    abilities: [5],
+    formation: true,
+    culture: "clockwork",
+    overdrive: true,
+    shieldLock: 30,
+  },
+  arccaster: {
+    move: 5,
+    weapon: 94,
+    weapon2: 8,
+    armour: 5,
+    rating: 3,
+    rf: 90,
+    abilities: [8],
+    culture: "clockwork",
+    overdrive: true,
+    arcChain: 50,
+  },
+  gyrocopter: {
+    move: 8,
+    weapon: 95,
+    weapon2: 0,
+    armour: 3,
+    rating: 2,
+    rf: 75,
+    abilities: [8],
+    fly: true,
+    culture: "clockwork",
+    overdrive: true,
+    caltrops: true,
+  },
+  automaton: {
+    move: 5,
+    weapon: 96,
+    weapon2: 0,
+    armour: 3,
+    rating: 2,
+    rf: 75,
+    abilities: [4],
+    culture: "clockwork",
+    overdrive: true,
+    unyielding: true,
+    volatile: 97,
+  },
+  // THE SAURIAN EXILES. apexRoar — APEX ROAR, the Amber Catalyst's gift to every Saurian: when it strikes a foe down,
+  // friends within 2 tiles gain that much on their attack rating until their next turn ends. flankCrit: a blow at a foe
+  // caught between it and a friend ignores armour and cover. thorns: the share (%) of a blow hand to hand that the
+  // striker takes back. harvest: it lifts caltrops, quicksand, a Flooded tile or boulders off the map and drops them
+  // with its next stone. raze: its blows bring any structure straight down.
+  raptor: {
+    move: 7,
+    weapon: 98,
+    weapon2: 0,
+    armour: 3,
+    rating: 4,
+    rf: 100,
+    abilities: [],
+    culture: "saurian",
+    apexRoar: 15,
+    flankCrit: true,
+  },
+  ankylosaur: {
+    move: 3,
+    weapon: 99,
+    weapon2: 0,
+    armour: 10,
+    rating: 3,
+    rf: 90,
+    abilities: [],
+    culture: "saurian",
+    apexRoar: 15,
+    thorns: 30,
+    armourName: "Spiked Shell",
+    armourBonus: 10,
+  },
+  pterosaur: {
+    move: 7,
+    weapon: 100,
+    weapon2: 2,
+    armour: 7,
+    rating: 3,
+    rf: 90,
+    abilities: [8],
+    fly: true,
+    culture: "saurian",
+    apexRoar: 15,
+    harvest: true,
+  },
+  tyrant: {
+    move: 4,
+    weapon: 101,
+    weapon2: 0,
+    armour: 8,
+    rating: 5,
+    rf: 115,
+    abilities: [14, 4],
+    culture: "saurian",
+    apexRoar: 15,
+    raze: true,
+    armourName: "Tyrant Hide",
+    armourBonus: 15,
+  },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -1003,6 +1343,18 @@ export const BONUS_COURAGE = {
   panther: 4,
   tortoise: 5,
   manta: 4,
+  scuttler: 4,
+  siren: 3,
+  brinehurler: 3,
+  behemoth: 5,
+  phalanx: 4,
+  arccaster: 3,
+  gyrocopter: 3,
+  automaton: 5,
+  raptor: 4,
+  ankylosaur: 5,
+  pterosaur: 4,
+  tyrant: 5,
 };
 export const BONUS_COST = {
   cragsmen: 175,
@@ -1051,14 +1403,43 @@ export const BONUS_COST = {
   panther: 0, // the Warden's shapes are never deployed
   tortoise: 0,
   manta: 0,
+  scuttler: 250,
+  siren: 225,
+  brinehurler: 275,
+  behemoth: 500,
+  phalanx: 225,
+  arccaster: 225,
+  gyrocopter: 200,
+  automaton: 100,
+  raptor: 200,
+  ankylosaur: 325,
+  pterosaur: 300,
+  tyrant: 700,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
-export const BONUS_ELITE = { battlemage: true, dragonrider: true, sunpriest: true, warden: true };
+export const BONUS_ELITE = {
+  battlemage: true,
+  dragonrider: true,
+  sunpriest: true,
+  warden: true,
+  behemoth: true, // the two Huge units
+  tyrant: true,
+};
 
 // Sprite strips: cut from the supplied art sheets by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
 // one attack (frame 0 a ready pose), `hitFrame` the frame the blow lands or the shot leaves on.
 const strip = (frames, hitFrame) => ({ frames, frameW: 88, frameH: 88, hitFrame });
 // a unit with a projectile plays the same strip for its shot and for its hand-to-hand blow
+// …and the same two for a unit whose poses need a wider or taller frame
+const wide = (frames, frameW, frameH, hitFrame) => ({ frames, frameW, frameH, hitFrame });
+const wideBoth = (frames, frameW, frameH, hitFrame) => ({
+  ...wide(frames, frameW, frameH, hitFrame),
+  rangedFrom: 0,
+  rangedTo: frames - 1,
+  rangedHit: hitFrame,
+  meleeFrom: 0,
+  meleeTo: frames - 1,
+});
 const both = (frames, hitFrame) => ({
   ...strip(frames, hitFrame),
   rangedFrom: 0,
@@ -1613,6 +1994,106 @@ export const BONUS_TYPES = {
     ability:
       "A shape of the Primal Warden. Void Beam: a line through its target and three tiles beyond, friend or foe. Flies.",
   },
+  // The Trench Brood
+  scuttler: {
+    name: "Carapace Scuttler",
+    sprite: "scuttler",
+    ...wide(4, 112, 88, 2),
+    kind: "melee",
+    ability:
+      "Carapace — its shell turns 40% of every blow, unless the attacker has a friend directly opposite: then the blow ignores its armour. Crush Depth. Wades deep water.",
+  },
+  siren: {
+    name: "Siren Channeler",
+    sprite: "siren",
+    ...wide(4, 128, 96, 1),
+    kind: "melee",
+    ability: "Lure — drags a foe within 4 tiles 2 tiles towards her and Snares it, in place of an attack. Crush Depth.",
+  },
+  brinehurler: {
+    name: "Brine Hurler",
+    sprite: "brinehurler",
+    ...both(4, 2),
+    kind: "ranged",
+    projectile: "ball",
+    greenShot: true,
+    ability:
+      "Toxic Coral — at 3–7 tiles; the tile it lands on stays Flooded: half pace and 20% more damage for all but the Trench Brood. Crush Depth.",
+  },
+  behemoth: {
+    name: "Trench Behemoth",
+    sprite: "behemoth",
+    ...wide(4, 152, 104, 1),
+    kind: "melee",
+    ability:
+      "Sweeping Bite — strikes its target and the foes on either side of it. Immovable — nothing pushes, pulls or carries it. Swims any water. Crush Depth. Fear.",
+  },
+  // The Clockwork Syndicate
+  phalanx: {
+    name: "Brass Phalanx",
+    sprite: "phalanx",
+    ...strip(4, 2),
+    kind: "melee",
+    ability: "Shield Lock — beside another Brass Phalanx it takes 30% less from every shot. Formation. Overdrive.",
+  },
+  arccaster: {
+    name: "Arc Caster",
+    sprite: "arccaster",
+    ...both(4, 1),
+    kind: "ranged",
+    ability:
+      "Arc Bolt — at 2–4 tiles, and it may still move. The bolt leaps at half strength to a second foe beside a target standing in water, or to a heavily armoured one. Overdrive.",
+  },
+  gyrocopter: {
+    name: "Caltrop Gyrocopter",
+    sprite: "gyrocopter",
+    ...wideBoth(4, 104, 88, 1),
+    kind: "ranged",
+    projectile: "stone",
+    ability:
+      "Caltrops — what it scatters stays: an enemy ground unit that steps on them stops there and loses 10 HP, until an enemy clears them. Flies. Overdrive.",
+  },
+  automaton: {
+    name: "Volatile Automaton",
+    sprite: "automaton",
+    ...strip(4, 1),
+    kind: "melee",
+    ability:
+      "Volatile — when it falls it bursts in fire on all eight tiles around it, friend or foe. A Priest cannot heal it; Craftsmen can repair it. Fearless. Overdrive.",
+  },
+  // The Saurian Exiles
+  raptor: {
+    name: "Raptor Skirmisher",
+    sprite: "raptor",
+    ...wide(4, 112, 88, 1),
+    kind: "melee",
+    ability:
+      "Pack Hunter — a blow at a foe caught between the Raptor and a friend ignores armour and cover. Apex Roar.",
+  },
+  ankylosaur: {
+    name: "Ankylosaur Juggernaut",
+    sprite: "ankylosaur",
+    ...wide(4, 144, 88, 1),
+    kind: "melee",
+    ability: "Spiked Shell — whoever strikes it hand to hand takes back 30% of the blow. Apex Roar.",
+  },
+  pterosaur: {
+    name: "Pterosaur Bombardier",
+    sprite: "pterosaur",
+    ...wideBoth(4, 128, 104, 1),
+    kind: "ranged",
+    projectile: "stone",
+    ability:
+      "Harvest — lifts caltrops, quicksand, a Flooded tile or boulders off the map and drops them with its next stone. Dropped Stone: 2–3 tiles, and it may still move. Flies. Apex Roar.",
+  },
+  tyrant: {
+    name: "Theropod Tyrant",
+    sprite: "tyrant",
+    ...wide(4, 168, 104, 1),
+    kind: "melee",
+    ability:
+      "Devastation — its blows bring down woods, barricades, walls and ruins for the rest of the battle. Apex Roar. Fear, Fearless.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -1929,6 +2410,103 @@ export const BONUS_SKILLS = [
     icon: "skill_first",
     d: "Every blow it deals is 10 stronger and every blow it takes is 10 weaker, on the weapon and armour table.",
   },
+  // the three faction gifts (one per upgrade token), then their units' own abilities
+  {
+    flag: "crush",
+    n: "Crush Depth",
+    icon: "skill_amphibious",
+    d: "The Abyssal Pearl's gift to the Trench Brood: the foe it strikes in its own turn is Snared — it cannot move on its next turn. War engines and what cannot be moved are not held.",
+  },
+  {
+    flag: "overdrive",
+    n: "Overdrive",
+    icon: "skill_charge",
+    d: "The Overclocked Mainspring's gift to the Clockwork Syndicate: once a turn, before it acts, it may wind itself past its limit. It then takes a second full action — move and attack again — and loses 25 HP as its second action ends, which no armour or cover softens.",
+  },
+  {
+    flag: "apexRoar",
+    n: "Apex Roar",
+    icon: "skill_standard",
+    d: "The Amber Catalyst's gift to the Saurian Exiles: when it strikes a foe down, every friend within 2 tiles gains +15 attack until the end of its next turn.",
+  },
+  {
+    flag: "carapace",
+    n: "Carapace",
+    icon: "skill_pavise",
+    d: "Its shell turns 40% of every blow. A foe that strikes it hand to hand with a friend standing directly opposite reaches the soft underside: that blow ignores its armour and any cover.",
+  },
+  {
+    flag: "lure",
+    n: "Lure",
+    icon: "skill_shroud",
+    d: "In place of an attack she sings a foe within 2 to 4 tiles towards her: it is dragged up to 2 tiles, out of its cover and into whatever lies in the way, and is Snared. It deals no damage. War engines and what cannot be moved do not come.",
+  },
+  {
+    flag: "flood",
+    n: "Flooded Ground",
+    icon: "skill_quicksand",
+    d: "The tile its coral lands on stays Flooded for the rest of the battle: ground units pay double to enter it and take 20% more damage while they stand in it. The Trench Brood and fliers are not troubled.",
+  },
+  {
+    flag: "anchored",
+    n: "Immovable",
+    icon: "skill_unyielding",
+    d: "Nothing moves it against its will: no gale, no Lure, no conveyor.",
+  },
+  {
+    flag: "sweep",
+    n: "Sweeping Bite",
+    icon: "skill_blast",
+    d: "Its bite takes in three tiles: the target in full, and the foes standing on either side of the target at three quarters.",
+  },
+  {
+    flag: "shieldLock",
+    n: "Shield Lock",
+    icon: "skill_formation",
+    d: "While another Brass Phalanx stands beside it their shields lock: each takes 30% less from every ranged attack.",
+  },
+  {
+    flag: "arcChain",
+    n: "Chain Arc",
+    icon: "skill_lightning",
+    d: "Its bolt leaps at half strength to one more foe standing beside its target: any foe if the target stands in water, otherwise only one in heavy armour.",
+  },
+  {
+    flag: "caltrops",
+    n: "Caltrops",
+    icon: "skill_ambush",
+    d: "The tile it attacks is strewn with caltrops, and it can strew an empty tile too. They never expire: an enemy ground unit that steps on them stops there and loses 10 HP. An enemy standing on or beside them can spend its action to clear them.",
+  },
+  {
+    flag: "volatile",
+    n: "Volatile",
+    icon: "skill_detonate",
+    d: "When it falls it bursts: a Boiler Blast on all eight tiles around it, friend or foe, structures too. One blast can set off the next.",
+  },
+  {
+    flag: "flankCrit",
+    n: "Pack Hunter",
+    icon: "skill_ambush",
+    d: "A blow at a foe caught between the Raptor and a friend directly opposite always goes home: it ignores the foe's armour and any cover.",
+  },
+  {
+    flag: "thorns",
+    n: "Spiked Shell",
+    icon: "skill_pikewall",
+    d: "Whoever strikes it hand to hand takes back 30% of the damage the blow did.",
+  },
+  {
+    flag: "harvest",
+    n: "Harvest",
+    icon: "skill_fly",
+    d: "It can spend its action to lift what lies under or beside it — caltrops, quicksand, a Flooded tile, loose boulders — and carry it. Its next Dropped Stone then falls 25 stronger, bursts on the four tiles around its target, and leaves what was carried where it lands.",
+  },
+  {
+    flag: "raze",
+    n: "Devastation",
+    icon: "skill_siege",
+    d: "Any wood, barricade, wall, tower or ruin its jaws close on comes straight down and stays down: the tile is open ground for the rest of the battle. It can attack such a tile directly.",
+  },
 ];
 
 // UPGRADE ARMY — each bonus unit hangs off an original unit, in a collectible slot that unit leaves empty, and waits
@@ -1990,6 +2568,21 @@ export const BONUS_UPGRADES_ALL = [
   { from: "bloodgorgers", to: "ahuizotl", need: "Obsidian", gate: 5955 }, // Coatlan 2
   { from: "eagle", to: "chieftain", need: "Obsidian", gate: 5956 }, // Coatlan 3
   { from: "shamans", to: "tzitzimitl", need: "Obsidian", gate: 5956 }, // Coatlan 3
+  // Abyssal Pearl — Thalassar (the Trench Brood)
+  { from: "militiamen", to: "scuttler", need: "Pearl", gate: 5964 }, // Thalassar 1
+  { from: "dunesirens", to: "siren", need: "Pearl", gate: 5965 }, // Thalassar 2
+  { from: "crossbowmen", to: "brinehurler", need: "Pearl", gate: 5965 }, // Thalassar 2
+  { from: "scuttler", to: "behemoth", need: "Pearl", gate: 5966 }, // Thalassar 3
+  // Overclocked Mainspring — Brasshaven (the Clockwork Syndicate)
+  { from: "militiamen", to: "automaton", need: "Mainspring", gate: 5973 }, // Brasshaven 1
+  { from: "footmen", to: "phalanx", need: "Mainspring", gate: 5974 }, // Brasshaven 2
+  { from: "crossbowmen", to: "arccaster", need: "Mainspring", gate: 5974 }, // Brasshaven 2
+  { from: "horsebowmen", to: "gyrocopter", need: "Mainspring", gate: 5975 }, // Brasshaven 3
+  // Amber Catalyst — the Amber Reach (the Saurian Exiles)
+  { from: "militiamen", to: "raptor", need: "Amber", gate: 5984 }, // the Amber Reach 1
+  { from: "pikemen", to: "ankylosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
+  { from: "raiders", to: "pterosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
+  { from: "ankylosaur", to: "tyrant", need: "Amber", gate: 5986 }, // the Amber Reach 3
 ];
 // …those the game offers (none into or out of a hidden unit)
 export const BONUS_UPGRADES = BONUS_UPGRADES_ALL.filter(
@@ -2203,7 +2796,68 @@ export const BONUS_META = {
     kit: "⚔ Prism Bolt / Totem Staff · 🛡 Minor Ward",
     note: "A masked shaman of the old powers, made from a Druid with a Void Rift Crystal. Fragile as itself, where it heals and cleanses; then it is whatever the battle needs: the Storm-Stalker Panther to strike and run, the Volcanic Siege-Tortoise to hold a line and bombard, the Astral Manta to fly over anything and lance a whole rank.",
   },
+  scuttler: {
+    role: "Armoured Crab",
+    kit: "⚔ Crusher Claw · 🛡 Carapace",
+    note: "The shield wall of the Trench Brood. Its shell turns 40% of every blow, and the foe it grips cannot move on its next turn. Catch it between two of your own and the shell counts for nothing.",
+  },
+  siren: {
+    role: "Deep Singer",
+    kit: "⚔ Lure / Staff · 🛡 Holy Vestment",
+    note: "A caster of the drowned temples who does no harm herself. Her song drags a foe 2 tiles out of its line, into the open or into whatever the Brood has made of the ground, and leaves it Snared there.",
+  },
+  brinehurler: {
+    role: "Coral Artillery",
+    kit: "⚔ Toxic Coral / Short Sword · 🛡 Breastplate",
+    note: "The Brood's siege piece. Every shell it lobs leaves the tile Flooded for the rest of the battle: half pace and 20% more damage for anyone who is not of the Trench.",
+  },
+  behemoth: {
+    role: "Huge Shark Brute",
+    kit: "⚔ Sweeping Bite · 🛡 Shark Hide",
+    note: "A shark that walks. Its bite takes in three tiles at once, nothing can push or pull it, and it swims any water as others walk a road.",
+  },
+  phalanx: {
+    role: "Shield Construct",
+    kit: "⚔ Piston Mace · 🛡 Heavy Armor & Shield",
+    note: "The line constructs of the Clockwork Syndicate. Two standing side by side lock shields and shrug off 30% of every shot.",
+  },
+  arccaster: {
+    role: "Lightning Skirmisher",
+    kit: "⚔ Arc Bolt / Short Sword · 🛡 Breastplate",
+    note: "A walking coil that shoots and moves on. Its bolt leaps to a second foe wherever the first stands in water, or beside heavy armour.",
+  },
+  gyrocopter: {
+    role: "Flying Minelayer",
+    kit: "⚔ Caltrops · 🛡 Light Armor",
+    note: "A fragile scout that flies over anything. It does not fight: it strews caltrops that stop and wound whatever walks onto them, and they stay until the enemy spends a turn sweeping them up.",
+  },
+  automaton: {
+    role: "Walking Bomb",
+    kit: "⚔ Ram · 🛡 Light Armor",
+    note: "Cheap, fearless and not meant to come back. When it falls its boiler bursts on every tile around it, friend or foe. No Priest can mend it.",
+  },
+  raptor: {
+    role: "Pack Skirmisher",
+    kit: "⚔ Sickle Claws · 🛡 Light Armor",
+    note: "The fastest thing on two legs. Alone its claws do little; a foe caught between a Raptor and any friend takes the blow with no armour at all.",
+  },
+  ankylosaur: {
+    role: "Armoured Beast",
+    kit: "⚔ Tail Club · 🛡 Spiked Shell",
+    note: "Slow, and nearly impossible to hurt without being hurt: whoever strikes it hand to hand takes back 30% of the blow.",
+  },
+  pterosaur: {
+    role: "Flying Bombardier",
+    kit: "⚔ Dropped Stone / Talon · 🛡 Feathered Hide",
+    note: "A rider on leather wings who uses the battlefield itself: it lifts caltrops, quicksand, flooded ground or boulders off the map and drops them on the enemy with its next stone.",
+  },
+  tyrant: {
+    role: "Huge Apex Predator",
+    kit: "⚔ Tyrant Jaws · 🛡 Tyrant Hide",
+    note: "The last thing the Amber Reach kept. Woods, barricades and walls it bites come down for good, so no chokepoint holds against it.",
+  },
 };
-// Battle ids of the six bonus regions (Tilicia 5902–5913, Isoluccia 5924–5933, Mare Nostra 5941–5952, Satoshi
-// 5961–5972, the Mirror Sea 5981–5992, Tezcal 5994–5998).
+// Battle ids of the bonus regions (Tilicia 5902–5913, Isoluccia 5924–5933, Mare Nostra 5941–5952, Satoshi
+// 5961–5972, the Mirror Sea 5981–5992, Tezcal 5994–5998; Thalassar 5964–5968, Brasshaven 5973–5977, the Amber Reach
+// 5984–5988).
 export const isBonusMap = (mapId) => mapId >= 5900 && mapId < 6000;

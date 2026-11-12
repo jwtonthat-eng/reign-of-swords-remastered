@@ -440,6 +440,15 @@ function TerrainInfo({ tile }) {
           </small>
         </div>
       )}
+      {(tile.hazards || []).map((hazard) => (
+        <div key={hazard.name} className="ros-struct-line ros-qs-line">
+          <span>
+            <img className="ros-tool-ico" src={base + "hud/" + hazard.icon + ".png"} alt="" draggable="false" />{" "}
+            <b>{tr(hazard.name)}</b>
+          </span>
+          <small>{tr(hazard.desc)}</small>
+        </div>
+      ))}
       {tile.structure && <StructureLine structure={tile.structure} />}
       <div className="ros-charge">{terrainNote(tile)}</div>
     </>

@@ -653,6 +653,12 @@ for (const k in UNIT_TYPES) {
   for (const flag of ["rage", "shieldWall", "valhalla", "judgement", "devour"]) T[flag] = c[flag] || 0;
   for (const flag of ["pounce", "sunbeam", "tailwind"]) T[flag] = c[flag] || 0; // Jaguar, Sun Priest, Feathered Serpent // Alchemist, Naga
   for (const flag of ["stoneskin", "purity", "burn", "undying"]) T[flag] = c[flag] || 0; // Golem, Unicorn, Efreet, Skeleton
+  // the Trench Brood, the Clockwork Syndicate, the Saurian Exiles
+  for (const flag of ["crush", "anchored", "flood", "overdrive", "caltrops", "flankCrit", "harvest", "raze"])
+    T[flag] = !!c[flag];
+  for (const flag of ["carapace", "lure", "sweep", "shieldLock", "arcChain", "volatile", "thorns", "apexRoar"])
+    T[flag] = c[flag] || 0;
+  T.culture = c.culture || null; // whose ground it is at home on (Flooded tiles, Razor Coral, Tar Pits)
   T.sutra = c.sutra || 0; // Sohei: HP mended by each friend beside it at the start of its turn
   T.grapple = c.grapple || 0; // Marines: the reach of their once-a-battle Grapple
   T.conjures = c.conjures || null; // Beast Master: what its Conjure calls (Hounds)

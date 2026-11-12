@@ -100,6 +100,9 @@ export const KINGDOM_POS_EP2 = {
   khemret: { left: "92%", top: "92%" }, // the east bank of the great river, in the south-east corner
   moananui: { left: "37%", top: "70%" }, // the chain of small islands on the west side of Mare Nostra
   coatlan: { left: "93%", top: "59%" }, // the eastern mountains, south-east of Tilicia
+  thalassar: { left: "62%", top: "84%" }, // the deep water south of Mare Nostra
+  brasshaven: { left: "70%", top: "27%" }, // the foundry coast, west of the Mirror Sea
+  "amber-reach": { left: "8%", top: "58%" }, // the lost valley beyond the western mountains
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -219,6 +222,10 @@ export const COLLECTIBLES = [
   { id: "Tsuba", icon: "🏵", token: "Tsuba of the Shogunate", culture: "Satoshi" },
   { id: "Jade", icon: "🐆", token: "Sacred Jade Jaguar", culture: "Tezcal" },
   { id: "Void", icon: "🔮", token: "Void Rift Crystal", culture: "Tilicia and Isoluccia" },
+  // …and one per faction: each also names the gift every unit made with it carries (data/bonus-units.js)
+  { id: "Pearl", icon: "🫧", token: "Abyssal Pearl", culture: "Thalassar", gift: "Crush Depth" },
+  { id: "Mainspring", icon: "⚙", token: "Overclocked Mainspring", culture: "Brasshaven", gift: "Overdrive" },
+  { id: "Amber", icon: "🦖", token: "Amber Catalyst", culture: "the Amber Reach", gift: "Apex Roar" },
 ];
 // The game's own six (what the Merchant trades in).
 export const TRADE_GOODS = COLLECTIBLES.filter((c) => !c.token);
@@ -1170,6 +1177,9 @@ export const RES_ICON = {
   Tsuba: "tsuba",
   Jade: "jade",
   Void: "void",
+  Pearl: "pearl",
+  Mainspring: "mainspring",
+  Amber: "amber",
 };
 
 export const GET_OPTIONS = [
@@ -1461,6 +1471,19 @@ export const TREE_COL = {
   chieftain: 3,
   tzitzimitl: 2,
   warden: 3,
+  // the three factions (the Trench Brood, the Clockwork Syndicate, the Saurian Exiles)
+  scuttler: 1,
+  siren: 3,
+  brinehurler: 3,
+  behemoth: 2,
+  automaton: 1,
+  phalanx: 2,
+  arccaster: 3,
+  gyrocopter: 3,
+  raptor: 1,
+  ankylosaur: 4,
+  pterosaur: 2,
+  tyrant: 5,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1533,6 +1556,19 @@ export const TREE_ROW = {
   chieftain: 23,
   tzitzimitl: 27,
   warden: 24,
+  // the three factions
+  scuttler: 10,
+  siren: 25,
+  brinehurler: 26,
+  behemoth: 28,
+  automaton: 11,
+  phalanx: 29,
+  arccaster: 27,
+  gyrocopter: 28,
+  raptor: 12,
+  ankylosaur: 5,
+  pterosaur: 30,
+  tyrant: 0,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",
@@ -1549,6 +1585,9 @@ export const NEED_COLOR = {
   Tsuba: "#c9a23a",
   Jade: "#3f9a5a",
   Void: "#9a5ce0",
+  Pearl: "#4fd0c8",
+  Mainspring: "#c98a3a",
+  Amber: "#f0a020",
 };
 
 // The heraldic tincture ramps, field/symbol/frame art tables, per-faction crests and the HeraldryShield component

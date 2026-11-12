@@ -348,6 +348,7 @@ export class Renderer {
       this._drawTilePass(g, geo);
     }
     this._drawQuicksand(g, vis);
+    this._drawHazards(g, vis);
     g.imageSmoothingEnabled = smooth;
   }
 
@@ -442,6 +443,63 @@ export class Renderer {
         g.fillRect(cellLeft, cellTop, tile, tile);
       }
     }
+  }
+
+  // BONUS (ours): what the three factions leave on the ground — Flooded tiles (a Brine Hurler's coral: a brine wash
+  // with two slow ripples) and caltrops (the Gyrocopter's: five iron stars, tinted by the side that strewed them).
+  _drawHazards(g, vis) {
+    const game = this.game,
+      tile = game.tile,
+      time = game.clock || 0;
+    const seen = (x, y) => x >= vis.x0 && x <= vis.x1 && y >= vis.y0 && y <= vis.y1;
+    if (game.flooded && game.flooded.size)
+      for (const k of game.flooded) {
+        const [x, y] = k.split(",").map(Number);
+        if (!seen(x, y)) continue;
+        const left = x * tile,
+          top = y * tile;
+        g.fillStyle = "rgba(36,150,140,0.42)";
+        g.fillRect(left, top, tile, tile);
+        g.strokeStyle = "rgba(190,255,235,0.55)";
+        g.lineWidth = Math.max(1, tile / 28);
+        for (const row of [0.34, 0.7]) {
+          g.beginPath();
+          for (let i = 0; i <= 8; i++) {
+            const px = left + (tile * i) / 8,
+              py = top + tile * row + Math.sin(time * 1.6 + i * 1.1 + x + y * 2 + row * 9) * tile * 0.035;
+            if (i) g.lineTo(px, py);
+            else g.moveTo(px, py);
+          }
+          g.stroke();
+        }
+      }
+    if (game.caltrops && game.caltrops.size)
+      for (const [k, team] of game.caltrops) {
+        const [x, y] = k.split(",").map(Number);
+        if (!seen(x, y)) continue;
+        g.strokeStyle = team === "blue" ? "#cfe0ff" : "#ffd0c4";
+        g.lineWidth = Math.max(1.5, tile / 20);
+        g.lineCap = "round";
+        const arm = tile * 0.08;
+        for (const [fx, fy] of [
+          [0.25, 0.3],
+          [0.7, 0.24],
+          [0.5, 0.55],
+          [0.22, 0.76],
+          [0.76, 0.74],
+        ]) {
+          const cx = x * tile + tile * fx,
+            cy = y * tile + tile * fy;
+          g.beginPath();
+          g.moveTo(cx - arm, cy - arm);
+          g.lineTo(cx + arm, cy + arm);
+          g.moveTo(cx + arm, cy - arm);
+          g.lineTo(cx - arm, cy + arm);
+          g.moveTo(cx, cy - arm * 1.3);
+          g.lineTo(cx, cy + arm * 0.6);
+          g.stroke();
+        }
+      }
   }
 
   _drawTutorialZone(g) {
@@ -1607,11 +1665,12 @@ export class Renderer {
       // @0x6593e, counter & 3) under a 100 Hz timer, so its cadence was the device's frame rate, not a set value; two
       // strides a tile here ran the legs at 9–12 strides a second, a heavy Bear's lumber looking frantic.
       const walkFrame = Math.floor(prog * WALK_FRAMES) % WALK_FRAMES;
-      sw = WALK_W;
-      sh = WALK_H;
-      sx = walkFrame * WALK_W;
-      dh = WALK_H * px;
-      dw = WALK_W * px;
+      // (the android walk sheets are 4 × 64×72; a wide BONUS beast's sheet has bigger frames — read them off it)
+      sw = img.width ? img.width / WALK_FRAMES : WALK_W;
+      sh = img.height || WALK_H;
+      sx = walkFrame * sw;
+      dh = sh * px;
+      dw = sw * px;
       mode = "w" + (u.paint || u.team);
     } else if (!u.attacking && standImg) {
       img = standImg;
@@ -1913,7 +1972,8 @@ export class Renderer {
       g.fill();
       return;
     }
-    if (shot.green) g.filter = "hue-rotate(80deg)"; // BONUS: the Alchemist's flask (the caller restores the context)
+    if (shot.green)
+      g.filter = "hue-rotate(80deg)"; // BONUS: the Alchemist's flask (the caller restores the context)
     else if (shot.hue) g.filter = `hue-rotate(${shot.hue}deg)`; // …and the Anubis Priest's Soulfire
     const frameW = isFire ? 64 : 28,
       frames = 5;

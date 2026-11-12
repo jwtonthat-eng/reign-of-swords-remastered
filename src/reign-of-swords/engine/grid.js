@@ -24,6 +24,7 @@ import {
 } from "../rules/terrain.js";
 
 import { WEAPON_RANGE, WEAPON_DMG, WEAPON_TAGS } from "../data/combat-data.js";
+import { FLOOD } from "../data/bonus-units.js";
 
 // Terrain move-cost by unit movement CATEGORY, ported from the real game's mTerrainTable (record 5010
 // af[terrainType][al+1], decompiled from La/j). Columns are the `al` category: [0 Fly, 1 Skirmish/loose,
@@ -265,6 +266,20 @@ export class GridMethods {
   // (fx, fy) = the tile the step comes FROM, when there is one (the reach / path floods pass it): it enables the
   // original's step-link rule. One-off checks (a landing tile, a portal exit) pass none, as getMoveCost(unit, 0, to).
   moveCost(u, tx, ty, fx, fy) {
+    const cost = this._terrainMoveCost(u, tx, ty, fx, fy);
+    // BONUS: Flooded ground (a Brine Hurler's coral) costs every ground unit not of the Trench double
+    if (
+      cost < 99 &&
+      this.flooded &&
+      this.flooded.has(tx + "," + ty) &&
+      u.T.culture !== "trench" &&
+      u.T.al !== 0 &&
+      !u.T.fly
+    )
+      return Math.min(98, cost * FLOOD.cost);
+    return cost;
+  }
+  _terrainMoveCost(u, tx, ty, fx, fy) {
     if (!this.inBounds(tx, ty)) return 99;
     if (this.portals && this._portalBlocks(u, tx, ty)) return 99; // Map::getMoveCost's portal gates (fliers included)
     // BONUS (ours, MECHANICS.md §13): Climb takes Cragsmen over cliffs (type 21) and Amphibious takes Marines through
@@ -523,6 +538,8 @@ export class GridMethods {
       // it. Immune units (fliers / Dune Sirens) glide over it normally. The start tile never blocks its own exit.
       if (this._quicksandAt(cur.tx, cur.ty) > 0 && !this._quicksandImmune(u) && !(cur.tx === u.tx && cur.ty === u.ty))
         continue;
+      // BONUS: enemy caltrops stop a ground unit the same way (the Gyrocopter's)
+      if (this.caltrops && this._caltropsAgainst(u, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
       // 4-DIRECTIONAL movement (orthogonal only) — the original's reach flood-fill `La/q.P()` expands exactly
       // 4 neighbours (`cg=[-1,1,0,0]`, `ch=[0,0,-1,1]`), and its tile metric `a.j.c` is manhattan, so units
       // never step diagonally.
@@ -818,6 +835,12 @@ export class GridMethods {
       if (u._blind) u._blind = false; // …and a Sun Priest's Eclipse
       if (u._chilled) u._chilled = false; // …and a Jotunn's chill
       if (u._seized) u._seized = false; // …and an Ahuizotl's grasp
+      // BONUS: an Apex Roar lasts to the end of the unit's next turn (one more for a unit that had already acted)
+      if (u._roar) {
+        if (u._roarKeep) u._roarKeep = false;
+        else u._roar = 0;
+      }
+      this._overdriveSettle(u); // BONUS: an Overdrive whose second action was never finished still costs its price
       if (u.dead || !this._canHideUnit(u)) continue;
       this._setHidden(u, !u.attackedTurn && this._canHide(u));
     }

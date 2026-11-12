@@ -1459,6 +1459,9 @@ export default {
   Tsuba: "Цуба",
   Jade: "Нефрит",
   Void: "Кристалл Бездны",
+  Pearl: "Жемчужина Бездны",
+  Mainspring: "Заводная пружина",
+  Amber: "Янтарь",
   Slowed: "Замедлен",
   "An Ice Field cuts its movement to three quarters until the end of its next turn.":
     "Ледяное поле сокращает его движение до трёх четвертей до конца его следующего хода.",
