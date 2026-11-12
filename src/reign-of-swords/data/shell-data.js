@@ -101,8 +101,8 @@ export const KINGDOM_POS_EP2 = {
   moananui: { left: "37%", top: "70%" }, // the chain of small islands on the west side of Mare Nostra
   coatlan: { left: "93%", top: "59%" }, // the eastern mountains, south-east of Tilicia
   thalassar: { left: "62%", top: "84%" }, // the deep water south of Mare Nostra
-  brasshaven: { left: "70%", top: "27%" }, // the foundry coast, west of the Mirror Sea
-  "amber-reach": { left: "8%", top: "58%" }, // the lost valley beyond the western mountains
+  brasshaven: { left: "68%", top: "21%" }, // the foundry coast, between Rukiev and the Mirror Sea
+  "amber-reach": { left: "15%", top: "57%" }, // the lost valley beyond the western mountains
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.

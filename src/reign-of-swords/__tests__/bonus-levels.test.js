@@ -566,3 +566,49 @@ describe("Thalassar, Brasshaven and the Amber Reach: every army mustered, their 
     }
   });
 });
+
+// The older regions' maps carry the bonus tiles of their cultures (user decision: laid into the existing battles).
+describe("the older regions: their own ground", () => {
+  const built = JSON.parse(readFileSync(join("public", "games", "reign-of-swords-2", "bonus.json"), "utf8"));
+  const tilesOf = (ids) => new Set(built.levels.filter((l) => ids.includes(l.mapId)).flatMap((l) => l.tiles));
+  it("Jarnheim has black ice and runic monoliths, Khemret sinkholes and mirage sand, Moananui razor coral", () => {
+    const jarnheim = tilesOf([5914, 5915, 5916, 5917, 5918]),
+      khemret = tilesOf([5934, 5935, 5936, 5937, 5938]),
+      moananui = tilesOf([5944, 5945, 5946, 5947, 5948]);
+    expect([269, 270].every((tile) => jarnheim.has(tile))).toBe(true);
+    expect([271, 272].every((tile) => khemret.has(tile))).toBe(true);
+    expect(moananui.has(276)).toBe(true);
+  });
+  it("Coatlan has altar steps, jungle ruins, chinampas and obsidian; Tezcal cenotes and glyphs; Satoshi bamboo and zen gardens", () => {
+    const coatlan = tilesOf([5954, 5955, 5956, 5957, 5958]),
+      tezcal = tilesOf([5994, 5995, 5996, 5997, 5998]),
+      satoshi = tilesOf([5961, 5962, 5963, 5971, 5972]);
+    expect([273, 274, 279, 280].every((tile) => coatlan.has(tile))).toBe(true);
+    expect([277, 278].every((tile) => tezcal.has(tile))).toBe(true);
+    expect([281, 283].every((tile) => satoshi.has(tile))).toBe(true);
+    // every map of Tezcal that has a cenote has at least two: one to dive into, one to come up in
+    for (const level of built.levels.filter((l) => l.mapId >= 5994 && l.mapId <= 5998)) {
+      const cenotes = level.tiles.filter((tile) => tile === 277).length;
+      expect(cenotes === 0 || cenotes >= 2, level.name).toBe(true);
+    }
+  });
+  it("a region's tiles stay in its own maps", () => {
+    const home = {
+      269: "Jarnheim",
+      270: "Jarnheim",
+      271: "Khemret",
+      272: "Khemret",
+      273: "Coatlan",
+      274: "Coatlan",
+      279: "Coatlan",
+      280: "Coatlan",
+      277: "Tezcal",
+      278: "Tezcal",
+      281: "Satoshi",
+      283: "Satoshi",
+    };
+    for (const level of built.levels)
+      for (const tile of new Set(level.tiles))
+        if (home[tile]) expect(level.kingdom, `${level.name}: tile ${tile}`).toContain(home[tile]);
+  });
+});
