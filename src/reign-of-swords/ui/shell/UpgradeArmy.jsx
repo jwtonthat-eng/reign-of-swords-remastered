@@ -82,22 +82,36 @@ export function UpgradeArmy({
     have = army[selKey] || 0,
     upgrades = (u.upgrades || []).filter((e) => upgradeOffered(e, isEp2, bonus)),
     upgradeFrom = UPGRADE_FROM[selKey];
+  // The game's own six collectibles sit in one row. Once the bonus campaigns add their culture tokens there are too
+  // many for that: they are laid in two rows of equal length instead (ui/styles/army.css .ros-res-cells.two).
+  const shown = COLLECTIBLES.filter((c) => !c.token || bonus),
+    twoRows = shown.length > 7;
   const resbar = (
     <div className="ros-resbar">
-      {COLLECTIBLES.filter((c) => !c.token || bonus).map((c) => (
-        <span
-          key={c.id}
-          className={"ros-res" + ((spoils[c.id] || 0) > 0 ? " has" : "")}
-          title={(c.token ? c.token : tr(c.id)) + " — " + tr("Spoils of War")}
-        >
-          {RES_ICON[c.id] ? (
-            <img className="ros-res-img" src={base + "icons/" + RES_ICON[c.id] + ".png"} alt={c.id} draggable="false" />
-          ) : (
-            <b className="ros-res-emoji">{c.icon}</b>
-          )}
-          <i className="ros-res-count">{spoils[c.id] || 0}</i>
-        </span>
-      ))}
+      <div
+        className={"ros-res-cells" + (twoRows ? " two" : "")}
+        style={twoRows ? { "--res-cols": Math.ceil(shown.length / 2) } : undefined}
+      >
+        {shown.map((c) => (
+          <span
+            key={c.id}
+            className={"ros-res" + ((spoils[c.id] || 0) > 0 ? " has" : "")}
+            title={(c.token ? c.token : tr(c.id)) + " — " + tr("Spoils of War")}
+          >
+            {RES_ICON[c.id] ? (
+              <img
+                className="ros-res-img"
+                src={base + "icons/" + RES_ICON[c.id] + ".png"}
+                alt={c.id}
+                draggable="false"
+              />
+            ) : (
+              <b className="ros-res-emoji">{c.icon}</b>
+            )}
+            <i className="ros-res-count">{spoils[c.id] || 0}</i>
+          </span>
+        ))}
+      </div>
       {onHeraldry ? (
         <button
           type="button"
