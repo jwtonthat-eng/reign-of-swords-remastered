@@ -139,7 +139,8 @@ public/games/
 public/ros-atlas/           the interactive map and animation atlases (Story & Assets)
 tools/ros/                  Python tools that extracted and audited the data from the original iOS games
 tools/ros/bonus/            the six fan-made bonus campaigns: level sources, sprite-sheet importer and their builder
-docs/images/                the screenshots in this README
+docs/images/                the screenshots in this README, and all-units.png: every unit the game offers
+                            (rebuilt by tools/ros/bonus/unit_gallery.py)
 ```
 
 React and Vite, an HTML canvas for the battlefield, no other runtime dependencies. The game rules, the decoded
