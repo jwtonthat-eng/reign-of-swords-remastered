@@ -149,52 +149,58 @@ describe("bonus units: upgrade paths", () => {
       ["craftsmen", "sentinel", "Spirit"],
       ["crossbowmen", "pavisiers", "Armor"],
       ["wizards", "battlemage", "Medal"],
-      ["militiamen", "marines", "Anchor"],
-      ["footmen", "gladiator", "Anchor"],
+      ["footmen", "marines", "Anchor"],
+      ["swordsmen", "gladiator", "Anchor"],
       ["raiders", "beastmaster", "Anchor"],
-      ["shamans", "sohei", "Tsuba"],
+      ["halberdiers", "sohei", "Tsuba"],
       ["footmen", "samurai", "Tsuba"],
-      ["archers", "shinobi", "Tsuba"],
+      ["rangers", "shinobi", "Tsuba"],
       ["samurai", "oni", "Tsuba"],
       ["beastmaster", "tengu", "Tsuba"],
-      ["griffon", "dragonrider", "Void"],
-      ["priests", "alchemist", "Void"],
-      ["sentinel", "golem", "Void"],
+      ["cavalry", "dragonrider", "Void"],
+      ["shamans", "alchemist", "Void"],
+      ["craftsmen", "golem", "Void"],
       ["druids", "warden", "Void"],
       ["militiamen", "jaguar", "Jade"],
       ["archers", "eagle", "Jade"],
       ["cavalry", "serpent", "Jade"],
-      ["shamans", "sunpriest", "Jade"],
+      ["priests", "sunpriest", "Jade"],
       ["militiamen", "berserker", "Bloodstone"],
       ["footmen", "shieldmaiden", "Bloodstone"],
       ["shieldmaiden", "einherjar", "Bloodstone"],
       ["berserker", "jotunn", "Bloodstone"],
       ["archers", "medjay", "Scarab"],
-      ["militiamen", "khopesh", "Scarab"],
-      ["priests", "anubis", "Scarab"],
-      ["bloodgorgers", "ammit", "Scarab"],
+      ["swordsmen", "khopesh", "Scarab"],
+      ["shamans", "anubis", "Scarab"],
+      ["dunesirens", "ammit", "Scarab"],
       ["militiamen", "toa", "Whalebone"],
       ["raiders", "tahuanui", "Whalebone"],
       ["shamans", "tohunga", "Whalebone"],
       ["dunesirens", "taniwha", "Whalebone"],
       ["jaguar", "coatecpatl", "Obsidian"],
-      ["bloodgorgers", "ahuizotl", "Obsidian"],
+      ["raiders", "ahuizotl", "Obsidian"],
       ["eagle", "chieftain", "Obsidian"],
       ["shamans", "tzitzimitl", "Obsidian"],
-      ["militiamen", "scuttler", "Pearl"],
+      ["footmen", "scuttler", "Pearl"],
       ["dunesirens", "siren", "Pearl"],
       ["crossbowmen", "brinehurler", "Pearl"],
       ["scuttler", "behemoth", "Pearl"],
       ["militiamen", "automaton", "Mainspring"],
-      ["footmen", "phalanx", "Mainspring"],
+      ["halberdiers", "phalanx", "Mainspring"],
       ["crossbowmen", "arccaster", "Mainspring"],
       ["archers", "gyrocopter", "Mainspring"],
-      ["militiamen", "raptor", "Amber"],
-      ["pikemen", "ankylosaur", "Amber"],
-      ["raiders", "pterosaur", "Amber"],
-      ["ankylosaur", "tyrant", "Amber"],
+      ["raiders", "raptor", "Amber"],
+      ["halberdiers", "ankylosaur", "Amber"],
+      ["horsebowmen", "pterosaur", "Amber"],
+      ["raptor", "tyrant", "Amber"],
     ]);
+    // the shape of the tree: at most three upgrades from the Militia, at most four bonus branches on any one unit,
+    // and no upgrade cheaper to deploy than the unit it is made from
+    const depth = (unit) => (UPGRADE_FROM[unit] ? depth(UPGRADE_FROM[unit].from) + 1 : 0);
     for (const { from, to, need, gate } of BONUS_UPGRADES) {
+      expect(depth(to), to).toBeLessThanOrEqual(3);
+      expect(BONUS_UPGRADES.filter((u) => u.from === from).length, from).toBeLessThanOrEqual(4);
+      expect(DEPLOY_COST[to], to).toBeGreaterThanOrEqual(DEPLOY_COST[from]);
       const branches = UNIT_META[from].upgrades;
       expect(branches.filter((b) => b.need === need).length).toBe(1); // one branch per collectible
       expect(UPGRADE_FROM[to]).toEqual({ from, need });
@@ -558,7 +564,7 @@ describe("Dragon Riders", () => {
   const run = (g, n = 400) => {
     for (let i = 0; i < n; i++) step(g);
   };
-  it("a 750-point elite flier in Relic Armour at the Hero's rating, upgraded from Griffon Riders with a Medal", () => {
+  it("a 750-point elite flier in Relic Armour at the Hero's rating, upgraded from Cavalry with a Void Rift Crystal", () => {
     const T = UNIT_TYPES.dragonrider,
       hero = UNIT_TYPES.king;
     expect(DEPLOY_COST.dragonrider).toBe(750);
@@ -569,7 +575,7 @@ describe("Dragon Riders", () => {
     expect(T.firstStrike && T.fear && T.hasCharge && T.twinAttack).toBe(true);
     expect(T.harasser).toBe(false); // the computer flies it in to fight instead of hovering at range
     expect([T.minRange, T.range]).toEqual([1, 8]); // the lance at 1, the breath at 2–8: no dead zone
-    expect(UPGRADE_FROM.dragonrider).toEqual({ from: "griffon", need: "Void" });
+    expect(UPGRADE_FROM.dragonrider).toEqual({ from: "cavalry", need: "Void" });
     expect(upgradeGate("dragonrider", true)).toBe(5943);
     expect(unitSkills("dragonrider").map((s) => s.n)).toEqual(
       expect.arrayContaining(["Dragonfire", "Fire and Lance", "Flight", "Fear"]),
@@ -824,19 +830,22 @@ describe("Satoshi's second wave: Sohei, Shinobi, Oni, Tengu", () => {
     Object.assign(foe, { tx: 11, ty: 10 }); // an enemy beside it: nowhere to hide
     expect(g._canHide(shinobi)).toBe(false);
   });
-  it("Earthshaker: the Oni's blow also lands, at half strength, on every other enemy beside its target", () => {
+  it("Sunder: the foe an Oni strikes is Shattered — every blow at it lands harder from then on, magic excepted", () => {
     const g = field();
     const oni = spawn(g, "oni", "blue", 10, 10),
-      target = spawn(g, "footmen", "red", 11, 10),
+      target = spawn(g, "knights", "red", 11, 10),
       beside = spawn(g, "footmen", "red", 12, 10),
-      besideOni = spawn(g, "footmen", "red", 10, 11),
-      friend = spawn(g, "footmen", "blue", 11, 9);
+      friend = spawn(g, "footmen", "blue", 11, 9),
+      wizard = spawn(g, "wizards", "blue", 11, 13);
+    const blow = g.computeDamage(friend, target),
+      spell = g.computeDamage(wizard, target);
     g.resolveDamage(oni, target);
-    expect(target.hp).toBeLessThan(100);
-    expect(beside.hp).toBeLessThan(100);
-    expect(100 - beside.hp).toBeLessThan(100 - target.hp);
-    expect(besideOni.hp).toBe(100); // beside the Oni, not beside the target
-    expect(friend.hp).toBe(100);
+    expect([target._shattered, !!beside._shattered]).toEqual([true, false]);
+    expect(beside.hp).toBe(100); // (it was Earthshaker: the blow no longer spreads)
+    target.hp = 100;
+    expect(g.computeDamage(friend, target)).toBeGreaterThan(blow);
+    expect(g.computeDamage(wizard, target)).toBe(spell);
+    expect(g._statusesOf(target).some((status) => status.name === "Armour shattered")).toBe(true);
     expect(UNIT_TYPES.oni.fear && UNIT_TYPES.oni.armourName === "Oni Hide").toBe(true);
   });
   it("Gale: the Tengu's foe is thrown a tile back and cannot strike back; with no room behind, it stands", () => {
@@ -853,7 +862,7 @@ describe("Satoshi's second wave: Sohei, Shinobi, Oni, Tengu", () => {
     expect(UNIT_TYPES.tengu.fly && UNIT_TYPES.tengu.al === 0).toBe(true);
   });
   it("each has its price, its upgrade and its Satoshi battle", () => {
-    expect([DEPLOY_COST.sohei, DEPLOY_COST.shinobi, DEPLOY_COST.oni, DEPLOY_COST.tengu]).toEqual([175, 225, 350, 325]);
+    expect([DEPLOY_COST.sohei, DEPLOY_COST.shinobi, DEPLOY_COST.oni, DEPLOY_COST.tengu]).toEqual([175, 225, 325, 325]);
     expect(upgradeGate("sohei", true)).toBe(5961);
     expect(upgradeGate("shinobi", true)).toBe(5962);
     expect(upgradeGate("oni", true)).toBe(5963);
@@ -974,7 +983,7 @@ describe("The laboratory and its creatures: Alchemist, Imp, Golem, Unicorn, Efre
   it("each has its price; Alchemist and Golem have their upgrade and the battle that opens it", () => {
     const cost = (k) => DEPLOY_COST[k];
     expect(["alchemist", "golem", "unicorn", "efreet", "naga", "skeleton"].map(cost)).toEqual([
-      250, 400, 275, 350, 300, 500,
+      250, 325, 275, 350, 300, 500,
     ]);
     expect(upgradeGate("alchemist", true)).toBe(5925);
     expect(upgradeGate("golem", true)).toBe(5912);
@@ -1019,7 +1028,7 @@ describe("Stone Sentinel and Golem: Bulwark", () => {
     g.resolveDamage(tengu, sentinel);
     expect([sentinel.tx, sentinel.ty]).toEqual([10, 10]);
     expect(UNIT_TYPES.sentinel.lastStrike).toBe(false); // it no longer strikes last
-    expect(UNIT_TYPES.golem.bulwark).toBe(true);
+    expect(UNIT_TYPES.golem.bulwark).toBe(false); // Bulwark is the Sentinel's alone; the Golem has Stoneskin
     expect(DEPLOY_COST.sentinel).toBe(300);
   });
 });
@@ -1127,7 +1136,7 @@ describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathe
     ]);
     expect(UPGRADE_FROM.tengu.from).toBe("beastmaster");
     const cost = (k) => DEPLOY_COST[k];
-    expect(["jaguar", "eagle", "sunpriest", "serpent"].map(cost)).toEqual([150, 175, 400, 300]);
+    expect(["jaguar", "eagle", "sunpriest", "serpent"].map(cost)).toEqual([150, 175, 325, 275]);
     expect(upgradeGate("jaguar", true)).toBe(5994);
     expect(upgradeGate("eagle", true)).toBe(5995);
     expect(upgradeGate("serpent", true)).toBe(5996);
@@ -1155,17 +1164,32 @@ describe("Jarnheim and Khemret: the Norse and Egyptian units", () => {
     expect(g._damage256(berserker, foe)).toBeGreaterThan(calm);
     expect(UNIT_TYPES.berserker.fearless).toBe(true);
   });
-  it("Shield Wall: a friend beside a Shieldmaiden takes a quarter less hand to hand, and nothing less from arrows", () => {
+  it("Shield Wall: an enemy ground unit that steps beside a Shieldmaiden stops there; fliers and friends do not", () => {
     const g = field();
-    const friend = spawn(g, "berserker", "blue", 10, 10), // (not a Formation unit, whose own rule also counts neighbours)
-      foe = spawn(g, "swordsmen", "red", 11, 10),
-      archer = spawn(g, "archers", "red", 10, 14);
-    const blow = g.computeDamage(foe, friend),
-      shot = g.computeDamage(archer, friend);
-    spawn(g, "shieldmaiden", "blue", 9, 10);
-    expect(g.computeDamage(foe, friend)).toBeLessThan(blow);
-    expect(g.computeDamage(foe, friend)).toBeGreaterThan(blow / 2); // about a quarter off
-    expect(g.computeDamage(archer, friend)).toBe(shot);
+    const maiden = spawn(g, "shieldmaiden", "blue", 10, 10),
+      runner = spawn(g, "raiders", "red", 14, 10),
+      flier = spawn(g, "griffon", "red", 14, 12),
+      friend = spawn(g, "raiders", "blue", 14, 8);
+    const steps = (u, x, y) => g.computeReach(u).dist.get(x + "," + y);
+    expect(steps(runner, 11, 10)).toBe(3); // up to her: it can stand beside her, and strike from there
+    expect(steps(runner, 11, 11)).toBe(4);
+    expect(steps(runner, 9, 10)).toBeUndefined(); // …but not round her: every tile beside her is where a move ends
+    expect(steps(runner, 8, 10)).toBeUndefined();
+    expect(steps(flier, 8, 10)).toBeDefined();
+    expect(steps(friend, 8, 10)).toBeDefined();
+    Object.assign(runner, { tx: 11, ty: 10 }); // beside her already: it may leave, but round her is the long way
+    expect(steps(runner, 13, 10)).toBe(2);
+    expect(steps(runner, 10, 11)).toBe(2);
+    expect(steps(runner, 9, 10)).toBe(6); // (four, were the tile under her shield not the end of a move)
+    maiden.dead = true;
+    expect(steps(runner, 8, 10)).toBeDefined();
+    // (it was a quarter off the blows at her neighbours: that is gone)
+    maiden.dead = false;
+    const foe = spawn(g, "swordsmen", "red", 10, 12),
+      beside = spawn(g, "berserker", "blue", 10, 11);
+    const blow = g.computeDamage(foe, beside);
+    maiden.dead = true;
+    expect(g.computeDamage(foe, beside)).toBe(blow);
   });
   it("Chosen of the Slain: an Einherjar regains 50 HP when it strikes a foe down", () => {
     const g = field();
@@ -1404,7 +1428,7 @@ describe("the culture tokens", () => {
     expect(UPGRADE_FROM.jotunn.from).toBe("berserker");
     expect(UPGRADE_FROM.coatecpatl.from).toBe("jaguar");
     expect(UPGRADE_FROM.chieftain.from).toBe("eagle");
-    expect(UPGRADE_FROM.golem.from).toBe("sentinel");
+    expect(UPGRADE_FROM.golem.from).toBe("craftsmen"); // (beside the Stone Sentinel, not after it: three upgrades at most)
   });
 });
 
@@ -1417,7 +1441,7 @@ describe("the Primal Warden", () => {
   it("is a hero made from a Druid with a Void Rift Crystal, and shifts between three shapes of its own", () => {
     expect(UPGRADE_FROM.warden).toEqual({ from: "druids", need: "Void" });
     expect(DEPLOY_ELITE.warden).toBe(true);
-    expect(DEPLOY_COST.warden).toBe(400);
+    expect(DEPLOY_COST.warden).toBe(300);
     for (const form of BONUS_FORMS) expect(DEPLOY_ORDER).not.toContain(form);
     const g = field();
     const warden = spawn(g, "warden", "blue", 10, 10);

@@ -712,16 +712,16 @@ kept apart from the original data so that everything else stays checkable agains
   Tsuba of the Shogunate (Satoshi), Sacred Jade Jaguar (Tezcal) and Void Rift Crystal (Tilicia and Isoluccia). Every
   battle and raid of a region rewards 2 of its token (The Harbour Chain also 2 Anchors and The Admiral's Deck 1 Void
   Crystal, for the units they open). They are spent like any collectible, one a unit, but the Merchant does not
-  trade them, and the camp shows them once the bonus campaigns are open. Upgrades paid in tokens: Anchor: Militia
-  to Marines, Footmen to Gladiators, Raiders to Beast Master. Tsuba: Shamans to Sohei, Footmen to Samurai, Archers to
-  Shinobi, Samurai to Oni, Beast Master to Tengu. Void: Griffon Riders to Dragon Riders, Priests to Alchemist, Stone
-  Sentinel to Golem, Druids to Primal Warden. Jade: Militia to Jaguar Warriors, Archers to Eagle Warriors, Cavalry to
-  Feathered Serpent, Shamans to Sun Priest. Bloodstone: Militia to Berserkers, Footmen to Shieldmaidens,
-  Shieldmaidens to Einherjar, Berserkers to Jotunn. Scarab: Archers to Medjay, Militia to Khopesh Warriors, Priests
-  to Anubis Priest, Blood Gorgers to Ammit. Whalebone: Militia to Toa, Raiders to Tahuanui Riders, Shamans to
-  Tohunga, Dune Sirens to Taniwha. Obsidian: Jaguar Warriors to Coatecpatl, Blood Gorgers to Ahuizotl, Eagle
-  Warriors to Cuahchic Chieftain, Shamans to Tzitzimitl. Cragsmen, Spellwardens, Stone Sentinel, Pavisiers and the
-  Battlemage keep the original collectibles. The tokens give a unit a branch per culture beside its six original
+  trade them, and the camp shows them once the bonus campaigns are open. Upgrades paid in tokens (as re-drawn by
+  "The rebalance" below): Anchor: Footmen to Marines, Swordsmen to Gladiators, Raiders to Beast Master. Tsuba:
+  Halberdiers to Sohei, Footmen to Samurai, Rangers to Shinobi, Samurai to Oni, Beast Master to Tengu. Void: Cavalry to
+  Dragon Riders, Shamans to Alchemist, Craftsmen to Golem, Druids to Primal Warden. Jade: Militia to Jaguar
+  Warriors, Archers to Eagle Warriors, Cavalry to Feathered Serpent, Priests to Sun Priest. Bloodstone: Militia to
+  Berserkers, Footmen to Shieldmaidens, Shieldmaidens to Einherjar, Berserkers to Jotunn. Scarab: Archers to Medjay,
+  Swordsmen to Khopesh Warriors, Shamans to Anubis Priest, Dune Sirens to Ammit. Whalebone: Militia to Toa, Raiders
+  to Tahuanui Riders, Shamans to Tohunga, Dune Sirens to Taniwha. Obsidian: Jaguar Warriors to Coatecpatl, Raiders to
+  Ahuizotl, Eagle Warriors to Cuahchic Chieftain, Shamans to Tzitzimitl. Cragsmen, Spellwardens, Stone Sentinel,
+  Pavisiers and the Battlemage keep the original collectibles. The tokens give a unit a branch per culture beside its six original
   slots, start each culture from the Militia or another early unit, and exist only after Episode II is won, so no
   bonus unit can be taken back into the original campaigns before they are finished. (Paths written elsewhere in
   this section with original collectibles for these units are superseded by this list.)

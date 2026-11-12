@@ -533,9 +533,9 @@ export const BONUS_WEAPONS = {
   100: {
     name: "Dropped Stone",
     row: 20, // Rock
-    range: [2, 3],
+    range: [2, 4],
     tags: [8], // Shoot and Move
-    desc: "A Dropped Stone falls on a foe 2 to 3 tiles away. Whatever else the Pterosaur is carrying falls with it.",
+    desc: "A Dropped Stone falls on a foe 2 to 4 tiles away. Whatever else the Pterosaur is carrying falls with it.",
   },
   101: {
     name: "Tyrant Jaws",
@@ -782,7 +782,9 @@ export const BONUS_COMBAT = {
   // shadowStep: hides on ANY ground (not only in cover) when it ends a turn unattacking, and its blows from hiding land
   // as an ambush (+30 on the cell, like a charge)
   shinobi: { move: 5, weapon: 46, weapon2: 47, armour: 3, rating: 3, rf: 90, abilities: [16], shadowStep: true },
-  // quake: its blow also shakes every other enemy standing next to its TARGET, at half strength
+  // sunder: the foe its blow lands on has its armour broken for the rest of the battle (the Obsidian Spikes' status).
+  // (It was Earthshaker, a blow shared with the foes beside its target, until the Trench Behemoth's Sweeping Bite did
+  // the same thing better: user decision — no two units with the same trick.)
   oni: {
     move: 3,
     weapon: 48,
@@ -791,8 +793,9 @@ export const BONUS_COMBAT = {
     rating: 4,
     rf: 100,
     abilities: [14, 4],
-    quake: true,
+    sunder: true,
     armourName: "Oni Hide",
+    armourBonus: 5,
   },
   // gale: the foe it strikes is thrown one tile back (and so cannot strike back), when there is room behind it
   tengu: {
@@ -823,7 +826,8 @@ export const BONUS_COMBAT = {
     conjures: "imp",
   },
   imp: { move: 6, weapon: 53, weapon2: 0, armour: 2, rating: 2, rf: 75, abilities: [], fly: true, summoned: true },
-  // stoneskin: no single blow takes more than this many HP from it
+  // stoneskin: no single blow takes more than this many HP from it. (Bulwark is the Stone Sentinel's alone: the two
+  // stand side by side under the Craftsmen now, one that cannot be charged or flanked, one that cannot be hit hard.)
   golem: {
     move: 3,
     weapon: 52,
@@ -833,7 +837,6 @@ export const BONUS_COMBAT = {
     rf: 100,
     abilities: [14, 4],
     unyielding: true,
-    bulwark: true,
     stoneskin: 20,
     armourName: "Rune Stone",
   },
@@ -932,8 +935,10 @@ export const BONUS_COMBAT = {
     tailwind: 1,
     dmgBonus: 10,
   },
-  // JARNHEIM. rage: +1 on the cell of its blows for every this-many HP it has lost. shieldWall: the share of a blow
-  // hand to hand that a friend beside it is spared (%). valhalla: HP it regains when it strikes a foe down.
+  // JARNHEIM. rage: +1 on the cell of its blows for every this-many HP it has lost. shieldWall: an enemy ground unit
+  // that steps onto a tile beside it must stop there (it was a share of a blow spared to the friends beside it, until
+  // the Brass Phalanx's Shield Lock: user decision — no two units with the same trick). valhalla: HP it regains when
+  // it strikes a foe down.
   // frost: its blow chills its target and every other enemy beside that target (half movement on their next turn).
   berserker: {
     move: 5,
@@ -955,7 +960,7 @@ export const BONUS_COMBAT = {
     rf: 100,
     abilities: [5],
     formation: true,
-    shieldWall: 25,
+    shieldWall: true,
   },
   einherjar: {
     move: 4,
@@ -1059,7 +1064,7 @@ export const BONUS_COMBAT = {
     aquatic: true,
     lurker: 20,
     armourName: "Scaled Hide",
-    armourBonus: 10,
+    armourBonus: 5,
   },
   // COATLAN. venom: its blows leave the flask's acid (5 HP a turn, 3 turns). seize: the foe it strikes cannot attack
   // on its next turn. vanguard: friends beside it strike first. drain: the share (%) of its Starfire's damage it
@@ -1145,13 +1150,15 @@ export const BONUS_COMBAT = {
     weapon: 3, // the original Spear
     weapon2: 0,
     armour: 9,
-    rating: 4,
-    rf: 100,
+    rating: 5,
+    rf: 115,
     abilities: [],
     culture: "trench",
     crush: true,
     lure: 4,
     shoreStride: true,
+    dmgBonus: 10,
+    armourBonus: 5,
   },
   brinehurler: {
     move: 4,
@@ -1364,57 +1371,57 @@ export const BONUS_COST = {
   pavisiers: 200,
   battlemage: 750,
   gladiator: 175,
-  samurai: 250,
+  samurai: 300,
   dragonrider: 750,
   beastmaster: 250,
   hounds: 0, // called by the Beast Master, never deployed
   sohei: 175,
   shinobi: 225,
-  oni: 350,
+  oni: 325,
   tengu: 325,
   alchemist: 250,
   imp: 0, // summoned by the Alchemist
-  golem: 400,
+  golem: 325,
   unicorn: 275,
   efreet: 350,
   naga: 300,
   skeleton: 500,
   jaguar: 150,
   eagle: 175,
-  sunpriest: 400,
-  serpent: 300,
+  sunpriest: 325,
+  serpent: 275,
   berserker: 175,
-  shieldmaiden: 200,
+  shieldmaiden: 175,
   einherjar: 275,
   jotunn: 425,
-  medjay: 175,
+  medjay: 150,
   khopesh: 175,
-  anubis: 275,
-  ammit: 275,
+  anubis: 250,
+  ammit: 250,
   toa: 150,
-  tahuanui: 250,
+  tahuanui: 225,
   tohunga: 250,
-  taniwha: 375,
-  coatecpatl: 200,
-  ahuizotl: 175,
-  chieftain: 275,
+  taniwha: 325,
+  coatecpatl: 175,
+  ahuizotl: 150,
+  chieftain: 250,
   tzitzimitl: 250,
-  warden: 400,
+  warden: 300,
   panther: 0, // the Warden's shapes are never deployed
   tortoise: 0,
   manta: 0,
-  scuttler: 225,
-  siren: 225,
-  brinehurler: 250,
-  behemoth: 500,
-  phalanx: 225,
+  scuttler: 200,
+  siren: 250,
+  brinehurler: 200,
+  behemoth: 450,
+  phalanx: 175,
   arccaster: 225,
-  gyrocopter: 175,
+  gyrocopter: 200,
   automaton: 100,
-  raptor: 200,
-  ankylosaur: 325,
+  raptor: 175,
+  ankylosaur: 275,
   pterosaur: 250,
-  tyrant: 700,
+  tyrant: 600,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
 export const BONUS_ELITE = {
@@ -1581,7 +1588,8 @@ export const BONUS_TYPES = {
     frameH: 96,
     hitFrame: 2,
     kind: "melee",
-    ability: "Earthshaker — its blow shakes every other enemy beside its target at half strength. Fear, Fearless.",
+    ability:
+      "Sunder — the foe it strikes is Shattered: every blow at it lands 10 harder for the rest of the battle. Fear, Fearless.",
   },
   tengu: {
     name: "Tengu",
@@ -1753,7 +1761,7 @@ export const BONUS_TYPES = {
     frameH: 88,
     hitFrame: 2,
     kind: "melee",
-    ability: "Shield Wall — friends beside it take a quarter less in melee. Formation.",
+    ability: "Shield Wall — an enemy ground unit that steps beside it must stop there. Formation.",
   },
   einherjar: {
     name: "Einherjar",
@@ -2084,7 +2092,7 @@ export const BONUS_TYPES = {
     kind: "ranged",
     projectile: "stone",
     ability:
-      "Harvest — lifts caltrops, quicksand, a Flooded tile or boulders off the map and drops them with its next stone. Dropped Stone: 2–3 tiles, and it may still move. Flies. Apex Roar.",
+      "Harvest — lifts caltrops, quicksand, a Flooded tile or boulders off the map and drops them with its next stone. Dropped Stone: 2–4 tiles, and it may still move. Flies. Apex Roar.",
   },
   tyrant: {
     name: "Theropod Tyrant",
@@ -2198,7 +2206,7 @@ export const BONUS_SKILLS = [
     flag: "shieldWall",
     n: "Shield Wall",
     icon: "skill_pavise",
-    d: "Every friendly unit standing beside it takes a quarter less from blows hand to hand.",
+    d: "No enemy slips past her: an enemy ground unit that steps onto a tile beside a Shieldmaiden must stop there. It can still strike from that tile, and fliers pass overhead.",
   },
   {
     flag: "valhalla",
@@ -2321,10 +2329,10 @@ export const BONUS_SKILLS = [
     d: "Hides on any ground, not only in cover, when it ends a turn without attacking and no enemy stands beside it. A blow or throw from hiding is an ambush: 30 stronger on the weapon and armour table.",
   },
   {
-    flag: "quake",
-    n: "Earthshaker",
+    flag: "sunder",
+    n: "Sunder",
     icon: "skill_unyielding",
-    d: "Its blow shakes the ground: every other enemy standing next to its target takes half of it.",
+    d: "Its kanabo breaks armour: the foe it strikes is Shattered, and every blow at that foe lands 10 stronger on the weapon and armour table for the rest of the battle. Magic gains nothing from it.",
   },
   {
     flag: "gale",
@@ -2523,20 +2531,22 @@ export const BONUS_UPGRADES_ALL = [
   // things: a unit can carry one branch per token without crowding its six original slots; a culture's first unit
   // hangs straight off the Militia (or another early unit), so the road to it is short; and since the tokens exist
   // only after Episode II is won, no bonus unit can be carried back to steamroll the original campaigns early.
+  // THE SHAPE OF THE TREE (user decision): no bonus unit stands more than three upgrades from the Militia, no unit
+  // carries more than four bonus branches, and no upgrade costs fewer deployment points than the unit it is made from.
   // Triton's Anchor — the naval regions
-  { from: "militiamen", to: "marines", need: "Anchor", gate: 5924 }, // Isoluccia 1, The Harbour Chain
-  { from: "footmen", to: "gladiator", need: "Anchor", gate: 5942 }, // Mare Nostra 2
+  { from: "footmen", to: "marines", need: "Anchor", gate: 5924 }, // Isoluccia 1, The Harbour Chain
+  { from: "swordsmen", to: "gladiator", need: "Anchor", gate: 5942 }, // Mare Nostra 2
   { from: "raiders", to: "beastmaster", need: "Anchor", gate: 5982 }, // the Mirror Sea 2
   // Tsuba of the Shogunate — Satoshi
-  { from: "shamans", to: "sohei", need: "Tsuba", gate: 5961 }, // Satoshi 1
+  { from: "halberdiers", to: "sohei", need: "Tsuba", gate: 5961 }, // Satoshi 1
   { from: "footmen", to: "samurai", need: "Tsuba", gate: 5962 }, // Satoshi 2
-  { from: "archers", to: "shinobi", need: "Tsuba", gate: 5962 }, // Satoshi 2
+  { from: "rangers", to: "shinobi", need: "Tsuba", gate: 5962 }, // Satoshi 2
   { from: "samurai", to: "oni", need: "Tsuba", gate: 5963 }, // Satoshi 3
   { from: "beastmaster", to: "tengu", need: "Tsuba", gate: 5963 }, // Satoshi 3
   // Void Rift Crystal — the fantastical: Tilicia and Isoluccia
-  { from: "griffon", to: "dragonrider", need: "Void", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
-  { from: "priests", to: "alchemist", need: "Void", gate: 5925 }, // Isoluccia 2, The Arsenal
-  { from: "sentinel", to: "golem", need: "Void", gate: 5912 }, // Tilicia raid 2, Quarry of Giants
+  { from: "cavalry", to: "dragonrider", need: "Void", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
+  { from: "shamans", to: "alchemist", need: "Void", gate: 5925 }, // Isoluccia 2, The Arsenal
+  { from: "craftsmen", to: "golem", need: "Void", gate: 5912 }, // Tilicia raid 2, Quarry of Giants
   { from: "druids", to: "warden", need: "Void", gate: 5906 }, // Tilicia 3, The Empty Tomb
   // the Beast Master's creatures, hidden for now (BONUS_HIDDEN)
   { from: "beastmaster", to: "unicorn", need: "Lore", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
@@ -2547,7 +2557,7 @@ export const BONUS_UPGRADES_ALL = [
   { from: "militiamen", to: "jaguar", need: "Jade", gate: 5994 }, // Tezcal 1
   { from: "archers", to: "eagle", need: "Jade", gate: 5995 }, // Tezcal 2
   { from: "cavalry", to: "serpent", need: "Jade", gate: 5996 }, // Tezcal 3
-  { from: "shamans", to: "sunpriest", need: "Jade", gate: 5996 }, // Tezcal 3
+  { from: "priests", to: "sunpriest", need: "Jade", gate: 5996 }, // Tezcal 3
   // Glacial Bloodstone — Jarnheim
   { from: "militiamen", to: "berserker", need: "Bloodstone", gate: 5914 }, // Jarnheim 1
   { from: "footmen", to: "shieldmaiden", need: "Bloodstone", gate: 5915 }, // Jarnheim 2
@@ -2555,9 +2565,9 @@ export const BONUS_UPGRADES_ALL = [
   { from: "berserker", to: "jotunn", need: "Bloodstone", gate: 5916 }, // Jarnheim 3
   // Scarab of the Duat — Khemret
   { from: "archers", to: "medjay", need: "Scarab", gate: 5934 }, // Khemret 1
-  { from: "militiamen", to: "khopesh", need: "Scarab", gate: 5935 }, // Khemret 2
-  { from: "priests", to: "anubis", need: "Scarab", gate: 5936 }, // Khemret 3
-  { from: "bloodgorgers", to: "ammit", need: "Scarab", gate: 5936 }, // Khemret 3
+  { from: "swordsmen", to: "khopesh", need: "Scarab", gate: 5935 }, // Khemret 2
+  { from: "shamans", to: "anubis", need: "Scarab", gate: 5936 }, // Khemret 3
+  { from: "dunesirens", to: "ammit", need: "Scarab", gate: 5936 }, // Khemret 3
   // Carved Whalebone — Moananui
   { from: "militiamen", to: "toa", need: "Whalebone", gate: 5944 }, // Moananui 1
   { from: "raiders", to: "tahuanui", need: "Whalebone", gate: 5945 }, // Moananui 2
@@ -2565,24 +2575,24 @@ export const BONUS_UPGRADES_ALL = [
   { from: "dunesirens", to: "taniwha", need: "Whalebone", gate: 5946 }, // Moananui 3
   // Smoldering Obsidian — Coatlan
   { from: "jaguar", to: "coatecpatl", need: "Obsidian", gate: 5954 }, // Coatlan 1
-  { from: "bloodgorgers", to: "ahuizotl", need: "Obsidian", gate: 5955 }, // Coatlan 2
+  { from: "raiders", to: "ahuizotl", need: "Obsidian", gate: 5955 }, // Coatlan 2
   { from: "eagle", to: "chieftain", need: "Obsidian", gate: 5956 }, // Coatlan 3
   { from: "shamans", to: "tzitzimitl", need: "Obsidian", gate: 5956 }, // Coatlan 3
   // Abyssal Pearl — Thalassar (the Trench Brood)
-  { from: "militiamen", to: "scuttler", need: "Pearl", gate: 5964 }, // Thalassar 1
+  { from: "footmen", to: "scuttler", need: "Pearl", gate: 5964 }, // Thalassar 1
   { from: "dunesirens", to: "siren", need: "Pearl", gate: 5965 }, // Thalassar 2
   { from: "crossbowmen", to: "brinehurler", need: "Pearl", gate: 5965 }, // Thalassar 2
   { from: "scuttler", to: "behemoth", need: "Pearl", gate: 5966 }, // Thalassar 3
   // Overclocked Mainspring — Brasshaven (the Clockwork Syndicate)
   { from: "militiamen", to: "automaton", need: "Mainspring", gate: 5973 }, // Brasshaven 1
-  { from: "footmen", to: "phalanx", need: "Mainspring", gate: 5974 }, // Brasshaven 2
+  { from: "halberdiers", to: "phalanx", need: "Mainspring", gate: 5974 }, // Brasshaven 2
   { from: "crossbowmen", to: "arccaster", need: "Mainspring", gate: 5974 }, // Brasshaven 2
   { from: "archers", to: "gyrocopter", need: "Mainspring", gate: 5975 }, // Brasshaven 3
   // Amber Catalyst — the Amber Reach (the Saurian Exiles)
-  { from: "militiamen", to: "raptor", need: "Amber", gate: 5984 }, // the Amber Reach 1
-  { from: "pikemen", to: "ankylosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
-  { from: "raiders", to: "pterosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
-  { from: "ankylosaur", to: "tyrant", need: "Amber", gate: 5986 }, // the Amber Reach 3
+  { from: "raiders", to: "raptor", need: "Amber", gate: 5984 }, // the Amber Reach 1
+  { from: "halberdiers", to: "ankylosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
+  { from: "horsebowmen", to: "pterosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
+  { from: "raptor", to: "tyrant", need: "Amber", gate: 5986 }, // the Amber Reach 3
 ];
 // …those the game offers (none into or out of a hidden unit)
 export const BONUS_UPGRADES = BONUS_UPGRADES_ALL.filter(
@@ -2654,7 +2664,7 @@ export const BONUS_META = {
   oni: {
     role: "Mountain Ogre",
     kit: "⚔ Kanabo · 🛡 Oni Hide",
-    note: "A red ogre of the high passes with an iron club. Slow and terrible: its blow shakes every foe beside the one it lands on.",
+    note: "A red ogre of the high passes with an iron club. Slow and terrible: the armour it strikes stays broken, and every blow after its own lands harder.",
   },
   tengu: {
     role: "Wind Spirit",
@@ -2669,7 +2679,7 @@ export const BONUS_META = {
   golem: {
     role: "Rune Construct",
     kit: "⚔ Rune Fists · 🛡 Rune Stone",
-    note: "A Stone Sentinel rebuilt with rune-cut armour. Slower still, but no single blow takes more than 20 HP from it.",
+    note: "A craftsman's giant of rune-cut stone. Slower than a Stone Sentinel, and a charge or a flank still tells on it, but no single blow takes more than 20 HP from it.",
   },
   unicorn: {
     role: "Winged Unicorn",
@@ -2719,7 +2729,7 @@ export const BONUS_META = {
   shieldmaiden: {
     role: "Shield-wall Infantry",
     kit: "⚔ Arming Sword · 🛡 Heavy Armor & Shield",
-    note: "The shield wall of Jarnheim. Friends who stand beside a Shieldmaiden take a quarter less from every blow hand to hand.",
+    note: "The shield wall of Jarnheim. No enemy on foot or horse slips past a Shieldmaiden: whoever steps beside her stops there.",
   },
   einherjar: {
     role: "Chosen Dead",
@@ -2799,7 +2809,7 @@ export const BONUS_META = {
   scuttler: {
     role: "Armoured Crab",
     kit: "⚔ Crusher Claw · 🛡 Carapace",
-    note: "The shield wall of the Trench Brood. Its shell turns 40% of every blow, and the foe it grips cannot move on its next turn. Catch it between two of your own and the shell counts for nothing.",
+    note: "The armoured front of the Trench Brood. Its shell turns 40% of every blow, and the foe it grips cannot move on its next turn. Catch it between two of your own and the shell counts for nothing.",
   },
   siren: {
     role: "Deep Singer",

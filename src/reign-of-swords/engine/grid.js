@@ -534,6 +534,7 @@ export class GridMethods {
       from = new Map();
     dist.set(key(u.tx, u.ty), 0);
     const queue = [{ tx: u.tx, ty: u.ty, c: 0 }];
+    const walls = this._shieldWalls(u);
     while (queue.length) {
       queue.sort((a, b) => a.c - b.c);
       const cur = queue.shift();
@@ -547,6 +548,8 @@ export class GridMethods {
       if (this.caltrops && this._caltropsAgainst(u, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
       // …and so do the bonus tiles a unit steps onto but not through: tar, black ice, a sinkhole, a cenote
       if (this._tileStops(u, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
+      // …and a tile beside an enemy Shieldmaiden (her Shield Wall)
+      if (this._besideWall(walls, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
       // 4-DIRECTIONAL movement (orthogonal only) — the original's reach flood-fill `La/q.P()` expands exactly
       // 4 neighbours (`cg=[-1,1,0,0]`, `ch=[0,0,-1,1]`), and its tile metric `a.j.c` is manhattan, so units
       // never step diagonally.
@@ -583,8 +586,18 @@ export class GridMethods {
   // the +30 is the rider's charging flag) in the very next tile along the same lane. We record the lane in dist/from
   // for the dash path and expose ONLY that launch tile as a stop, so a charger can't glide diagonally onto open
   // ground. createChargeTargetList counts a diagonal step's terrain TWICE and the foe's own tile against the move.
+  // BONUS — Shield Wall: the enemy Shieldmaidens a ground unit cannot slip past (none for a flier).
+  _shieldWalls(u) {
+    if (!u.T || u.T.al === 0 || u.T.fly) return [];
+    return this.units.filter((o) => !o.dead && o.team !== u.team && o.T && o.T.shieldWall);
+  }
+  _besideWall(walls, tx, ty) {
+    return walls.some((w) => Math.abs(w.tx - tx) + Math.abs(w.ty - ty) === 1);
+  }
+
   _addChargeLanes(u, moveBudget, dist, from, stops) {
     const chargeable = (f) => !!f && f.team !== u.team && !f.dead;
+    const walls = this._shieldWalls(u);
     for (const [dx, dy] of [
       [1, 1],
       [1, -1],
@@ -625,6 +638,7 @@ export class GridMethods {
           }
           stops.add(key(x, y)); // the launch tile is reachable — to charge FROM, not to loiter on
         }
+        if (this._besideWall(walls, x, y)) break; // BONUS: the gallop ends beside a Shieldmaiden
       }
     }
   }

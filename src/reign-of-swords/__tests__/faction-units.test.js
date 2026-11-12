@@ -77,11 +77,10 @@ describe("the three factions: the data", () => {
           .sort(),
       ).toEqual([...units].sort());
     }
-    // each faction's first unit comes straight from the Militia, and its Huge unit from one of its own
-    for (const first of ["scuttler", "automaton", "raptor"])
-      expect(BONUS_UPGRADES.find((u) => u.to === first).from).toBe("militiamen");
-    expect(BONUS_UPGRADES.find((u) => u.to === "behemoth").from).toBe("scuttler");
-    expect(BONUS_UPGRADES.find((u) => u.to === "tyrant").from).toBe("ankylosaur");
+    // each faction's first unit comes from an early original unit, and its Huge unit from that first unit
+    const from = (unit) => BONUS_UPGRADES.find((u) => u.to === unit).from;
+    expect([from("scuttler"), from("automaton"), from("raptor")]).toEqual(["footmen", "militiamen", "raiders"]);
+    expect([from("behemoth"), from("tyrant")]).toEqual(["scuttler", "raptor"]);
   });
 });
 

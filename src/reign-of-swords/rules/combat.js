@@ -425,17 +425,6 @@ export class CombatMethods {
     else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
     if (attacker._blind) dmg = Math.trunc(dmg / 2); // BONUS: blinded by a Sun Priest's Eclipse
     if (defender.T.physicalHalf && !MAGIC_WEAPONS.includes(weapon)) dmg = Math.trunc(dmg / 2); // BONUS: the Siege-Tortoise's Obsidian Shell
-    // BONUS: Shield Wall — a friend standing beside a Shieldmaiden is spared a share of a blow hand to hand
-    if (dist === 1) {
-      const wall = this.units.reduce(
-        (best, o) =>
-          !o.dead && o !== defender && o.team === defender.team && o.T.shieldWall && manhattan(o, defender) === 1
-            ? Math.max(best, o.T.shieldWall)
-            : best,
-        0,
-      );
-      if (wall) dmg = Math.trunc((dmg * (100 - wall)) / 100);
-    }
     // BONUS: Carapace — the Scuttler's shell turns a share of every blow that does not reach the underside
     if (defender.T.carapace && !exposed) dmg = Math.trunc((dmg * (100 - defender.T.carapace)) / 100);
     // BONUS: Shield Lock — a Brass Phalanx beside another is spared a share of every shot
@@ -1047,7 +1036,7 @@ export class CombatMethods {
       out.push({
         icon: "status_shroud",
         name: "Armour shattered",
-        desc: "Obsidian Spikes broke its heavy armour: every blow at it lands 10 harder for the rest of the battle. A Zen Sand Garden mends it.",
+        desc: "Its armour is broken, by Obsidian Spikes or an Oni's kanabo: every blow at it lands 10 harder for the rest of the battle. A Zen Sand Garden mends it.",
       });
     if (u._roar)
       out.push({
@@ -1719,17 +1708,11 @@ export class CombatMethods {
         if (!e.dead && e !== defender && e.team !== attacker.team && manhattan(e, attacker) === 1 && !this._isHidden(e))
           this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.75), false, false, wMain);
     if (manhattan(attacker, defender) === 1 && opts.weapon == null) {
-      // BONUS: Earthshaker — the Oni's blow shakes every other enemy standing next to its TARGET, at half strength
-      if (attacker.T.quake)
-        for (const e of this.units)
-          if (
-            !e.dead &&
-            e !== defender &&
-            e.team !== attacker.team &&
-            manhattan(e, defender) === 1 &&
-            !this._isHidden(e)
-          )
-            this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.5), false, false, wMain);
+      // BONUS: Sunder — the Oni's kanabo breaks the armour of the foe it strikes (the Obsidian Spikes' status)
+      if (attacker.T.sunder && !defender.dead && !defender._shattered) {
+        defender._shattered = true;
+        this._tileNote(defender, "Shattered");
+      }
       // BONUS: Gale — the Tengu's foe is thrown one tile straight back (so it is out of reach to strike back), unless
       // it is a war engine or the tile behind is taken or no ground it could stand on
       if (
