@@ -467,6 +467,13 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "A Crusher Claw delivers decent damage against all but the heaviest armor, and does not let go.",
   },
+  90: {
+    name: "Coral Trident",
+    row: 3, // Spear
+    range: [1, 1],
+    tags: [],
+    desc: "A Coral Trident delivers decent damage against all but the heaviest armor: it is for whatever her song has brought within reach.",
+  },
   91: {
     name: "Toxic Coral",
     row: 20, // Rock
@@ -497,10 +504,10 @@ export const BONUS_WEAPONS = {
   },
   95: {
     name: "Caltrops",
-    row: 8, // Short Sword
-    range: [1, 2],
+    row: 19, // Short Bow
+    range: [2, 4],
     tags: [8], // Shoot and Move
-    desc: "Caltrops are scattered at 1 to 2 tiles. They do little harm as they fall, and stay where they land until an enemy clears them.",
+    desc: "Caltrops are flung at 2 to 4 tiles: a scatter of iron that wounds lightly armoured troops as it falls, and stays where it lands until an enemy clears it.",
   },
   96: {
     name: "Ram",
@@ -1142,11 +1149,11 @@ export const BONUS_COMBAT = {
   },
   siren: {
     move: 5,
-    weapon: 1,
+    weapon: 90,
     weapon2: 0,
     armour: 9,
-    rating: 3,
-    rf: 90,
+    rating: 4,
+    rf: 100,
     abilities: [],
     culture: "trench",
     crush: true,
@@ -1204,8 +1211,8 @@ export const BONUS_COMBAT = {
     weapon: 94,
     weapon2: 8,
     armour: 5,
-    rating: 3,
-    rf: 90,
+    rating: 4,
+    rf: 100,
     abilities: [8],
     culture: "clockwork",
     overdrive: true,
@@ -1215,9 +1222,9 @@ export const BONUS_COMBAT = {
     move: 8,
     weapon: 95,
     weapon2: 0,
-    armour: 3,
-    rating: 2,
-    rf: 75,
+    armour: 7,
+    rating: 3,
+    rf: 90,
     abilities: [8],
     fly: true,
     culture: "clockwork",
@@ -1273,8 +1280,8 @@ export const BONUS_COMBAT = {
     weapon: 100,
     weapon2: 2,
     armour: 7,
-    rating: 3,
-    rf: 90,
+    rating: 4,
+    rf: 100,
     abilities: [8],
     fly: true,
     culture: "saurian",
@@ -1403,17 +1410,17 @@ export const BONUS_COST = {
   panther: 0, // the Warden's shapes are never deployed
   tortoise: 0,
   manta: 0,
-  scuttler: 250,
+  scuttler: 225,
   siren: 225,
-  brinehurler: 275,
+  brinehurler: 250,
   behemoth: 500,
   phalanx: 225,
   arccaster: 225,
-  gyrocopter: 200,
+  gyrocopter: 175,
   automaton: 100,
   raptor: 200,
   ankylosaur: 325,
-  pterosaur: 300,
+  pterosaur: 250,
   tyrant: 700,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
@@ -2475,7 +2482,7 @@ export const BONUS_SKILLS = [
     flag: "caltrops",
     n: "Caltrops",
     icon: "skill_ambush",
-    d: "The tile it attacks is strewn with caltrops, and it can strew an empty tile too. They never expire: an enemy ground unit that steps on them stops there and loses 10 HP. An enemy standing on or beside them can spend its action to clear them.",
+    d: "The tile it shoots at is strewn with caltrops, and it can strew an empty tile too. They never expire: an enemy ground unit that steps on them stops there and loses 10 HP. An enemy standing on or beside them can spend its action to clear them.",
   },
   {
     flag: "volatile",
@@ -2577,7 +2584,7 @@ export const BONUS_UPGRADES_ALL = [
   { from: "militiamen", to: "automaton", need: "Mainspring", gate: 5973 }, // Brasshaven 1
   { from: "footmen", to: "phalanx", need: "Mainspring", gate: 5974 }, // Brasshaven 2
   { from: "crossbowmen", to: "arccaster", need: "Mainspring", gate: 5974 }, // Brasshaven 2
-  { from: "horsebowmen", to: "gyrocopter", need: "Mainspring", gate: 5975 }, // Brasshaven 3
+  { from: "archers", to: "gyrocopter", need: "Mainspring", gate: 5975 }, // Brasshaven 3
   // Amber Catalyst — the Amber Reach (the Saurian Exiles)
   { from: "militiamen", to: "raptor", need: "Amber", gate: 5984 }, // the Amber Reach 1
   { from: "pikemen", to: "ankylosaur", need: "Amber", gate: 5985 }, // the Amber Reach 2
@@ -2803,8 +2810,8 @@ export const BONUS_META = {
   },
   siren: {
     role: "Deep Singer",
-    kit: "⚔ Lure / Staff · 🛡 Holy Vestment",
-    note: "A caster of the drowned temples who does no harm herself. Her song drags a foe 2 tiles out of its line, into the open or into whatever the Brood has made of the ground, and leaves it Snared there.",
+    kit: "⚔ Lure / Coral Trident · 🛡 Holy Vestment",
+    note: "A caster of the drowned temples whose song does no harm. It drags a foe 2 tiles out of its line, into the open or into whatever the Brood has made of the ground, and leaves it Snared there, within reach of her trident.",
   },
   brinehurler: {
     role: "Coral Artillery",
@@ -2828,8 +2835,8 @@ export const BONUS_META = {
   },
   gyrocopter: {
     role: "Flying Minelayer",
-    kit: "⚔ Caltrops · 🛡 Light Armor",
-    note: "A fragile scout that flies over anything. It does not fight: it strews caltrops that stop and wound whatever walks onto them, and they stay until the enemy spends a turn sweeping them up.",
+    kit: "⚔ Caltrops · 🛡 Feathered Hide",
+    note: "A fragile scout that flies over anything. It never closes: it flings caltrops from 2 to 4 tiles that stop and wound whatever walks onto them, and they stay until the enemy spends a turn sweeping them up.",
   },
   automaton: {
     role: "Walking Bomb",

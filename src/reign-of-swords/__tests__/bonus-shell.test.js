@@ -26,7 +26,7 @@ const idx = (id) => camp.kingdoms.findIndex((k) => k.id === id);
 const storyOf = (id) => camp.kingdoms[idx(id)].missions.map((m) => m.mapId);
 
 describe("bonus kingdoms on the campaign map", () => {
-  it("are ten extra regions with their story battles and raids, each with a place on the Episode II map", () => {
+  it("are thirteen extra regions with their story battles and raids, each with a place on the Episode II map", () => {
     expect(bonus.kingdoms.map((k) => k.id)).toEqual([
       "tilicia",
       "isoluccia",
@@ -38,6 +38,9 @@ describe("bonus kingdoms on the campaign map", () => {
       "khemret",
       "moananui",
       "coatlan",
+      "thalassar",
+      "brasshaven",
+      "amber-reach",
     ]);
     expect(bonus.kingdoms.map((k) => k.name).slice(2)).toEqual([
       "Mare Nostra",
@@ -48,6 +51,9 @@ describe("bonus kingdoms on the campaign map", () => {
       "The Sands of Khemret",
       "The Isles of Moananui",
       "The Highlands of Coatlan",
+      "The Drowned Coast of Thalassar",
+      "The Foundries of Brasshaven",
+      "The Amber Reach",
     ]);
     for (const kingdom of bonus.kingdoms) {
       const small = !["tilicia", "isoluccia"].includes(kingdom.id); // 2 raids; the first two have 3
@@ -87,10 +93,10 @@ describe("bonus kingdoms on the campaign map", () => {
     const mirrorDone = new Set([...seaDone, ...storyOf("mirror-sea")]);
     expect(kingdomUnlocked(camp, idx("tezcal"), mirrorDone)).toBe(true);
   });
-  it("Jarnheim, Khemret, Moananui and Coatlan open with the bonus campaigns, beside Tilicia, and nothing waits on them", () => {
+  it("Jarnheim, Khemret, Moananui, Coatlan and the three factions' regions open with the bonus campaigns, beside Tilicia, and nothing waits on them", () => {
     const beforeLast = new Set([...progressBefore(original, levels, -1)].filter((id) => id !== 5432));
     const done = progressBefore(original, levels, -1);
-    for (const id of ["jarnheim", "khemret", "moananui", "coatlan"]) {
+    for (const id of ["jarnheim", "khemret", "moananui", "coatlan", "thalassar", "brasshaven", "amber-reach"]) {
       expect(camp.kingdoms[idx(id)].unlockAfter).toEqual(camp.kingdoms[idx("tilicia")].unlockAfter);
       expect(kingdomUnlocked(camp, idx(id), beforeLast)).toBe(false);
       expect(kingdomUnlocked(camp, idx(id), done)).toBe(true); // with no bonus battle fought yet
@@ -147,6 +153,18 @@ describe("bonus kingdoms on the campaign map", () => {
       [5954, "coatecpatl"],
       [5955, "ahuizotl"],
       [5956, "chieftain"],
+      [5964, "scuttler"], // the three factions: each story battle hands out the unit (or two) it opens
+      [5965, "siren"],
+      [5965, "brinehurler"],
+      [5966, "behemoth"],
+      [5973, "automaton"],
+      [5974, "phalanx"],
+      [5974, "arccaster"],
+      [5975, "gyrocopter"],
+      [5984, "raptor"],
+      [5985, "ankylosaur"],
+      [5985, "pterosaur"],
+      [5986, "tyrant"],
     ]) {
       expect(gives(mapId)).toContain(unit);
       expect(unlocksOf(mapId, true)).toContain(unit);

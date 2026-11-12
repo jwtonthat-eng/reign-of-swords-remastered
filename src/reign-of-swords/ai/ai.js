@@ -150,7 +150,8 @@ export class AiMethods {
     if ((u.T.repair || u.T.build) && this._aiTryCraftsmen(u, reach)) return;
     if (u.type === "bodyguard" && u._conjuredBy != null && this._aiTryAbsorb(u, reach)) return;
     if (u.T.detonate && this._aiTryDetonate(u, reach, enemies)) return;
-    if (u.T.lure && this._aiTryLure(u, enemies)) return; // BONUS: the Siren Channeler
+    // BONUS: the Siren Channeler sings when there is nobody her trident can reach this turn
+    if (u.T.lure && !this._aiHasTarget(u) && this._aiTryLure(u, enemies)) return;
     if (this._aiTryClearCaltrops(u)) return; // BONUS: a unit the Gyrocopter's caltrops stopped
     this._aiFightOrAdvance(u, { reach, stops, enemies, foes, wizMove, noAttack, foeTeam });
   }

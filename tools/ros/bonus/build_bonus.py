@@ -80,6 +80,18 @@ SPEAKERS = {
     # Coatlan (Eagle Captain Cuali, above, is its guide too)
     "itzpapal": ("Itzpapal the Star-Eater", "foe", "face083"),
     "itzpapal_hurt": ("Itzpapal the Star-Eater", "foe", "face083"),
+    # Thalassar (the Trench Brood)
+    "nacre": ("Tide-Mother Nacre", "foe", "face083"),
+    "nacre_hurt": ("Tide-Mother Nacre", "foe", "face083"),
+    "brannoch": ("Pilot Brannoch", "you", "face078"),
+    # Brasshaven (the Clockwork Syndicate)
+    "volkmar": ("Chief Artificer Volkmar", "foe", "face072"),
+    "volkmar_hurt": ("Chief Artificer Volkmar", "foe", "face074"),
+    "wren": ("Wren the Tinker", "you", "face086"),
+    # the Amber Reach (the Saurian Exiles)
+    "rashkar": ("Exile-King Rashkar", "foe", "face069"),
+    "rashkar_hurt": ("Exile-King Rashkar", "foe", "face071"),
+    "orin": ("Orin the Trapper", "you", "face075"),
 }
 
 
@@ -675,6 +687,9 @@ def main():
     import khemret
     import moananui
     import coatlan
+    import thalassar
+    import brasshaven
+    import amber_reach
 
     data = build(
         [
@@ -688,6 +703,9 @@ def main():
             khemret.KINGDOM,
             moananui.KINGDOM,
             coatlan.KINGDOM,
+            thalassar.KINGDOM,
+            brasshaven.KINGDOM,
+            amber_reach.KINGDOM,
         ]
     )
     stats = ", ".join("%d %s" % (sum(1 for l in data["levels"] if l["group"] == g), g) for g in ("story", "siege"))

@@ -188,7 +188,7 @@ describe("bonus units: upgrade paths", () => {
       ["militiamen", "automaton", "Mainspring"],
       ["footmen", "phalanx", "Mainspring"],
       ["crossbowmen", "arccaster", "Mainspring"],
-      ["horsebowmen", "gyrocopter", "Mainspring"],
+      ["archers", "gyrocopter", "Mainspring"],
       ["militiamen", "raptor", "Amber"],
       ["pikemen", "ankylosaur", "Amber"],
       ["raiders", "pterosaur", "Amber"],

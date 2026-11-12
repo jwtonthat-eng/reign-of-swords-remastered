@@ -1,7 +1,7 @@
 // The BONUS campaigns (Tilicia & Isoluccia — ours, built by tools/ros/bonus/build_bonus.py into bonus.json): the
 // records load beside Episode II's own maps and their scripted events fire through the original's scenario VM.
 import { describe, it, expect } from "vitest";
-import { loadEpisode, makeGame, startBattle, nextRound, put, step } from "./battle.js";
+import { loadEpisode, makeGame, startBattle, nextRound, put, step, spawn } from "./battle.js";
 import { missionList } from "../engine/engine.js";
 import { moveType } from "../rules/terrain.js";
 import { readFileSync } from "node:fs";
@@ -12,11 +12,11 @@ const mine = (g) => g.units.filter((u) => !u.dead && u.team === "blue" && !u.all
 const foes = (g) => g.units.filter((u) => !u.dead && u.team === "red");
 
 describe("bonus campaigns: loading", () => {
-  it("adds 52 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
+  it("adds 67 bonus battles to Episode II and leaves its own 100-odd maps in place", () => {
     const maps = missionList();
     const bonus = maps.filter((m) => m.mapId >= 5900 && m.mapId < 6000);
-    expect(bonus.filter((m) => m.group === "story").length).toBe(30); // 3 in each of the ten regions
-    expect(bonus.filter((m) => m.group === "siege").length).toBe(22); // 3 + 3, then 2 in each of the other eight
+    expect(bonus.filter((m) => m.group === "story").length).toBe(39); // 3 in each of the thirteen regions
+    expect(bonus.filter((m) => m.group === "siege").length).toBe(28); // 3 + 3, then 2 in each of the other eleven
     expect(maps.some((m) => m.mapId === 5432)).toBe(true);
   });
 });
@@ -379,10 +379,25 @@ describe("Moananui and Coatlan: every army mustered, and their scripted endings"
       khemret: "Scarab",
       moananui: "Whalebone",
       coatlan: "Obsidian",
+      thalassar: "Pearl", // the three factions
+      brasshaven: "Mainspring",
+      "amber-reach": "Amber",
     };
     // …and the three battles that also hand out a token of another kind, for the unit they unlock
     const ALSO = { 5924: { Anchor: 2 }, 5943: { Void: 1 } }; // Marines at the Harbour Chain; the Dragon Rider
-    const TOKENS = ["Bloodstone", "Scarab", "Obsidian", "Whalebone", "Anchor", "Tsuba", "Jade", "Void"];
+    const TOKENS = [
+      "Bloodstone",
+      "Scarab",
+      "Obsidian",
+      "Whalebone",
+      "Anchor",
+      "Tsuba",
+      "Jade",
+      "Void",
+      "Pearl",
+      "Mainspring",
+      "Amber",
+    ];
     expect(built.kingdoms.map((k) => k.id).sort()).toEqual(Object.keys(TOKEN).sort());
     for (const kingdom of built.kingdoms) {
       const mine = TOKEN[kingdom.id];
@@ -470,5 +485,84 @@ describe("Moananui and Coatlan: every army mustered, and their scripted endings"
     const g = startBattle(makeGame(5958), "auto");
     holdUntil(g, 9);
     expect(g.phase).toBe("victory");
+  });
+});
+
+// Thalassar (the Trench Brood, 5964-5968), Brasshaven (the Clockwork Syndicate, 5973-5977) and the Amber Reach (the
+// Saurian Exiles, 5984-5988): ours, like the rest, and laid with the bonus tiles of their own.
+describe("Thalassar, Brasshaven and the Amber Reach: every army mustered, their ground and their scripted endings", () => {
+  const built = JSON.parse(readFileSync(join("public", "games", "reign-of-swords-2", "bonus.json"), "utf8"));
+  const level = (id) => built.levels.find((l) => l.mapId === id);
+  const tilesOf = (id) => new Set(level(id).tiles);
+  const start = (id) => startBattle(makeGame(id), "auto");
+  it("hand the player no troops: each battle and raid has a budget, a muster zone and no unit of yours on the field", () => {
+    for (const id of [5964, 5965, 5966, 5967, 5968, 5973, 5974, 5975, 5976, 5977, 5984, 5985, 5986, 5987, 5988]) {
+      const l = level(id);
+      expect(l.player, l.name).toEqual([]);
+      expect(l.budget, l.name).toBeGreaterThanOrEqual(2250);
+      expect(l.deployZone.length, l.name).toBeGreaterThanOrEqual(30);
+    }
+  });
+  it("each region is laid with its own tiles: muck, chimneys and coral; belts and vents; tar and ferns", () => {
+    const has = (ids, tile) => ids.some((id) => tilesOf(id).has(tile));
+    const thalassar = [5964, 5965, 5966, 5967, 5968],
+      brasshaven = [5973, 5974, 5975, 5976, 5977],
+      amber = [5984, 5985, 5986, 5987, 5988];
+    expect([265, 266, 276].map((tile) => has(thalassar, tile))).toEqual([true, true, true]); // muck, chimney, coral
+    expect([260, 261, 262, 263, 264].map((tile) => has(brasshaven, tile))).toEqual([false, true, true, true, true]);
+    expect([267, 268].map((tile) => has(amber, tile))).toEqual([true, true]); // tar, ferns
+  });
+  it("The Drowned Causeway is held by Carapace Scuttlers, and more rise from the tide beside you on round 3", () => {
+    const g = start(5964);
+    const scuttlers = () => g.units.filter((u) => !u.dead && u.team === "red" && u.type === "scuttler").length;
+    expect(scuttlers()).toBe(6);
+    nextRound(g);
+    nextRound(g);
+    expect(g.turn).toBe(3);
+    expect(g.units.some((u) => u.type === "scuttler" && u.tx === 2 && u.ty === 13)).toBe(true);
+  });
+  it("The Mouth of the Trench ends when the Tide-Mother falls, and she keeps her islet behind two Behemoths", () => {
+    const g = start(5966);
+    const mother = g.units.find((u) => u.team === "red" && u.type === "siren" && u.tx === 11 && u.ty === 1);
+    expect(mother).toBeTruthy();
+    expect(g.units.filter((u) => u.team === "red" && u.type === "behemoth").map((u) => [u.tx, u.ty])).toEqual([
+      [11, 4],
+      [12, 4],
+    ]);
+    nextRound(g);
+    expect(mother.ty).toBeLessThanOrEqual(3); // she does not come down off her islet to fight
+    fell(g, mother);
+    expect(g.phase).toBe("victory");
+  });
+  it("The Mainspring Vault ends when Chief Artificer Volkmar falls, and The Tyrant's Hollow when the Tyrant does", () => {
+    for (const [id, type] of [
+      [5975, "king"],
+      [5986, "tyrant"],
+    ]) {
+      const g = start(id);
+      const boss = g.units.find((u) => u.team === "red" && u.type === type);
+      expect(boss, type).toBeTruthy();
+      expect(g.units.filter((u) => !u.dead && u.team === "red").length).toBeGreaterThan(8);
+      fell(g, boss);
+      expect(g.phase, type).toBe("victory");
+    }
+  });
+  it("The Assembly Line carries what stands on its belts, and its vents hide what is beyond them", () => {
+    const g = start(5974);
+    const rider = spawn(g, "footmen", "blue", 4, 5); // a belt running east
+    expect(g.tileAt(4, 5)).toBe(261);
+    nextRound(g);
+    expect(rider.dead || rider.tx === 5).toBe(true);
+    expect(g._hasVents()).toBe(true);
+  });
+  it("The Powder Line is held until round 9, and The Pearl Beds and The Nesting Cliffs are won by standing on their goal", () => {
+    const powder = start(5977);
+    expect(powder.units.filter((u) => u.team === "red").length).toBe(0); // they come in waves
+    for (const id of [5968, 5987]) {
+      const g = start(id);
+      const [x, y] = tag(g, 6)[0].a;
+      reach(g, mine(g)[0], [x, y]);
+      expect(g.phase, String(id)).toBe("victory");
+    }
   });
 });
