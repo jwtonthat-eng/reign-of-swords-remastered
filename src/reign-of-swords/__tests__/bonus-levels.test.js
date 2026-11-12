@@ -499,7 +499,7 @@ describe("Thalassar, Brasshaven and the Amber Reach: every army mustered, their 
     for (const id of [5964, 5965, 5966, 5967, 5968, 5973, 5974, 5975, 5976, 5977, 5984, 5985, 5986, 5987, 5988]) {
       const l = level(id);
       expect(l.player, l.name).toEqual([]);
-      expect(l.budget, l.name).toBeGreaterThanOrEqual(2250);
+      expect(l.budget, l.name).toBeGreaterThanOrEqual(1950); // (the smallest muster: The Amber Mine, a raid)
       expect(l.deployZone.length, l.name).toBeGreaterThanOrEqual(30);
     }
   });

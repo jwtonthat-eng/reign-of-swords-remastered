@@ -118,7 +118,7 @@ LEVELS.append(
         "name": "The Singing Shoals",
         "objective": "Silence the Sirens and break the coral battery. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 3750,
+        "budget": 4350,
         "sides": {"P": ARMY, "E": BROOD},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~
@@ -222,7 +222,7 @@ LEVELS.append(
         "name": "The Mouth of the Trench",
         "objective": "Defeat the Tide-Mother at the mouth of the trench.",
         "turn_limit": 34,
-        "budget": 4500,
+        "budget": 4000,
         "sides": {"P": ARMY, "E": BROOD},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -415,7 +415,7 @@ LEVELS.append(
         "name": "The Pearl Beds",
         "objective": "Reach the pearl beds beyond the reef.",
         "turn_limit": 20,
-        "budget": 2400,
+        "budget": 2050,
         "sides": {"P": ARMY, "E": "Bed Wardens"},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~

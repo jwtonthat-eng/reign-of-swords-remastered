@@ -11,7 +11,7 @@ LEVELS.append(
         "name": "The Paddy Road",
         "objective": "Land on Satoshi and clear Lord Kagemori's men from the road inland.",
         "turn_limit": 30,
-        "budget": 4000,
+        "budget": 4300,
         "sides": {"P": "Carrone Army", "E": "Kagemori's Host"},
         "terrain": """
 ^^^^^^^^^.==.fff^^^^^^
@@ -116,7 +116,7 @@ LEVELS.append(
         "name": "Ishiro's Hill",
         "objective": "Hold Lord Ishiro's hill fort for ten turns. Lord Ishiro must survive.",
         "turn_limit": 20,
-        "budget": 4000,
+        "budget": 3350,
         "win_switch": False,
         "sides": {"P": "Carrone Army", "A": "Ishiro's Retainers", "E": "Kagemori's Host"},
         "terrain": """

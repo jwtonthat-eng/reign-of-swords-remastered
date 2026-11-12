@@ -1136,7 +1136,7 @@ describe("Tezcal: Jaguar Warriors, Eagle Warriors, the Sun Priest and the Feathe
     ]);
     expect(UPGRADE_FROM.tengu.from).toBe("beastmaster");
     const cost = (k) => DEPLOY_COST[k];
-    expect(["jaguar", "eagle", "sunpriest", "serpent"].map(cost)).toEqual([150, 175, 325, 275]);
+    expect(["jaguar", "eagle", "sunpriest", "serpent"].map(cost)).toEqual([150, 175, 325, 300]);
     expect(upgradeGate("jaguar", true)).toBe(5994);
     expect(upgradeGate("eagle", true)).toBe(5995);
     expect(upgradeGate("serpent", true)).toBe(5996);

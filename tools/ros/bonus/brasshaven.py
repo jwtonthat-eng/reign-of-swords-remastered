@@ -17,7 +17,7 @@ LEVELS.append(
         "name": "The Scrapyard Gate",
         "objective": "Break through the scrapyard to the city gate. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 2900,
+        "budget": 2650,
         "sides": {"P": ARMY, "E": SYNDICATE},
         "terrain": """
 ^^^^^^^^.==.^^^^^^^^
@@ -119,7 +119,7 @@ LEVELS.append(
         "name": "The Assembly Line",
         "objective": "Take the assembly yard. Eliminate all enemies.",
         "turn_limit": 36,
-        "budget": 3750,
+        "budget": 3050,
         "sides": {"P": ARMY, "E": SYNDICATE},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -347,7 +347,7 @@ LEVELS.append(
         "name": "The Gyro Sheds",
         "objective": "Burn the flying-machine sheds. Eliminate all enemies.",
         "turn_limit": 22,
-        "budget": 3000,
+        "budget": 2850,
         "sides": {"P": ARMY, "E": "Shed Wardens"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^

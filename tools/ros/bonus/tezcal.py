@@ -15,7 +15,7 @@ LEVELS.append(
         "name": "The Green Road",
         "objective": "Break the ambush on the jungle road. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3750,
+        "budget": 4250,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 fffffffff==fffffffff
@@ -130,7 +130,7 @@ LEVELS.append(
         "name": "The Serpent Ford",
         "objective": "Force the river and clear the far bank. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 4500,
+        "budget": 4450,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ffffffffff.==.ffffffffff
@@ -242,7 +242,7 @@ LEVELS.append(
         "name": "The Temple of the Sun",
         "objective": "Storm the temple and defeat Sun-Speaker Itzcal.",
         "turn_limit": 36,
-        "budget": 4750,
+        "budget": 3500,
         "sides": {"P": ARMY, "A": "Cuali's Eagles", "E": TEMPLE},
         "terrain": """
 ffffffffffffffffffffffff
@@ -373,7 +373,7 @@ LEVELS.append(
         "name": "The Night Hunt",
         "objective": "Hold your camp in the clearing for 8 turns against the jaguar hunt.",
         "turn_limit": 12,
-        "budget": 3250,
+        "budget": 3850,
         "win_switch": False,
         "sides": {"P": ARMY, "E": "Jaguar Order"},
         "terrain": """
@@ -479,7 +479,7 @@ LEVELS.append(
         "name": "The Sun Treasury",
         "objective": "Reach the temple treasury within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 3500,
+        "budget": 3800,
         "sides": {"P": ARMY, "E": "Treasury Guard"},
         "terrain": """
 ffffffffffffffffffffff

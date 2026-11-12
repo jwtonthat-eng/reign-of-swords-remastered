@@ -16,7 +16,7 @@ LEVELS.append(
         "name": "The Red Road",
         "objective": "Clear the desert road to the river. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3250,
+        "budget": 4000,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ..s...r...==...r...s..
@@ -126,7 +126,7 @@ LEVELS.append(
         "name": "The River Gate",
         "objective": "Force the causeway and clear the west bank. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 3750,
+        "budget": 3400,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ..s.....h..==..h.....s..
@@ -355,7 +355,7 @@ LEVELS.append(
         "name": "The Oasis Caravan",
         "objective": "Reach the caravan master's tents within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 1500,
+        "budget": 1200,
         "sides": {"P": ARMY, "E": "Caravan Guard"},
         "terrain": """
 ..s......,,......s....
@@ -439,7 +439,7 @@ LEVELS.append(
         "name": "The Sealed Tomb",
         "objective": "Reach the burial vault within sixteen turns, or eliminate all enemies.",
         "turn_limit": 16,
-        "budget": 3250,
+        "budget": 3700,
         "sides": {"P": ARMY, "E": "Tomb Wardens"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^

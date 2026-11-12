@@ -18,7 +18,7 @@ LEVELS.append(
         "name": "The Cloud Forest",
         "objective": "Force the forest road into the highlands. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3500,
+        "budget": 4500,
         "sides": {"P": ARMY, "E": ORDER},
         "terrain": """
 ffffffff..==..ffffffff
@@ -126,7 +126,7 @@ LEVELS.append(
         "name": "The Lake Causeway",
         "objective": "Cross the causeway over the highland lake. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 2750,
+        "budget": 2600,
         "sides": {"P": ARMY, "E": ORDER},
         "terrain": """
 ffff.......==.......ffff
@@ -233,7 +233,7 @@ LEVELS.append(
         "name": "The Temple of Stars",
         "objective": "Storm the star-temple by night and destroy Itzpapal.",
         "turn_limit": 34,
-        "budget": 3800,
+        "budget": 3500,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ffffffffffffffffffffffffff
@@ -360,7 +360,7 @@ LEVELS.append(
         "name": "The Skull Rack",
         "objective": "Reach the skull rack in the temple court within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 3000,
+        "budget": 3050,
         "sides": {"P": ARMY, "E": "Court Guard"},
         "terrain": """
 ffffffffffffffffffffff
@@ -445,7 +445,7 @@ LEVELS.append(
         "name": "The Drowned Village",
         "objective": "Hold the fishing village for 8 turns against the lake.",
         "turn_limit": 12,
-        "budget": 2400,
+        "budget": 2600,
         "win_switch": False,
         "sides": {"P": ARMY, "E": "The Lake"},
         "terrain": """

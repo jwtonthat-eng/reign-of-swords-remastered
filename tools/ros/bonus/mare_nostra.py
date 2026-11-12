@@ -189,7 +189,7 @@ LEVELS.append(
         "name": "The Admiral's Deck",
         "objective": "Board the flagship and defeat Admiral Corvane.",
         "turn_limit": 32,
-        "budget": 5500,
+        "budget": 6000,
         "sides": {"P": ARMY, "A": COMPANY, "E": FLEET},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

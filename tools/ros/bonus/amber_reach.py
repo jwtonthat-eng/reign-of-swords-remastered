@@ -16,7 +16,7 @@ LEVELS.append(
         "name": "The Tar Flats",
         "objective": "Cross the tar flats into the Reach. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 2750,
+        "budget": 2700,
         "sides": {"P": ARMY, "E": EXILES},
         "terrain": """
 ^^^^^^^......^^^^^^^
@@ -118,7 +118,7 @@ LEVELS.append(
         "name": "The Thunder Ford",
         "objective": "Force the river and break the armoured herd. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 3750,
+        "budget": 3350,
         "sides": {"P": ARMY, "E": EXILES},
         "terrain": """
 ^^^^.......ee.......^^^^
@@ -225,7 +225,7 @@ LEVELS.append(
         "name": "The Tyrant's Hollow",
         "objective": "Bring down the Theropod Tyrant.",
         "turn_limit": 34,
-        "budget": 4000,
+        "budget": 4250,
         "sides": {"P": ARMY, "E": EXILES},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -343,7 +343,7 @@ LEVELS.append(
         "name": "The Nesting Cliffs",
         "objective": "Reach the nests on the cliff top.",
         "turn_limit": 20,
-        "budget": 2400,
+        "budget": 2300,
         "sides": {"P": ARMY, "E": "Cliff Flight"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^
@@ -422,7 +422,7 @@ LEVELS.append(
         "name": "The Amber Mine",
         "objective": "Take the amber diggings. Eliminate all enemies.",
         "turn_limit": 24,
-        "budget": 2250,
+        "budget": 1950,
         "sides": {"P": ARMY, "E": "Mine Guard"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^

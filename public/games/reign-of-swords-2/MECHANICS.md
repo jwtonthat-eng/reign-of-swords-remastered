@@ -658,24 +658,24 @@ kept apart from the original data so that everything else stays checkable agains
   | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
   | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 3 | 750, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
   | Gladiators | 4, skirmish | Gladius (Sword) | Heavy & Shield (-10 taken) | 3 | 175 | Whirl |
-  | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 250 | Lesser Shroud, Pike Wall |
+  | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 300 | Lesser Shroud, Pike Wall |
   | Dragon Riders | 8, flying | Dragonfire 2-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Fire and Lance, First Strike, Fear, Charge |
   | Beast Master | 4, formation | Whip (Spear) | Shield | 1 | 250 | Call Hounds |
   | Hounds (called) | 7, skirmish | Fangs (Antlers) | Nature's Cloak | 2 | - | leashed, as the Conjurer's minions |
   | Sohei | 4, formation | Naginata (Halberd, +5) | Holy Vestment | 4 | 175 | Sutra, Fearless |
   | Shinobi | 5, skirmish | Shuriken 2-3 (Spear), Ninjato | Light | 3 | 225 | Shadow, Stealth |
-  | Oni | 3, formation | Kanabo (Greatsword) | Heavy, shown as Oni Hide | 4 | 350 | Earthshaker, Fear, Fearless |
+  | Oni | 3, formation | Kanabo (Greatsword) | Heavy (-5 taken), shown as Oni Hide | 4 | 325 | Sunder, Fear, Fearless |
   | Tengu | 7, flying | Gale Blade (Sword, +20) | Feathered Hide (-10 taken) | 5 | 325 | Gale |
   | Alchemist | 4, formation | Acid Flask 2-6 (Fireball), Dagger | Holy Vestment | 3 | 250 | Acid Flask, Elixir, Summon Imp |
   | Imp (summoned) | 6, flying | Claws (Short Sword) | Minor Ward | 2 | - | leashed, as the Conjurer's minions |
-  | Golem | 3, formation | Rune Fists (Greatsword) | Heavy & Shield, shown as Rune Stone | 4 | 400 | Stoneskin, Unyielding, Fear, Fearless |
+  | Golem | 3, formation | Rune Fists (Greatsword) | Heavy & Shield, shown as Rune Stone | 4 | 325 | Stoneskin, Unyielding, Fear, Fearless |
   | Unicorn | 7, flying | Starlight 2-4 (Lightning Storm), Antlers | Feathered Hide | 3 | 275 | Purity |
   | Efreet | 5, flying | Flame Jet 2-4 (Fireball, with its + cross), Burning Hands | Feathered Hide (-10 taken), shown as Living Flame | 5 | 350 | Burning Aura (20), Fear |
   | Naga | 5, skirmish | Twin Scimitars (Sword, +10) | Heavy & Shield (-10 taken) | 5 | 300 | Constrict, Whirl, Amphibious |
   | Skeletons | 4, formation | Rusted Sword (Sword, +10) | Heavy & Shield (-10 taken) | 5 | 500 | Rise Again (at full HP), Fearless |
   | Jaguar Warriors | 5, skirmish | Macuahuitl (Sword) | Light & Shield (-5 taken) | 3 | 150 | Jungle Stride, Pounce |
   | Eagle Warriors | 5, skirmish | Atlatl Dart 2-3 (Spear), Macuahuitl | Light | 2 | 175 | Jungle Stride, Eagle Eye, Shoot and Move |
-  | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 400, elite | Sun Magic |
+  | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 325, elite | Sun Magic |
   | Feathered Serpent | 7, flying | Gale 2-4 (Lightning Storm, +10), Fangs | Feathered Hide | 4 | 300 | Tailwind, Shoot and Move |
 
 - **Four more cultures, eight tokens and the Primal Warden** (the fifth wave; all art supplied by the user).
@@ -685,21 +685,21 @@ kept apart from the original data so that everything else stays checkable agains
   between Hunewold and Rukiev, Khemret on the east bank of the south-east river, Moananui on the island chain west of
   Mare Nostra, Coatlan in the eastern mountains south-east of Tilicia. That makes ten bonus regions, 30 story battles
   and 22 raids.
-  *Units* (cost; ability): Berserkers 175 (Rage: +1 on the cell per 2 HP lost; Fearless), Shieldmaidens 200 (Shield
-  Wall: a friend beside one takes a quarter less hand to hand), Einherjar 275 (Chosen of the Slain: +50 HP for each
+  *Units* (cost; ability): Berserkers 175 (Rage: +1 on the cell per 2 HP lost; Fearless), Shieldmaidens 175 (Shield
+  Wall: an enemy ground unit that steps onto a tile beside one stops there), Einherjar 275 (Chosen of the Slain: +50 HP for each
   foe struck down), Jotunn 425 (Frost Slam: its target and the foes beside it move at half pace until their next turn
   ends; Fear); Medjay 175 (Composite Bow 2-7; Desert Stride: terrain types 3, 22, 27, 28 cost 1), Khopesh Warriors
   175 (Shield Hook: the target's armour column is read without its shield, 1 to 0, 6 to 3, 10 to 8), Anubis Priest
-  275 (Soulfire 2-6, +1 on the cell per 3 HP the target has lost; magic), Ammit 275 (Devourer: a bite that leaves a
+  250 (Soulfire 2-6, +1 on the cell per 3 HP the target has lost; magic), Ammit 250 (Devourer: a bite that leaves a
   foe at 20 HP or fewer kills it, war engines excepted; Fear); Toa Warriors 150 (First Thrust: +20 at a foe at full
-  health; shallows cost 1), Tahuanui Riders 250 (flier; Sky Hunter: +25 against war engines and units with a ranged
+  health; shallows cost 1), Tahuanui Riders 225 (flier; Sky Hunter: +25 against war engines and units with a ranged
   weapon), Tohunga 250 (Spirit Wisps 2-5; Karakia: at the start of its side's turn the most wounded friend within 3
-  tiles mends 15 HP), Taniwha 375 (deep water and shallows cost 1 and it attacks from them; +20 from water; Fear);
-  Coatecpatl Warriors 200 (Serpent Venom: the flask's acid, 5 HP for 3 turns; Jungle Stride), Ahuizotl 175
+  tiles mends 15 HP), Taniwha 325 (deep water and shallows cost 1 and it attacks from them; +20 from water; Fear);
+  Coatecpatl Warriors 175 (Serpent Venom: the flask's acid, 5 HP for 3 turns; Jungle Stride), Ahuizotl 150
   (Drowning Grasp: the foe it strikes has no targets on its next turn; Amphibious), Cuahchic Chieftain 275 (war
   darts 2-4, Shoot and Move, Battle Standard; Vanguard: a friend beside it counts as having First Strike),
   Tzitzimitl 250 (flier; Starfire 2-5, half its damage returns as health; Fear; magic).
-  *The Primal Warden* (a design supplied by the user; 400, elite): Druids + Void. A healer (20 HP at 2 tiles, which
+  *The Primal Warden* (a design supplied by the user; 300, elite): Druids + Void. A healer (20 HP at 2 tiles, which
   also lifts acid, chill, blindness and holds) with a Prism Bolt (2-4), that shapeshifts by the Druid's rule (one
   shift a turn, HP kept, not over water or cliffs) into the Storm-Stalker Panther (move 8; Static Arc 2-3, Shoot and
   Move), the Volcanic Siege-Tortoise (move 2; Magma Mortar 2-5 on the 3 x 3 around its target at 100% / 60%, friend
@@ -759,7 +759,7 @@ kept apart from the original data so that everything else stays checkable agains
   has their present numbers); the four made from a Beast Master had to outfight a master and its two packs of Hounds,
   which is why Skeletons are now a 500-point unit that rises at full health.
 - **Stone Sentinel and Pavisiers, improved** (user decision, from the arena's battle types). The Sentinel no
-  longer strikes last and has *Bulwark* (the Golem too): a charge adds nothing against it, the flank bonus is not
+  longer strikes last and has *Bulwark* (the Golem had it too, until the rebalance below): a charge adds nothing against it, the flank bonus is not
   applied against it, and a Tengu's Gale does not move it; it costs 300. A planted *Pavise* now also takes a quarter
   off every blow hand to hand (not with Siege Armor), and the Pavisiers' own shots from a planted pavise add 10 to
   the Crossbow's cell.
@@ -786,12 +786,12 @@ kept apart from the original data so that everything else stays checkable agains
   after the Mirror Sea's second battle. *Sutra* (Sohei): at the start of its side's turn every friendly unit
   orthogonally beside a Sohei mends 10 HP with the village heal (not war engines or Stone Sentinels). *Shadow*
   (Shinobi): Stealth that hides on any ground, not only in cover; a turn begun in hiding makes its blows that turn an
-  ambush, +30 on the weapon x armour cell. *Earthshaker* (Oni): every other enemy adjacent to its melee target takes
-  half the blow. *Gale* (Tengu): its melee target is moved one tile straight back if that tile is free and ground it
+  ambush, +30 on the weapon x armour cell. *Earthshaker* (Oni, until the rebalance below gave it Sunder): every other enemy adjacent to its melee target
+  took half the blow. *Gale* (Tengu): its melee target is moved one tile straight back if that tile is free and ground it
   could stand on (war engines never), before the counter-attack is judged, so a thrown foe does not strike back.
   Gladiators now wear the Heavy & Shield column with a further 10 off every cell (the Samurai's rule), at 175.
   Upgrades of the Satoshi four: Shamans + Armor to Sohei, Rangers + Lore to Shinobi, Greatswordsmen + Spirit to
-  Oni, and Beast Master + Spirit to Tengu (the only bonus unit upgraded from another bonus unit).
+  Oni, and Beast Master + Spirit to Tengu (then the only bonus unit upgraded from another bonus unit).
   DELIBERATE FIX found with the Shinobi: a move cut short beside a hidden foe no longer stops on a tile another unit
   holds (a flier over a friend); it stops on the next free tile.
 - **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
@@ -881,18 +881,18 @@ those choices are marked.
 
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
   |---|---|---|---|---|---|---|
-  | Carapace Scuttler | 3, skirmish | Crusher Claw (Spear) | Heavy & Shield, shown as Carapace | 3 | 225 | Carapace, Amphibious, Crush Depth |
-  | Siren Channeler | 5, skirmish | Spear (the original) | Holy Vestment | 4 | 225 | Lure, Wayfinder, Crush Depth |
-  | Brine Hurler | 4, formation | Toxic Coral 3-7 (Rock), Short Sword | Breastplate | 3 | 250 | Flooded Ground, Move or Shoot, Crush Depth |
-  | Trench Behemoth | 4, formation | Sweeping Bite (Halberd) | Heavy (-10 taken), shown as Shark Hide | 5 | 500, elite | Sweeping Bite, Immovable, Lurker of the Deep, Fear, Crush Depth |
-  | Brass Phalanx | 3, formation | Piston Mace (Sword) | Heavy & Shield | 4 | 225 | Shield Lock, Formation, Overdrive |
+  | Carapace Scuttler | 3, skirmish | Crusher Claw (Spear) | Heavy & Shield, shown as Carapace | 3 | 200 | Carapace, Amphibious, Crush Depth |
+  | Siren Channeler | 5, skirmish | Spear (the original, +10) | Holy Vestment (-5 taken) | 5 | 250 | Lure, Wayfinder, Crush Depth |
+  | Brine Hurler | 4, formation | Toxic Coral 3-7 (Rock), Short Sword | Breastplate | 3 | 200 | Flooded Ground, Move or Shoot, Crush Depth |
+  | Trench Behemoth | 4, formation | Sweeping Bite (Halberd) | Heavy (-10 taken), shown as Shark Hide | 5 | 450, elite | Sweeping Bite, Immovable, Lurker of the Deep, Fear, Crush Depth |
+  | Brass Phalanx | 3, formation | Piston Mace (Sword) | Heavy & Shield | 4 | 175 | Shield Lock, Formation, Overdrive |
   | Arc Caster | 5, skirmish | Arc Bolt 2-4 (Lightning Storm), Short Sword | Breastplate | 4 | 225 | Chain Arc, Shoot and Move, Overdrive |
-  | Caltrop Gyrocopter | 8, flies | Caltrops 2-4 (Short Bow) | Feathered Hide | 3 | 175 | Caltrops, Shoot and Move, Overdrive |
+  | Caltrop Gyrocopter | 8, flies | Caltrops 2-4 (Short Bow) | Feathered Hide | 3 | 200 | Caltrops, Shoot and Move, Overdrive |
   | Volatile Automaton | 5, formation | Ram (Spear) | Light | 2 | 100 | Volatile, Unyielding, Fearless, Overdrive |
-  | Raptor Skirmisher | 7, skirmish | Sickle Claws (Wizard Blade) | Light | 4 | 200 | Pack Hunter, Apex Roar |
-  | Ankylosaur Juggernaut | 3, formation | Tail Club (Sword) | Heavy & Shield (-10 taken), shown as Spiked Shell | 3 | 325 | Spiked Shell, Apex Roar |
-  | Pterosaur Bombardier | 7, flies | Dropped Stone 2-3 (Rock), Talon | Feathered Hide | 4 | 250 | Harvest, Shoot and Move, Apex Roar |
-  | Theropod Tyrant | 4, formation | Tyrant Jaws (Greatsword; 120 wood, 90 stone) | Heavy (-15 taken), shown as Tyrant Hide | 5 | 700, elite | Devastation, Fear, Fearless, Apex Roar |
+  | Raptor Skirmisher | 7, skirmish | Sickle Claws (Wizard Blade) | Light | 4 | 175 | Pack Hunter, Apex Roar |
+  | Ankylosaur Juggernaut | 3, formation | Tail Club (Sword) | Heavy & Shield (-10 taken), shown as Spiked Shell | 3 | 275 | Spiked Shell, Apex Roar |
+  | Pterosaur Bombardier | 7, flies | Dropped Stone 2-4 (Rock), Talon | Feathered Hide | 4 | 250 | Harvest, Shoot and Move, Apex Roar |
+  | Theropod Tyrant | 4, formation | Tyrant Jaws (Greatsword; 120 wood, 90 stone) | Heavy (-15 taken), shown as Tyrant Hide | 5 | 600, elite | Devastation, Fear, Fearless, Apex Roar |
 
 - **Their abilities.**
   - *Carapace* and *Pack Hunter* — **there is no unit facing in the game**, so "the rear" is the original's own
@@ -970,6 +970,59 @@ those choices are marked.
   more to stay where it was.
 - **What the computer does not do.** It does not harvest, dive, or avoid a tile for what it does: it walks onto ice,
   tar, caltrops and belts as onto any ground it can cross. The Autopilot plays your side the same way.
+- **The rebalance** (user decisions, after the three factions: shorter roads, fairer prices, no two units with the
+  same trick, and a rising curve in every region).
+  - *The tree.* No bonus unit stands more than three upgrades from the Militia (the Tyrant stood five away), no
+    unit carries more than four bonus branches (the Militia carried eight, Archers five), and no upgrade costs fewer
+    deployment points than the unit it is made from. Eighteen units are made from a different unit: Marines, the
+    Carapace Scuttler (Footmen); Gladiators, Khopesh Warriors (Swordsmen); Sohei, the Brass Phalanx, the Ankylosaur
+    (Halberdiers); Shinobi (Rangers); the Raptor, the Ahuizotl (Raiders); the Pterosaur (Horse Bowmen); Dragon Riders
+    (Cavalry); the Golem (Craftsmen, beside the Stone Sentinel and no longer after it); the Sun Priest (Priests); the
+    Alchemist, the Anubis Priest (Shamans); the Ammit (Dune Sirens); the Tyrant (the Raptor). The token, and the
+    battle that opens the upgrade, are unchanged for every one of them. The list under *Tokens* above and the
+    Field Manual's tree show the present paths; the test `bonus-units.test.js` holds the three rules.
+  - *Three abilities replaced*, where two units did the same thing. **Oni — Sunder** (it was Earthshaker, a blow
+    shared with the foes beside its target, which the Behemoth's Sweeping Bite also does): the foe its kanabo
+    strikes is Shattered, the Obsidian Spikes' status on any armour — +10 on the cell of every blow but magic at it
+    for the rest of the battle; its hide now takes 5 off every cell. **Shieldmaidens — Shield Wall** (it was a
+    quarter off the blows at their neighbours, beside the Brass Phalanx's Shield Lock): an enemy ground unit that
+    steps onto a tile orthogonally beside a Shieldmaiden stops there — a dead end in its reach, as caltrops are, and
+    the end of a charge lane; it may still strike from that tile, leave it on a later turn, and fliers are not
+    stopped. **Golem — no Bulwark** (it was a Stone Sentinel with Stoneskin added): the Sentinel is the one a charge
+    or a flank gains nothing against, the Golem the one no blow takes more than 20 HP from. Reviewed and kept: the
+    three holds (Crush Depth stops a move, the Ahuizotl's Drowning Grasp stops an attack, the Jotunn's Frost Slam
+    slows a whole knot of foes), Whirl (round the Gladiators themselves) and the two menders (a Sohei's neighbours,
+    a Tohunga's single most wounded friend at a distance).
+  - *Prices* follow the arena (`docs/unit-balance.md`): a unit should fight at about its points among units of its
+    kind, an upgrade must beat its base one for one, and no unit may win more of the original finals than the
+    originals do. Only the showpieces cost more than 325: the Battlemage and Dragon Riders 750, the Tyrant 600 (was
+    700), the Behemoth 450 (was 500), the Jotunn 425. Down: Golem 400 to 325, Sun Priest 400 to 325, Primal Warden
+    400 to 300, Taniwha 375 to 325 (and 5 off every cell in place of 10), Oni 350 to 325, Ankylosaur 325 to 275,
+    Anubis Priest 275 to 250, Ammit 275 to 250, Tahuanui Riders 250 to 225, Brine Hurler 250 to 200, Scuttler 225 to
+    200, Brass Phalanx 225 to 175, Shieldmaidens 200 to 175, Coatecpatl Warriors 200 to 175, Raptor 200 to 175,
+    Ahuizotl 175 to 150. Up, where a unit out-fought its price: Samurai 250 to 300, Gyrocopter 175 to 200. The Siren
+    Channeler is 250, the price of the Dune Sirens she is made from, and is rated 5 with +10 on her spear and 5 off
+    every cell to be worth it; the Pterosaur's stone reaches 2-4. Medjay, the Chieftain and the Feathered Serpent
+    were tried cheaper and put back: at the lower price an army of them won six or seven of the eight original
+    finals, where no original unit wins more than five.
+  - *A rising curve in every region.* All 67 bonus battles were rated by the map runner (three dice seeds, the
+    Autopilot's three strategies, its two stock armies of original units) and their muster budgets moved until each
+    region climbs: the first battle easy to normal, the second no easier, the third the hardest, the raids between.
+    46 budgets changed. Story ratings now, first to third: Tilicia 1.5 / 3.1 / 4.9, Isoluccia 2.1 / 3.0 / 5.8, Mare
+    Nostra 2.1 / 5.7 / 6.1, Satoshi 2.0 / 2.4 / 5.9, the Mirror Sea 5.7 / 3.8 / 6.3, Tezcal 2.0 / 2.0 / 5.9,
+    Jarnheim 2.1 / 2.4 / 5.9, Khemret 2.0 / 2.2 / 5.9, Moananui 2.0 / 2.4 / 5.7, Coatlan 1.8 / 2.0 / 6.0,
+    Thalassar 2.0 / 3.2 / 4.7, Brasshaven 1.8 / 2.5 / 3.8, the Amber Reach 1.7 / 2.6 / 6.3. Before, seven regions
+    did not climb: they opened on a battle rated above their second (The Paddy Road 7.5, The Red Road 5.9, The Cloud
+    Forest 4.3, The Line of Hulls 5.7) or closed below an earlier one (The Temple of the Sun 1.2, The Jarl's Hold
+    2.1, The Mouth of the Trench 2.3).
+    What the numbers do not say: a rating is the mean of two test armies, and a battle tips over a small change of
+    budget — both armies win it (about 2), or one of them never does (about 6). Most third battles sit on the far
+    side of that edge: one stock army cannot win them and the other wins them at a rating near 2, so "hard" there
+    means the battle punishes the wrong army, not that every army struggles. The ship battles are the plain case:
+    the army without an elite unit runs out of turns on every one of them whatever it musters, which is why the
+    Mirror Sea's first battle (The Line of Hulls) still reads 5.7 — the other army rates it 1.4 — and why its budget
+    was left alone. Budgets within 50 points of an edge are brittle for the Autopilot; a player is not held to
+    its two armies.
 
 ### Not reproduced
 

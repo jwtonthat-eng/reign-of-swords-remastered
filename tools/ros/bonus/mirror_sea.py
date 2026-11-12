@@ -92,7 +92,7 @@ LEVELS.append(
         "name": "The Kennel Ship",
         "objective": "Board the kennel ship. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 3500,
+        "budget": 3400,
         "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -165,7 +165,7 @@ LEVELS.append(
         "name": "The Reaver-King",
         "objective": "Cross the flagship to the islet and defeat Reaver-King Skarl.",
         "turn_limit": 34,
-        "budget": 3500,
+        "budget": 2850,
         "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -313,7 +313,7 @@ LEVELS.append(
         "name": "Wolf Pack",
         "objective": "Three reaver cutters have you grappled. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3850,
+        "budget": 3650,
         "sides": {"P": ARMY, "E": REAVERS},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
