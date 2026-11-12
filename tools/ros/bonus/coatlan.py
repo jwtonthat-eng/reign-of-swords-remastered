@@ -233,7 +233,7 @@ LEVELS.append(
         "name": "The Temple of Stars",
         "objective": "Storm the star-temple by night and destroy Itzpapal.",
         "turn_limit": 34,
-        "budget": 3650,
+        "budget": 3800,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ffffffffffffffffffffffffff

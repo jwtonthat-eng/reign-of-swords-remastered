@@ -27,7 +27,8 @@ SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.j
           "beasts": "beastmaster-hounds-sheet.jpg", "satoshi": "satoshi-units-sheet.jpg",
           "alchemy": "alchemy-units-sheet.jpg", "mythic": "mythic-units-sheet.jpg",
           "aztec": "aztec-units-sheet.jpg", "north": "norse-egypt-units-sheet.jpg",
-          "ocean": "polynesian-units-sheet.jpg", "aztec2": "aztec2-units-sheet.jpg"}  # a unit's "sheet" (default first)
+          "ocean": "polynesian-units-sheet.jpg", "aztec2": "aztec2-units-sheet.jpg",
+          "warden": "primal-warden-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -355,6 +356,34 @@ UNITS = {
         "anchors": [187, 507, 960, 1453, 1867],
         "stand": 0, "walk": [0, 1, 0, 1], "attack": [0, 2, 3, 4], "height": 50, "team": False,
         "frame": (128, 88), "lift": 0,
+    },
+    # The Primal Warden and its three shapes (the prism burst, the lightning and the lava are left to the engine).
+    "warden": {
+        "sheet": "warden", "ground": (54, 72, 60),
+        "boxes": [(90, 110, 300, 430), (370, 110, 585, 430), (630, 130, 880, 430), (880, 130, 1130, 430),
+                  (1130, 40, 1420, 430), (1400, 110, 1680, 430), (2060, 100, 2345, 430)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 6], "height": 66, "team": False,
+        "frame": (128, 96),
+    },
+    "panther": {
+        "sheet": "warden", "ground": (54, 72, 60),
+        "boxes": [(30, 540, 335, 775), (355, 540, 675, 775), (830, 560, 1225, 775), (1260, 530, 1635, 775),
+                  (1640, 540, 2045, 775), (2065, 530, 2355, 775)],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [1, 3, 4, 5], "height": 44, "team": False,
+        "frame": (128, 88),
+    },
+    "tortoise": {
+        "sheet": "warden", "ground": (54, 72, 60),
+        "boxes": [(45, 860, 365, 1135), (375, 860, 695, 1135), (715, 900, 1035, 1135), (1055, 900, 1385, 1135),
+                  (1395, 800, 1745, 1135), (1755, 840, 2055, 1135), (2075, 880, 2375, 1135)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 5, 4, 5], "height": 56, "team": False,
+    },
+    "manta": {
+        "sheet": "warden", "ground": (54, 72, 60),
+        "boxes": [(45, 1250, 345, 1490), (395, 1250, 695, 1490), (750, 1240, 1285, 1490), (1325, 1220, 1705, 1490),
+                  (1735, 1210, 2035, 1490), (2075, 1230, 2355, 1490)],
+        "stand": 0, "walk": None, "attack": [1, 3, 4, 5], "height": 46, "team": False,
+        "frame": (128, 88),
     },
 }
 

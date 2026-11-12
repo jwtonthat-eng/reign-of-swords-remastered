@@ -366,15 +366,24 @@ describe("Moananui and Coatlan: every army mustered, and their scripted endings"
       for (const hidden of ["unicorn", "efreet", "naga", "skeleton"]) expect(keys, level.name).not.toContain(hidden);
     }
   });
-  it("every battle and raid of a culture's region rewards 2 of its token, and no other region rewards a token", () => {
+  it("every battle and raid of a region rewards 2 of its culture's token, and no token of another culture", () => {
+    // region -> its token (Tilicia and Isoluccia: the Void Rift Crystal of the fantastical units)
     const TOKEN = {
+      tilicia: "Void",
+      isoluccia: "Void",
+      "mare-nostra": "Anchor",
+      "mirror-sea": "Anchor",
+      satoshi: "Tsuba",
+      tezcal: "Jade",
       jarnheim: "Bloodstone",
       khemret: "Scarab",
-      tezcal: "Obsidian",
       moananui: "Whalebone",
       coatlan: "Obsidian",
     };
-    const TOKENS = ["Bloodstone", "Scarab", "Obsidian", "Whalebone"];
+    // …and the three battles that also hand out a token of another kind, for the unit they unlock
+    const ALSO = { 5924: { Anchor: 2 }, 5943: { Void: 1 } }; // Marines at the Harbour Chain; the Dragon Rider
+    const TOKENS = ["Bloodstone", "Scarab", "Obsidian", "Whalebone", "Anchor", "Tsuba", "Jade", "Void"];
+    expect(built.kingdoms.map((k) => k.id).sort()).toEqual(Object.keys(TOKEN).sort());
     for (const kingdom of built.kingdoms) {
       const mine = TOKEN[kingdom.id];
       const name = kingdom.name.replace("Kingdom of ", "");
@@ -385,8 +394,10 @@ describe("Moananui and Coatlan: every army mustered, and their scripted endings"
       expect(ids.length, kingdom.id).toBeGreaterThanOrEqual(5);
       for (const id of ids) {
         const spoils = (built.rewards[id] || {}).spoils || {};
-        for (const token of TOKENS)
-          expect(spoils[token], `${kingdom.id} ${id} ${token}`).toBe(token === mine ? 2 : undefined);
+        for (const token of TOKENS) {
+          const want = token === mine ? 2 : (ALSO[id] || {})[token];
+          expect(spoils[token], `${kingdom.id} ${id} ${token}`).toBe(want);
+        }
       }
     }
   });

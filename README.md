@@ -46,12 +46,11 @@ It is a remake, not an exact copy.
 - **The original army.** Knights, Pikemen, Swordsmen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen,
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
-- **Six fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
-  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi and the jungles of Tezcal, 18
-  battles and 14 raids that follow the "Battlemage" letters Episode II ends on, with twenty-four new units (Cragsmen,
-  Spellwardens, Stone Sentinels, Marines, Pavisiers, the Battlemage, Gladiators, Samurai, Dragon Riders, Beast
-  Masters with their Hounds, Sohei, Shinobi, Oni, Tengu, Alchemists with their Imps, Golems, Unicorns, Efreet, Naga,
-  Skeletons, Jaguar Warriors, Eagle Warriors, the Sun Priest and Feathered Serpents).
+- **Ten fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
+  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi, the jungles of Tezcal, Norse
+  Jarnheim, Egyptian Khemret, Polynesian Moananui and the highlands of Coatlan: 30 battles and 22 raids, with
+  thirty-seven new units, each with an ability of its own, and eight culture tokens that pay for their upgrades.
+  `docs/images/all-units.png` shows every unit; `docs/unit-balance.md` has the balance numbers.
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.
@@ -116,6 +115,7 @@ address with an episode in it (`#reign-of-swords`, `#reign-of-swords-2`) lands o
 | `npm run e2e:maps` | The map runner: whole battles played by the Autopilot (slow) |
 | `npm run e2e:arena` | Unit arena: every bonus unit against the originals in duels, against cavalry, holding a castle and behind a spear line |
 | `npm run e2e:stress` | Random play with an army of bonus units, under the fuzzer's checks |
+| `npm run e2e:arena:report` | Gather the arena's rows into `docs/unit-balance.md` |
 
 ## How it is built
 
@@ -138,7 +138,7 @@ public/games/
   reign-of-swords-2/        Episode II data (shares Episode I's sprites and audio)
 public/ros-atlas/           the interactive map and animation atlases (Story & Assets)
 tools/ros/                  Python tools that extracted and audited the data from the original iOS games
-tools/ros/bonus/            the six fan-made bonus campaigns: level sources, sprite-sheet importer and their builder
+tools/ros/bonus/            the ten fan-made bonus campaigns: level sources, sprite-sheet and token importers and their builder
 docs/images/                the screenshots in this README, and all-units.png: every unit the game offers
                             (rebuilt by tools/ros/bonus/unit_gallery.py)
 ```

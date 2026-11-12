@@ -392,6 +392,9 @@ export class LoopMethods {
     const target = a.target,
       tile = this.tile;
     const gained = this._healTick(target, a.u && a.u.T.healAmount);
+    // BONUS: Cleansing Touch — a Primal Warden's Heal also lifts what ails its target
+    if (a.u && a.u.T.cleanse)
+      Object.assign(target, { _acid: null, _chilled: false, _blind: false, _held: false, _seized: false });
     target.flash = 0.14;
     // the Heal state's overlay (5017 #3) plays on the healed unit — renderOverlay @0x7641a draws it at Map+0x1c, which
     // Unit::heal (@0x6bfac) points at the target; nothing plays on the Priest

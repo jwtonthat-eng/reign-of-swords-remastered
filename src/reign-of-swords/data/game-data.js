@@ -646,6 +646,7 @@ for (const k in UNIT_TYPES) {
   for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
   for (const flag of ["shadowStep", "quake", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
   for (const flag of ["flask", "constrict", "bulwark", "forestWalk", "eagleEye", "sunPriest"]) T[flag] = !!c[flag];
+  for (const flag of ["cleanse", "physicalHalf"]) T[flag] = !!c[flag]; // Primal Warden, Siege-Tortoise
   for (const flag of ["shoreStride", "aquatic", "venom", "seize", "vanguard"]) T[flag] = !!c[flag]; // Moananui, Coatlan
   for (const flag of ["opening", "skyHunter", "karakia", "lurker", "drain"]) T[flag] = c[flag] || 0;
   for (const flag of ["frost", "desertStride", "hook"]) T[flag] = !!c[flag]; // Jotunn, Medjay, Khopesh Warriors
@@ -747,6 +748,13 @@ UNIT_TYPES.druids.shapeshiftForms = ["stag", "greateagle", "bear"]; // string 54
 UNIT_TYPES.stag.shapeshiftForms = ["druids", "greateagle", "bear"];
 UNIT_TYPES.greateagle.shapeshiftForms = ["druids", "stag", "bear"];
 UNIT_TYPES.bear.shapeshiftForms = ["druids", "stag", "greateagle"];
+// BONUS: the Primal Warden's three shapes, by the same rule ("druids" = the unit's own first form, here the Warden)
+UNIT_TYPES.warden.shapeshiftForms = ["panther", "tortoise", "manta"];
+UNIT_TYPES.panther.shapeshiftForms = ["druids", "tortoise", "manta"];
+UNIT_TYPES.tortoise.shapeshiftForms = ["druids", "panther", "manta"];
+UNIT_TYPES.manta.shapeshiftForms = ["druids", "panther", "tortoise"];
+UNIT_TYPES.tortoise.blastArea = true; // the Magma Mortar bursts on the 3 x 3 around its target
+UNIT_TYPES.tortoise.splash = true;
 UNIT_TYPES.wizards.canLightning = true; // alternate spell: Lightning Storm (weapon 26)
 UNIT_TYPES.wizards.splash = true; // Fireball is a + CROSS area hit — enables the splash resolve + the blast preview
 // Movement traits (help "MOVEMENT"): flyers ignore terrain (Griffon Riders / Great Eagles); wizards Teleport

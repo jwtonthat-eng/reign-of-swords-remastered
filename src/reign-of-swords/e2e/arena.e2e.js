@@ -105,6 +105,7 @@ function battle({ map = MAP, blue, red, strategy = "attack", fort = null, seed }
   const enemy = g.mission.groupOrder.find((x) => x.side === "enemy").gi;
   const place = (type, team, x, y, extra) => {
     const u = spawn(g, type, team, x, y, extra);
+    u._worth = DEPLOY_COST[type] || 0; // (a shapeshifter stays worth what it was deployed as)
     if (g.moveCost(u, x, y) < 99) return u;
     for (let r = 1; r < 8; r++)
       for (let dy = -r; dy <= r; dy++)
@@ -131,10 +132,10 @@ function battle({ map = MAP, blue, red, strategy = "attack", fort = null, seed }
     step(g);
   }
   const left = (list) =>
-    list.reduce((sum, u) => sum + (u.dead ? 0 : (u.hp / 100) * DEPLOY_COST[u.type]), 0) /
+    list.reduce((sum, u) => sum + (u.dead ? 0 : (u.hp / 100) * u._worth), 0) /
     Math.max(
       1,
-      list.reduce((sum, u) => sum + DEPLOY_COST[u.type], 0),
+      list.reduce((sum, u) => sum + u._worth, 0),
     );
   const out = { blueLeft: left(mine), redLeft: left(foes), turn: g.turn };
   if (g.destroy) g.destroy();

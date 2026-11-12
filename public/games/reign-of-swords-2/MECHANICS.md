@@ -622,14 +622,15 @@ not on this list is meant to match the binaries — a difference that is not lis
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
 
-### The bonus campaigns: Tilicia, Isoluccia, Mare Nostra, Satoshi, the Mirror Sea and Tezcal (Episode II only)
+### The bonus campaigns: ten regions after Episode II (Episode II only)
 
-Six fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+Ten fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
 kept apart from the original data so that everything else stays checkable against the binaries.
 
 - **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
-  beside it) holds the six regions, their 18 story battles and 14 raids (map ids 5902-5913 Tilicia, 5924-5933 Isoluccia,
-  5941-5952 Mare Nostra, 5961-5972 Satoshi, 5981-5992 the Mirror Sea, 5994-5998 Tezcal), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
+  beside it) holds the ten regions, their 30 story battles and 22 raids (map ids 5902-5913 Tilicia, 5914-5918 Jarnheim,
+  5924-5933 Isoluccia, 5934-5938 Khemret, 5941-5952 Mare Nostra, 5944-5948 Moananui, 5954-5958 Coatlan, 5961-5972
+  Satoshi, 5981-5992 the Mirror Sea, 5994-5998 Tezcal), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
   `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
   `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
   the code. Their sprites are cut from art sheets supplied for this project
@@ -676,6 +677,57 @@ kept apart from the original data so that everything else stays checkable agains
   | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 400, elite | Sun Magic |
   | Feathered Serpent | 7, flying | Gale 2-4 (Lightning Storm, +10), Fangs | Feathered Hide | 4 | 300 | Tailwind, Shoot and Move |
 
+- **Four more cultures, eight tokens and the Primal Warden** (the fifth wave; all art supplied by the user).
+  *Regions.* Jarnheim (Norse; map ids 5914-5918), Khemret (Egyptian; 5934-5938), Moananui (Polynesian; 5944-5948)
+  and Coatlan (a second Aztec region; 5954-5958), three story battles and two raids each. All four open with the
+  bonus campaigns (the rule Tilicia has) and are nobody's prerequisite. Markers: Jarnheim in the northern range
+  between Hunewold and Rukiev, Khemret on the east bank of the south-east river, Moananui on the island chain west of
+  Mare Nostra, Coatlan in the eastern mountains south-east of Tilicia. That makes ten bonus regions, 30 story battles
+  and 22 raids.
+  *Units* (cost; ability): Berserkers 175 (Rage: +1 on the cell per 2 HP lost; Fearless), Shieldmaidens 200 (Shield
+  Wall: a friend beside one takes a quarter less hand to hand), Einherjar 275 (Chosen of the Slain: +50 HP for each
+  foe struck down), Jotunn 425 (Frost Slam: its target and the foes beside it move at half pace until their next turn
+  ends; Fear); Medjay 175 (Composite Bow 2-7; Desert Stride: terrain types 3, 22, 27, 28 cost 1), Khopesh Warriors
+  175 (Shield Hook: the target's armour column is read without its shield, 1 to 0, 6 to 3, 10 to 8), Anubis Priest
+  275 (Soulfire 2-6, +1 on the cell per 3 HP the target has lost; magic), Ammit 275 (Devourer: a bite that leaves a
+  foe at 20 HP or fewer kills it, war engines excepted; Fear); Toa Warriors 150 (First Thrust: +20 at a foe at full
+  health; shallows cost 1), Tahuanui Riders 250 (flier; Sky Hunter: +25 against war engines and units with a ranged
+  weapon), Tohunga 250 (Spirit Wisps 2-5; Karakia: at the start of its side's turn the most wounded friend within 3
+  tiles mends 15 HP), Taniwha 375 (deep water and shallows cost 1 and it attacks from them; +20 from water; Fear);
+  Coatecpatl Warriors 200 (Serpent Venom: the flask's acid, 5 HP for 3 turns; Jungle Stride), Ahuizotl 175
+  (Drowning Grasp: the foe it strikes has no targets on its next turn; Amphibious), Cuahchic Chieftain 275 (war
+  darts 2-4, Shoot and Move, Battle Standard; Vanguard: a friend beside it counts as having First Strike),
+  Tzitzimitl 250 (flier; Starfire 2-5, half its damage returns as health; Fear; magic).
+  *The Primal Warden* (a design supplied by the user; 400, elite): Druids + Void. A healer (20 HP at 2 tiles, which
+  also lifts acid, chill, blindness and holds) with a Prism Bolt (2-4), that shapeshifts by the Druid's rule (one
+  shift a turn, HP kept, not over water or cliffs) into the Storm-Stalker Panther (move 8; Static Arc 2-3, Shoot and
+  Move), the Volcanic Siege-Tortoise (move 2; Magma Mortar 2-5 on the 3 x 3 around its target at 100% / 60%, friend
+  or foe, never at a tile beside it, where it has only a Bite; everything but magic does half damage to it) or the
+  Astral Manta (flier; Void Beam 1-4, which goes on through three tiles beyond its target at full strength, friend
+  or foe). The computer picks the Panther where a Druid would take the Stag, the Tortoise for the Bear, the Manta for
+  the Eagle.
+  *Tokens.* Eight new collectibles, one per culture: Glacial Bloodstone (Jarnheim), Scarab of the Duat (Khemret),
+  Smoldering Obsidian (Coatlan), Carved Whalebone (Moananui), Triton's Anchor (Mare Nostra and the Mirror Sea),
+  Tsuba of the Shogunate (Satoshi), Sacred Jade Jaguar (Tezcal) and Void Rift Crystal (Tilicia and Isoluccia). Every
+  battle and raid of a region rewards 2 of its token (The Harbour Chain also 2 Anchors and The Admiral's Deck 1 Void
+  Crystal, for the units they open). They are spent like any collectible, one a unit, but the Merchant does not
+  trade them, and the camp shows them once the bonus campaigns are open. Upgrades paid in tokens: Anchor: Militia
+  to Marines, Footmen to Gladiators, Raiders to Beast Master. Tsuba: Shamans to Sohei, Footmen to Samurai, Archers to
+  Shinobi, Samurai to Oni, Beast Master to Tengu. Void: Griffon Riders to Dragon Riders, Priests to Alchemist, Stone
+  Sentinel to Golem, Druids to Primal Warden. Jade: Militia to Jaguar Warriors, Archers to Eagle Warriors, Cavalry to
+  Feathered Serpent, Shamans to Sun Priest. Bloodstone: Militia to Berserkers, Footmen to Shieldmaidens,
+  Shieldmaidens to Einherjar, Berserkers to Jotunn. Scarab: Archers to Medjay, Militia to Khopesh Warriors, Priests
+  to Anubis Priest, Blood Gorgers to Ammit. Whalebone: Militia to Toa, Raiders to Tahuanui Riders, Shamans to
+  Tohunga, Dune Sirens to Taniwha. Obsidian: Jaguar Warriors to Coatecpatl, Blood Gorgers to Ahuizotl, Eagle
+  Warriors to Cuahchic Chieftain, Shamans to Tzitzimitl. Cragsmen, Spellwardens, Stone Sentinel, Pavisiers and the
+  Battlemage keep the original collectibles. The tokens give a unit a branch per culture beside its six original
+  slots, start each culture from the Militia or another early unit, and exist only after Episode II is won, so no
+  bonus unit can be taken back into the original campaigns before they are finished. (Paths written elsewhere in
+  this section with original collectibles for these units are superseded by this list.)
+  *Balance.* `docs/unit-balance.md` holds the arena's present numbers for every unit, original ones included; its
+  "original finals" test (the last battle of each original kingdom fought with an army of the unit) was added to
+  catch units that would steamroll the original game, and the Battlemage (range 2-6, +5 on its bolts), Gladiators,
+  Tengu, Tohunga, Medjay and the Chieftain were reduced after it.
 - **Tilicia and Isoluccia are three battles each** (user decision; they were built with six). Every battle of
   the two regions is now fought with an army the player deploys: the fixed-force battles (The Tolm Road, The Sleepers
   Wake, Landfall, Free Company) are gone, with The Sealed Vale and The Causeway. Tilicia is Ostrak's Bargain,

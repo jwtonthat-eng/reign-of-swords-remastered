@@ -53,7 +53,7 @@ def main():
         os.remove(script)
     recolour = {rgb(key): rgb(shade) for key, shade in zip(data["primary"], data["ramps"]["azure"])}
     recolour.update({rgb(key): rgb(shade) for key, shade in zip(data["secondary"], data["ramps"]["or"])})
-    summoned = lambda u: u["summoned"] or (not u["cost"] and not u["bonus"])  # the Druid's forms, too
+    summoned = lambda u: u["summoned"] or not u["cost"]  # the Druid's and the Primal Warden's forms, too
     sections = [
         ("The original units", [u for u in data["units"] if not u["bonus"] and not summoned(u)]),
         ("The bonus units", [u for u in data["units"] if u["bonus"] and not summoned(u)]),
@@ -87,7 +87,8 @@ def main():
             sheet.alpha_composite(sprite, (x0 + (CELL_W - sprite.width) // 2, y0 + CELL_H - 54 - sprite.height))
             text = unit["name"]
             draw.text((x0 + CELL_W / 2, y0 + CELL_H - 40), text, font=label, fill=INK, anchor="ma")
-            cost = "%d points" % unit["cost"] if unit["cost"] else "summoned" if unit["summoned"] else "a Druid's form"
+            form = "a Warden's shape" if unit["bonus"] else "a Druid's form"
+            cost = "%d points" % unit["cost"] if unit["cost"] else "summoned" if unit["summoned"] else form
             draw.text((x0 + CELL_W / 2, y0 + CELL_H - 22), cost, font=small, fill=DIM, anchor="ma")
         y += ((len(units) + COLUMNS - 1) // COLUMNS) * CELL_H
     sheet.convert("RGB").save(OUT)

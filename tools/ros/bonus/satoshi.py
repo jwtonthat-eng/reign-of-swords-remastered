@@ -104,7 +104,7 @@ f.........==..........
             ("ishiro", "He knows you have landed. He will come for my hill before you can reach his castle. Come quickly."),
         ],
         "defeat": [("officer_hurt", "We are driven back to the boats, Commander.")],
-        "reward": {"units": {"sohei": 1}, "spoils": {"Weapons": 1, "Armor": 1, "Spirit": 1}},
+        "reward": {"units": {"sohei": 1}, "spoils": {"Weapons": 1, "Armor": 1, "Spirit": 1, "Tsuba": 2}},
     }
 )
 
@@ -244,7 +244,7 @@ LEVELS.append(
             ("advisor", "His castle lies across the strait, Varius, with the sea at its back. Corvane's scrolls are inside it."),
         ],
         "defeat": [("officer_hurt", "The hill is lost, Commander, and Lord Ishiro with it.")],
-        "reward": {"units": {"samurai": 2, "shinobi": 1}, "spoils": {}},
+        "reward": {"units": {"samurai": 2, "shinobi": 1}, "spoils": {"Tsuba": 2}},
     }
 )
 
@@ -379,7 +379,7 @@ LEVELS.append(
             ("advisor", "Then there is one Battlemage in the world, and it marches under your banner. See that it never needs a second. Let us go home."),
         ],
         "defeat": [("officer_hurt", "We could not carry the moat, Commander. Kagemori still holds his castle.")],
-        "reward": {"units": {"oni": 1, "tengu": 1}, "spoils": {"Lore": 1, "Spirit": 1, "Armor": 1}},
+        "reward": {"units": {"oni": 1, "tengu": 1}, "spoils": {"Lore": 1, "Spirit": 1, "Armor": 1, "Tsuba": 2}},
     }
 )
 
@@ -456,7 +456,7 @@ LEVELS.append(
         ],
         "victory": [("ishiro", "You have kept faith with gods that are not your own, Commander. It will be remembered.")],
         "defeat": [("officer_hurt", "The shrine is stripped bare, Commander. We came too late.")],
-        "reward": {"units": {"archers": 1}, "spoils": {"Spirit": 2, "Lore": 1}},
+        "reward": {"units": {"archers": 1}, "spoils": {"Spirit": 2, "Lore": 1, "Tsuba": 2}},
     }
 )
 
@@ -540,7 +540,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "The stockade is burning, Commander. Kagemori will get no more ships from this coast.")],
         "defeat": [("officer_hurt", "They held their fence, Commander. We will have to come again.")],
-        "reward": {"units": {"swordsmen": 1}, "spoils": {"Weapons": 2, "Beasts": 1}},
+        "reward": {"units": {"swordsmen": 1}, "spoils": {"Weapons": 2, "Beasts": 1, "Tsuba": 2}},
     }
 )
 

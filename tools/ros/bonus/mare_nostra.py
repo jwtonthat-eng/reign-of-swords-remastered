@@ -80,7 +80,7 @@ LEVELS.append(
             ("advisor", "Then that is where his fighters will be. And his silver."),
         ],
         "defeat": [("officer_hurt", "They have cut the grapples, Commander. We are adrift.")],
-        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1}},
+        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1, "Anchor": 2}},
     }
 )
 
@@ -177,7 +177,7 @@ LEVELS.append(
             ("bellaro", "And the convoy's master has talked. Corvane's flagship lies a day's drift to the east."),
         ],
         "defeat": [("officer_hurt", "We never got off our own deck, Commander.")],
-        "reward": {"units": {"gladiator": 2}, "spoils": {"Beasts": 1}},
+        "reward": {"units": {"gladiator": 2}, "spoils": {"Beasts": 1, "Anchor": 2}},
     }
 )
 
@@ -268,7 +268,7 @@ LEVELS.append(
             ("advisor", "The buyer is a warlord in the isles of Satoshi, far to the east. It seems our voyage is not over."),
         ],
         "defeat": [("officer_hurt", "The flagship has thrown us back, Commander. Our own deck is burning.")],
-        "reward": {"units": {"dragonrider": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
+        "reward": {"units": {"dragonrider": 1}, "spoils": {"Lore": 1, "Spirit": 1, "Anchor": 2, "Void": 1}},
     }
 )
 
@@ -368,7 +368,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "We ran the blockade, Commander. The grain ships can follow.")],
         "defeat": [("officer_hurt", "They have the deck, Commander.")],
-        "reward": {"units": {"footmen": 1}, "spoils": {"Armor": 1, "Spirit": 1}},
+        "reward": {"units": {"footmen": 1}, "spoils": {"Armor": 1, "Spirit": 1, "Anchor": 2}},
     }
 )
 
@@ -432,7 +432,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "Both prizes are ours, Commander. The cargo is Imperial grain. It can go home.")],
         "defeat": [("officer_hurt", "We are driven back to our own deck, Commander.")],
-        "reward": {"units": {"crossbowmen": 1}, "spoils": {"Weapons": 1, "Lore": 1}},
+        "reward": {"units": {"crossbowmen": 1}, "spoils": {"Weapons": 1, "Lore": 1, "Anchor": 2}},
     }
 )
 

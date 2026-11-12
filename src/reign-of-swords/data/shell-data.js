@@ -572,6 +572,35 @@ UNIT_META.hounds = {
   conjured: true,
   note: "A pack of corsair war hounds, called by a Beast Master: fast and savage, a little less than a Stag. Leashed within 8 tiles of their master, and gone if it falls.",
 };
+// …the Primal Warden's three shapes (reference only, as the Druid's beasts)
+for (const [form, role, note] of [
+  [
+    "panther",
+    "Warden's Shape",
+    "A shape of the Primal Warden: a fast skirmisher whose Static Arc strikes at 2 to 3 tiles, after which it bounds away with the move it has left.",
+  ],
+  [
+    "tortoise",
+    "Warden's Shape",
+    "A shape of the Primal Warden: slow living artillery. Its Magma Mortar bursts on a 3 by 3 area, its shell halves all but magic, and up close it has only a weak bite.",
+  ],
+  [
+    "manta",
+    "Warden's Shape",
+    "A shape of the Primal Warden: a flier whose Void Beam goes on through three tiles beyond its target, friend or foe.",
+  ],
+])
+  UNIT_META[form] = {
+    name: UNIT_TYPES[form].name,
+    cost: 0,
+    role,
+    kit: "",
+    upgrades: null,
+    ep2: true,
+    bonus: true,
+    conjured: true,
+    note,
+  };
 // …and the Alchemist's Imp
 UNIT_META.imp = {
   name: UNIT_TYPES.imp.name,
@@ -658,6 +687,7 @@ export const ARMY_GROUPS = [
       "anubis",
       "tohunga",
       "tzitzimitl",
+      "warden",
     ],
   },
   {
@@ -1430,6 +1460,7 @@ export const TREE_COL = {
   ahuizotl: 4,
   chieftain: 3,
   tzitzimitl: 2,
+  warden: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1501,6 +1532,7 @@ export const TREE_ROW = {
   ahuizotl: 4,
   chieftain: 23,
   tzitzimitl: 27,
+  warden: 24,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",

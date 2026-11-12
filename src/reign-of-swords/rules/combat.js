@@ -25,7 +25,7 @@ import {
   ACID,
   BONUS_RANGED,
   BEAM_WEAPONS,
-  BREATH_SHARE,
+  BEAM_SHARE,
 } from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
 
@@ -393,6 +393,7 @@ export class CombatMethods {
       dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
     else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
     if (attacker._blind) dmg = Math.trunc(dmg / 2); // BONUS: blinded by a Sun Priest's Eclipse
+    if (defender.T.physicalHalf && !MAGIC_WEAPONS.includes(weapon)) dmg = Math.trunc(dmg / 2); // BONUS: the Siege-Tortoise's Obsidian Shell
     // BONUS: Shield Wall — a friend standing beside a Shieldmaiden is spared a share of a blow hand to hand
     if (dist === 1) {
       const wall = this.units.reduce(
@@ -1362,21 +1363,17 @@ export class CombatMethods {
     // BONUS: Dragonfire burns on through the two tiles beyond its target, in the line the Ballistae's bolt would take
     // (60% then 35%), on whoever stands there and on any structure
     if (BEAM_WEAPONS.includes(wMain)) {
-      const line = this._ballistaStep(attacker, defender.tx, defender.ty);
-      for (let k = 1; line && k <= 2; k++) {
+      const line = this._ballistaStep(attacker, defender.tx, defender.ty),
+        shares = BEAM_SHARE[wMain] || [];
+      for (let k = 1; line && k <= shares.length; k++) {
         const x = defender.tx + line.fx * k,
           y = defender.ty + line.fy * k;
         if (!this.inBounds(x, y)) break;
         const e = this.unitAt(x, y);
         this.spawnFx("fire", x * this.tile + this.tile / 2, y * this.tile + this.tile * 0.42, { delay: 0.08 * k });
         if (e && !e.dead && e !== attacker)
-          this._applyHit(
-            e,
-            attacker,
-            shared(this.computeDamage(attacker, e, { weapon: wMain }), BREATH_SHARE[k - 1]),
-            false,
-          );
-        this._areaStructureHit(attacker, x, y, BREATH_SHARE[k - 1], wMain);
+          this._applyHit(e, attacker, shared(this.computeDamage(attacker, e, { weapon: wMain }), shares[k - 1]), false);
+        this._areaStructureHit(attacker, x, y, shares[k - 1], wMain);
       }
     }
     // BONUS: Whirl — the Gladiators' blow spins on through every other enemy standing next to them, at 3/4 strength

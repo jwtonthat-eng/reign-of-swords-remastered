@@ -116,7 +116,7 @@ LEVELS.append(
             ("officer", "The Arsenal is the next strongpoint. Whoever holds it holds the harbor."),
         ],
         "defeat": [("officer_hurt", "The tide has turned, Commander. The fleet has stood back out to sea.")],
-        "reward": {"units": {"pavisiers": 2, "marines": 2}, "spoils": {"Armor": 1, "Spirit": 1}},
+        "reward": {"units": {"pavisiers": 2, "marines": 2}, "spoils": {"Armor": 1, "Spirit": 1, "Anchor": 2, "Void": 2}},
     }
 )
 
@@ -242,7 +242,7 @@ cc.....DDDDDDD.....ee
             ("advisor", "There is only the citadel left, Varius. And whatever he woke inside it."),
         ],
         "defeat": [("officer_hurt", "The Arsenal is lost, Commander. The fleet is burning at its moorings.")],
-        "reward": {"units": {"alchemist": 1}, "spoils": {"Lore": 1, "Weapons": 1, "Spirit": 1}},
+        "reward": {"units": {"alchemist": 1}, "spoils": {"Lore": 1, "Weapons": 1, "Spirit": 1, "Void": 2}},
     }
 )
 
@@ -365,7 +365,7 @@ LEVELS.append(
             ("advisor", "It will march home with us, Varius. I only wonder what the Emperor will do with such a weapon."),
         ],
         "defeat": [("officer_hurt", "The lightning... Commander, there is nothing left of the line.")],
-        "reward": {"units": {"battlemage": 1}, "spoils": {"Lore": 2, "Spirit": 1}},
+        "reward": {"units": {"battlemage": 1}, "spoils": {"Lore": 2, "Spirit": 1, "Void": 2}},
     }
 )
 
@@ -428,7 +428,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "The cove is clear, Commander, and the silver is ours.")],
         "defeat": [("officer_hurt", "They were in the dunes all along, Commander.")],
-        "reward": {"units": {"raiders": 1}, "spoils": {"Weapons": 1, "Beasts": 1}},
+        "reward": {"units": {"raiders": 1}, "spoils": {"Weapons": 1, "Beasts": 1, "Void": 2}},
     }
 )
 
@@ -534,7 +534,7 @@ b......DDDDDD.......
         ],
         "victory": [("officer", "The lighthouse held, Commander.")],
         "defeat": [("officer_hurt", "The light is out, Commander.")],
-        "reward": {"units": {"crossbowmen": 1}, "spoils": {"Lore": 1, "Armor": 1}},
+        "reward": {"units": {"crossbowmen": 1}, "spoils": {"Lore": 1, "Armor": 1, "Void": 2}},
     }
 )
 
@@ -619,7 +619,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "The square is ours, Commander. That was a line worth breaking.")],
         "defeat": [("officer_hurt", "We never reached their shields, Commander.")],
-        "reward": {"units": {"swordsmen": 1}, "spoils": {"Armor": 1, "Weapons": 1, "Spirit": 1}},
+        "reward": {"units": {"swordsmen": 1}, "spoils": {"Armor": 1, "Weapons": 1, "Spirit": 1, "Void": 2}},
     }
 )
 

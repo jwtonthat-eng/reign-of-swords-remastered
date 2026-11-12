@@ -6,7 +6,14 @@ import { join } from "node:path";
 import { loadEpisode, makeGame, startBattle, spawn, only, settle, step, nextRound } from "./battle.js";
 import { UNIT_TYPES, DEPLOY_COST } from "../data/game-data.js";
 import { WEAPON_DMG, UNIT_COMBAT } from "../data/combat-data.js";
-import { BONUS_ORDER, BONUS_WEAPONS, BONUS_UPGRADES, BONUS_UPGRADES_ALL, BONUS_HIDDEN } from "../data/bonus-units.js";
+import {
+  BONUS_ORDER,
+  BONUS_WEAPONS,
+  BONUS_UPGRADES,
+  BONUS_UPGRADES_ALL,
+  BONUS_HIDDEN,
+  BONUS_FORMS,
+} from "../data/bonus-units.js";
 import {
   UNIT_META,
   unitSkills,
@@ -51,7 +58,7 @@ function edgeTile(g, type) {
 }
 
 describe("bonus units: the data", () => {
-  it("thirty-six units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
+  it("thirty-seven units on offer (four more are hidden), each on an original weapon row and armour column, with a cost and a courage tier", () => {
     expect(BONUS_ORDER).toEqual([
       "cragsmen",
       "spellwardens",
@@ -89,6 +96,7 @@ describe("bonus units: the data", () => {
       "ahuizotl",
       "chieftain",
       "tzitzimitl",
+      "warden",
     ]);
     for (const k of BONUS_ORDER) {
       const T = UNIT_TYPES[k];
@@ -139,6 +147,7 @@ describe("bonus units: upgrade paths", () => {
       ["griffon", "dragonrider", "Void"],
       ["priests", "alchemist", "Void"],
       ["sentinel", "golem", "Void"],
+      ["druids", "warden", "Void"],
       ["militiamen", "jaguar", "Jade"],
       ["archers", "eagle", "Jade"],
       ["cavalry", "serpent", "Jade"],
@@ -421,14 +430,14 @@ describe("Lesser Shroud (Samurai)", () => {
 });
 
 describe("the units as retuned", () => {
-  it("Battlemage: Chain Lightning at 2–7, teleports like a Wizard, strikes first, may attack after moving", () => {
+  it("Battlemage: Chain Lightning at 2–6, teleports like a Wizard, strikes first, may attack after moving", () => {
     const g = field();
     const mage = spawn(g, "battlemage", "blue", 5, 5),
-      far = spawn(g, "footmen", "red", 12, 5),
+      far = spawn(g, "footmen", "red", 11, 5),
       beyond = spawn(g, "footmen", "red", 13, 6);
     expect(mage.T.minRange).toBe(1);
-    expect(mage.T.range).toBe(7);
-    expect(g.targetsFrom(mage, 5, 5)).toContain(far); // 7 away
+    expect(mage.T.range).toBe(6);
+    expect(g.targetsFrom(mage, 5, 5)).toContain(far); // 6 away
     expect(g.targetsFrom(mage, 5, 5)).not.toContain(beyond); // 9 away
     expect(mage.T.teleport).toBe(true);
     expect(mage.T.firstStrike).toBe(true);
@@ -1247,7 +1256,7 @@ describe("Moananui and Coatlan: the Polynesian and serpent-order units", () => {
     expect(hunting[2]).toBe(plain[2]);
     expect(UNIT_TYPES.tahuanui.fly).toBe(true);
   });
-  it("Karakia: as its turn begins a Tohunga mends the most wounded friend within 3 tiles by 20", () => {
+  it("Karakia: as its turn begins a Tohunga mends the most wounded friend within 3 tiles by 15", () => {
     const g = field();
     spawn(g, "tohunga", "blue", 10, 10);
     const worst = spawn(g, "footmen", "blue", 12, 10),
@@ -1257,7 +1266,7 @@ describe("Moananui and Coatlan: the Polynesian and serpent-order units", () => {
     other.hp = 60;
     far.hp = 10;
     g.healOnKeeps("blue");
-    expect([worst.hp, other.hp, far.hp]).toEqual([50, 60, 10]);
+    expect([worst.hp, other.hp, far.hp]).toEqual([45, 60, 10]);
   });
   it("Lurker of the Deep: a Taniwha swims deep water at 1, fights from it, and strikes harder out of it", () => {
     const g = startBattle(makeGame(5941));
@@ -1359,5 +1368,82 @@ describe("the eight culture tokens", () => {
     expect(UPGRADE_FROM.coatecpatl.from).toBe("jaguar");
     expect(UPGRADE_FROM.chieftain.from).toBe("eagle");
     expect(UPGRADE_FROM.golem.from).toBe("sentinel");
+  });
+});
+
+describe("the Primal Warden", () => {
+  const field = () => {
+    const g = startBattle(makeGame(5204));
+    only(g);
+    return g;
+  };
+  it("is a hero made from a Druid with a Void Rift Crystal, and shifts between three shapes of its own", () => {
+    expect(UPGRADE_FROM.warden).toEqual({ from: "druids", need: "Void" });
+    expect(DEPLOY_ELITE.warden).toBe(true);
+    expect(DEPLOY_COST.warden).toBe(400);
+    for (const form of BONUS_FORMS) expect(DEPLOY_ORDER).not.toContain(form);
+    const g = field();
+    const warden = spawn(g, "warden", "blue", 10, 10);
+    warden.hp = 70;
+    expect(UNIT_TYPES.warden.shapeshiftForms).toEqual(["panther", "tortoise", "manta"]);
+    expect(g._shapeshift(warden, "panther")).toBe(true);
+    expect([warden.type, warden.hp, warden._druidType]).toEqual(["panther", 70, "warden"]); // HP carries over
+    expect(warden.T.shapeshiftForms).toEqual(["druids", "tortoise", "manta"]);
+    warden._shiftTurn = null;
+    expect(g._shapeshift(warden, "druids")).toBe(true); // "druids" = its own first form
+    expect(warden.type).toBe("warden");
+  });
+  it("Cleansing Touch: its heal mends 20 HP at 2 tiles and lifts acid, chill, blindness and holds", () => {
+    const g = field();
+    const warden = spawn(g, "warden", "blue", 10, 10),
+      friend = spawn(g, "footmen", "blue", 12, 10);
+    Object.assign(friend, { hp: 50, _acid: { turns: 3, by: warden }, _chilled: true, _blind: true, _seized: true });
+    g.selected = warden;
+    expect(g._clickHeal(friend)).toBe(true);
+    for (let i = 0; i < 200; i++) step(g);
+    expect(friend.hp).toBe(70);
+    expect([friend._acid, friend._chilled, friend._blind, friend._seized]).toEqual([null, false, false, false]);
+  });
+  it("Storm-Stalker Panther: a Static Arc at 2–3 that it may follow with a move", () => {
+    const T = UNIT_TYPES.panther;
+    expect([T.minRange, T.range, T.move]).toEqual([1, 3, 8]);
+    expect(T.shootMove).toBe(true);
+  });
+  it("Volcanic Siege-Tortoise: a mortar on a 3 by 3 area, never beside itself; blades do half, magic all", () => {
+    const g = field();
+    const tortoise = spawn(g, "tortoise", "blue", 5, 10),
+      target = spawn(g, "footmen", "red", 9, 10),
+      diagonal = spawn(g, "footmen", "red", 10, 11),
+      apart = spawn(g, "footmen", "red", 11, 10);
+    expect(g._weaponAt(tortoise, 4)).toBe(86);
+    expect(g._weaponAt(tortoise, 1)).toBe(87); // only its Bite up close
+    expect(UNIT_TYPES.tortoise.move).toBe(2);
+    g.resolveDamage(tortoise, target, {});
+    expect(target.hp).toBeLessThan(100);
+    expect(diagonal.hp).toBeLessThan(100); // the corner of the 3 x 3
+    expect(apart.hp).toBe(100);
+    const sword = spawn(g, "swordsmen", "red", 5, 11),
+      wizard = spawn(g, "wizards", "red", 5, 5);
+    const T = tortoise.T;
+    const blade = g._damage256(sword, tortoise),
+      spell = g._damage256(wizard, tortoise, { weapon: 25 });
+    tortoise.T = { ...T, physicalHalf: false };
+    expect(blade).toBeLessThan(g._damage256(sword, tortoise));
+    expect(spell).toBe(g._damage256(wizard, tortoise, { weapon: 25 }));
+  });
+  it("Astral Manta: its Void Beam goes on through three tiles beyond its target at full strength, friend or foe", () => {
+    const g = field();
+    const manta = spawn(g, "manta", "blue", 5, 10),
+      target = spawn(g, "archers", "red", 7, 10),
+      second = spawn(g, "archers", "red", 8, 10),
+      friend = spawn(g, "footmen", "blue", 10, 10),
+      beyond = spawn(g, "archers", "red", 11, 10),
+      beside = spawn(g, "archers", "red", 7, 11);
+    g.resolveDamage(manta, target, {});
+    expect(100 - second.hp).toBe(100 - target.hp); // in full
+    expect(friend.hp).toBeLessThan(100); // it does not spare its own side
+    expect(beyond.hp).toBe(100); // four tiles in all
+    expect(beside.hp).toBe(100);
+    expect(UNIT_TYPES.manta.fly).toBe(true);
   });
 });

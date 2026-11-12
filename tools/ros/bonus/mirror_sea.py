@@ -80,7 +80,7 @@ LEVELS.append(
             ("advisor", "There was a cage on the last one, Varius. Iron, man-high, and chewed from the inside. Whatever they kept in it, they took it with them."),
         ],
         "defeat": [("officer_hurt", "They have thrown us back across the plank, Commander. The strait is still shut.")],
-        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1}},
+        "reward": {"units": {}, "spoils": {"Weapons": 1, "Armor": 1, "Anchor": 2}},
     }
 )
 
@@ -153,7 +153,7 @@ LEVELS.append(
             ("advisor", "There are whelps below, Varius, not yet blooded, and our militia are farm boys who grew up with dogs. Give me a season and a Medal to pin on the best of them, and the Empire will have Beast Masters of its own."),
         ],
         "defeat": [("officer_hurt", "The pack has the deck, Commander. We cannot hold the planks.")],
-        "reward": {"units": {"militiamen": 2}, "spoils": {"Beasts": 2}},
+        "reward": {"units": {"militiamen": 2}, "spoils": {"Beasts": 2, "Anchor": 2}},
     }
 )
 
@@ -233,7 +233,7 @@ LEVELS.append(
             ("advisor", "The Rukiev coast can fish again, Varius, and so can we. Two seas in one year. The Emperor will run out of water to send you to."),
         ],
         "defeat": [("officer_hurt", "We never reached the sand, Commander. The flagship has thrown us back.")],
-        "reward": {"units": {"marines": 1}, "spoils": {"Lore": 1, "Spirit": 1}},
+        "reward": {"units": {"marines": 1}, "spoils": {"Lore": 1, "Spirit": 1, "Anchor": 2}},
     }
 )
 
@@ -301,7 +301,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "The fire ship is aground and burning alone, Commander.")],
         "defeat": [("officer_hurt", "The grain fleet is burning, Commander.")],
-        "reward": {"units": {"footmen": 1}, "spoils": {"Armor": 1, "Lore": 1}},
+        "reward": {"units": {"footmen": 1}, "spoils": {"Armor": 1, "Lore": 1, "Anchor": 2}},
     }
 )
 
@@ -375,7 +375,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "All three cutters are ours, Commander. The pack is broken.")],
         "defeat": [("officer_hurt", "They are over the rail on every side, Commander.")],
-        "reward": {"units": {"swordsmen": 1}, "spoils": {"Weapons": 1, "Beasts": 1}},
+        "reward": {"units": {"swordsmen": 1}, "spoils": {"Weapons": 1, "Beasts": 1, "Anchor": 2}},
     }
 )
 

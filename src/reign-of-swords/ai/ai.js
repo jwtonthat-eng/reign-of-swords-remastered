@@ -593,6 +593,17 @@ export class AiMethods {
         } else form = !allFree && pace <= 8 ? "stag" : "greateagle";
       } else form = "greateagle";
     }
+    // BONUS: a Primal Warden makes the Druid's choices with its own shapes — the Panther where a Druid would run as a
+    // Stag, the Siege-Tortoise where it would stand as a Bear, the Manta where it would fly as an Eagle; and with foes
+    // near and no move made, the Manta again (the Tortoise is too slow to be worth taking on the march)
+    if (druid === "warden") {
+      form = { stag: "panther", bear: "tortoise", greateagle: "manta" }[form] || form;
+      if (form === druid || form === u.type) form = nearestDist <= 5 ? (moved ? "tortoise" : "manta") : "panther";
+      if (!UNIT_TYPES[form] || form === u.type) return false;
+      if (!this.game._shapeshift(u, form)) return false;
+      if (!moved) u._shiftFx = true;
+      return true;
+    }
     if (form !== druid && !has(form)) return false;
     if (form === u.type || !this.game._shapeshift(u, form === druid ? "druids" : form)) return false;
     // before the move, the bloom + sound play once the camera is on the druid (see _aiCarryOut's `begin`)

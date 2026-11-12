@@ -270,8 +270,13 @@ function SelectedUnit({ u, state, ctrl }) {
               title={u.shapeshiftBlocked ? tr("Can't shapeshift over water or cliffs") : undefined}
               onClick={() => ctrl && ctrl.shapeshift(f)}
             >
-              {UNIT_TYPES[f] ? <UnitSprite unit={f} size={24} framed={false} /> : null}
-              {tr(SHIFT_NAME[f] || f)}
+              {UNIT_TYPES[f] ? (
+                <UnitSprite unit={f === "druids" ? u.shapeshiftBase || f : f} size={24} framed={false} />
+              ) : null}
+              {/* "druids" is the unit's own first form: a Druid, or (BONUS) a Primal Warden */}
+              {f === "druids" && u.shapeshiftBase && u.shapeshiftBase !== "druids"
+                ? tr(UNIT_TYPES[u.shapeshiftBase].name)
+                : tr(SHIFT_NAME[f] || (UNIT_TYPES[f] && UNIT_TYPES[f].name) || f)}
             </button>
           ))}
         </div>

@@ -118,7 +118,7 @@ ffffffff.==.ffffffff
             ("officer", "Some of their dead carried our own pikes, Commander, cut short for the forest. The men want to try it."),
         ],
         "defeat": [("officer_hurt", "We are cut to pieces on the road, Commander. Back to the boats.")],
-        "reward": {"units": {"jaguar": 1}, "spoils": {"Beasts": 1, "Weapons": 1, "Obsidian": 2}},
+        "reward": {"units": {"jaguar": 1}, "spoils": {"Beasts": 1, "Weapons": 1, "Jade": 2}},
     }
 )
 
@@ -230,7 +230,7 @@ ffffff.....==.....ffffff
             ("advisor", "The Battlemage, Varius. The reavers sold him the story, and he believed all of it."),
         ],
         "defeat": [("officer_hurt", "The river ran red and we never reached the bank, Commander.")],
-        "reward": {"units": {"eagle": 1}, "spoils": {"Lore": 1, "Armor": 1, "Obsidian": 2}},
+        "reward": {"units": {"eagle": 1}, "spoils": {"Lore": 1, "Armor": 1, "Jade": 2}},
     }
 )
 
@@ -361,7 +361,7 @@ ffffffff...==...ffffffff
             ("advisor", "Let us go home before the rumour finds another shore."),
         ],
         "defeat": [("officer_hurt", "We could not carry the gate, Commander. The altar is still burning.")],
-        "reward": {"units": {"serpent": 1}, "spoils": {"Spirit": 1, "Lore": 1, "Armor": 1, "Obsidian": 2}},
+        "reward": {"units": {"serpent": 1}, "spoils": {"Spirit": 1, "Lore": 1, "Armor": 1, "Jade": 2}},
     }
 )
 
@@ -467,7 +467,7 @@ ffffffffffffffffffffff
         ],
         "victory": [("officer", "Dawn, Commander. The fence held, and there are spotted hides all round it.")],
         "defeat": [("officer_hurt", "They are inside the fence, Commander. The camp is lost.")],
-        "reward": {"units": {"pikemen": 1}, "spoils": {"Beasts": 2, "Armor": 1, "Obsidian": 2}},
+        "reward": {"units": {"pikemen": 1}, "spoils": {"Beasts": 2, "Armor": 1, "Jade": 2}},
     }
 )
 
@@ -556,7 +556,7 @@ ffffff....==....ffffff
         ],
         "victory": [("cuali", "Forty towns will eat this winter, Commander. They will know whose soldiers carried it back.")],
         "defeat": [("officer_hurt", "The vault is empty, Commander. They got it away into the hills.")],
-        "reward": {"units": {"archers": 1}, "spoils": {"Weapons": 1, "Lore": 1, "Spirit": 1, "Obsidian": 2}},
+        "reward": {"units": {"archers": 1}, "spoils": {"Weapons": 1, "Lore": 1, "Spirit": 1, "Jade": 2}},
     }
 )
 

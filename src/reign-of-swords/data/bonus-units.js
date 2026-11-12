@@ -53,11 +53,14 @@ export const BONUS_ALL = [
   "ahuizotl",
   "chieftain",
   "tzitzimitl",
+  "warden", // the Primal Warden (a hero unit: Druids + a Void Rift Crystal)
 ];
 // The bonus units the game offers, in Field Manual order.
 export const BONUS_ORDER = BONUS_ALL.filter((unit) => !BONUS_HIDDEN.includes(unit));
 // Units a bonus unit calls onto the field: never deployed or owned (the Beast Master's Hounds).
 export const BONUS_SUMMONS = ["hounds", "imp"];
+// The shapes a Primal Warden takes (never deployed or owned: it shifts into them, as a Druid into its beasts).
+export const BONUS_FORMS = ["panther", "tortoise", "manta"];
 
 // New weapon ids (the originals end at 34). `row` = the ORIGINAL weapon whose damage row it copies.
 export const BONUS_WEAPONS = {
@@ -71,7 +74,7 @@ export const BONUS_WEAPONS = {
   36: {
     name: "Chain Lightning",
     row: 25, // Fireball
-    range: [2, 7],
+    range: [2, 6],
     tags: [8], // Shoot and Move
     desc: "Chain Lightning strikes its target, then leaps on through up to four more enemies, each within 2 tiles of the last, weakening as it goes.",
   },
@@ -394,25 +397,76 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "The Ahuizotl bites, and the hand on its tail holds on: the foe it strikes cannot attack on its next turn.",
   },
+  82: {
+    name: "Prism Bolt",
+    row: 26, // Lightning Storm
+    range: [2, 4],
+    tags: [],
+    desc: "A Prism Bolt is a ray from the Warden's staff: steady damage against every armor.",
+  },
+  83: {
+    name: "Totem Staff",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "A Totem Staff is a last resort: weak against everything but the unarmoured.",
+  },
+  84: {
+    name: "Static Arc",
+    row: 26, // Lightning Storm
+    range: [2, 3],
+    tags: [8], // Shoot and Move
+    desc: "A Static Arc leaps from the Panther at 2 to 3 tiles, and it bounds away again with the move it has left.",
+  },
+  85: {
+    name: "Storm Claws",
+    row: 4, // Antlers
+    range: [1, 1],
+    tags: [],
+    desc: "Storm Claws tear at lightly armoured troops.",
+  },
+  86: {
+    name: "Magma Mortar",
+    row: 20, // Rock (the Catapult's)
+    range: [2, 5],
+    tags: [13], // a fire weapon
+    blast: [100, 60],
+    desc: "A Magma Mortar lobs molten rock onto a 3 by 3 area, friend or foe. It cannot be aimed at a tile beside the Tortoise.",
+  },
+  87: {
+    name: "Bite",
+    row: 8, // Short Sword
+    range: [1, 1],
+    tags: [],
+    desc: "The Tortoise's Bite is slow and weak: keep it behind your line.",
+  },
+  88: {
+    name: "Void Beam",
+    row: 25, // Fireball
+    range: [1, 4],
+    tags: [],
+    desc: "A Void Beam is a lance of starlight that goes on through three tiles beyond its target at full strength, friend or foe.",
+  },
 };
 // The weapons Nullify stops (the three spells and Chain Lightning).
-export const MAGIC_WEAPONS = [25, 26, 27, 36, 61, 70, 75, 80];
+export const MAGIC_WEAPONS = [25, 26, 27, 36, 61, 70, 75, 80, 82, 84, 88];
 // every bonus weapon that is not swung in melee (rules/combat RANGED_WEAPONS)
-export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63, 68, 70, 75, 79, 80];
+export const BONUS_RANGED = [35, 36, 39, 42, 46, 50, 54, 55, 60, 61, 63, 68, 70, 75, 79, 80, 82, 84, 86, 88];
 // the Alchemist's flask, and the acid it leaves: HP a turn, for how many of the victim's turns
 export const FLASK_WEAPON = 50;
 export const ACID = { damage: 5, turns: 3 };
 export const CHAIN_WEAPON = 36;
 // Chain Lightning: added to the weapon x armour cell of every bolt and leap, and the share of the bolt each leap
 // carries (four leaps, each from the unit last struck to the nearest unstruck enemy within CHAIN_REACH tiles)
-export const CHAIN_BONUS = 10;
+export const CHAIN_BONUS = 5;
 export const CHAIN_SHARE = [0.5, 0.4, 0.3, 0.2];
 export const CHAIN_REACH = 2;
 // Dragonfire, and the share of the blow the first and second tile BEYOND its target take
 export const DRAGONFIRE_WEAPON = 42;
 // the weapons that burn on in a line beyond their target: Dragonfire and the Sun Priest's Sunbeam
-export const BEAM_WEAPONS = [42, 61];
-export const BREATH_SHARE = [0.6, 0.35];
+export const BEAM_WEAPONS = [42, 61, 88];
+// …and the share of the blow each tile beyond the target takes (the Manta's Void Beam: three more tiles, in full)
+export const BEAM_SHARE = { 42: [0.6, 0.35], 61: [0.6, 0.35], 88: [1, 1, 1] };
 
 // Movement class (0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 war engine), as data/combat-data UNIT_AL.
 export const BONUS_AL = {
@@ -458,6 +512,10 @@ export const BONUS_AL = {
   ahuizotl: 1,
   chieftain: 1,
   tzitzimitl: 0,
+  warden: 2,
+  panther: 3,
+  tortoise: 2,
+  manta: 0,
 };
 
 // The combat record of each unit, in the shape of data/combat-data UNIT_COMBAT. rating tier → rf 45/60/75/90/100/115.
@@ -539,7 +597,7 @@ export const BONUS_COMBAT = {
     rf: 90,
     abilities: [],
     whirl: true,
-    armourBonus: 10,
+    armourBonus: 5,
   },
   // a swordsman who is also a lesser Shaman: the Spirit Shroud aura (flag `shroud`), reaching 2 tiles instead of 4.
   // dmgBonus / armourBonus: +10 on the weapon x armour cell of every blow it deals, -10 on every blow it takes.
@@ -616,7 +674,7 @@ export const BONUS_COMBAT = {
     abilities: [],
     fly: true,
     gale: true,
-    dmgBonus: 20,
+    dmgBonus: 10,
     armourBonus: 10,
   },
   // THE LABORATORY AND ITS CREATURES. The Alchemist throws flasks (flask: a Fireball-shaped burst that leaves acid),
@@ -824,7 +882,7 @@ export const BONUS_COMBAT = {
   // lurker: +N on the cell when it strikes from water.
   toa: { move: 5, weapon: 73, weapon2: 0, armour: 6, rating: 3, rf: 90, abilities: [], opening: 20, shoreStride: true },
   tahuanui: { move: 8, weapon: 74, weapon2: 0, armour: 7, rating: 4, rf: 100, abilities: [], fly: true, skyHunter: 25 },
-  tohunga: { move: 4, weapon: 75, weapon2: 76, armour: 9, rating: 3, rf: 90, abilities: [], karakia: 20 },
+  tohunga: { move: 4, weapon: 75, weapon2: 76, armour: 9, rating: 3, rf: 90, abilities: [], karakia: 15 },
   taniwha: {
     move: 5,
     weapon: 77,
@@ -869,8 +927,8 @@ export const BONUS_COMBAT = {
     weapon: 79,
     weapon2: 59,
     armour: 5,
-    rating: 4,
-    rf: 100,
+    rating: 3,
+    rf: 90,
     abilities: [8, 11],
     standard: true,
     vanguard: true,
@@ -888,6 +946,15 @@ export const BONUS_COMBAT = {
     drain: 50,
     dmgBonus: 10,
   },
+  // THE PRIMAL WARDEN (a design supplied by the user): a fragile healer that shapeshifts, as the Druid does (ability
+  // 21), into three shapes of its own. cleanse: its Heal also lifts acid, chill, blindness and any hold.
+  warden: { move: 4, weapon: 82, weapon2: 83, armour: 9, rating: 3, rf: 90, abilities: [21], cleanse: true },
+  // the Storm-Stalker Panther: a fast skirmisher that shoots and bounds away (Shoot and Move)
+  panther: { move: 8, weapon: 84, weapon2: 85, armour: 4, rating: 5, rf: 115, abilities: [8] },
+  // the Volcanic Siege-Tortoise: slow artillery. physicalHalf: everything but magic does half damage to it.
+  tortoise: { move: 2, weapon: 86, weapon2: 87, armour: 10, rating: 5, rf: 115, abilities: [7], physicalHalf: true },
+  // the Astral Manta: a flier whose beam pierces a line
+  manta: { move: 7, weapon: 88, weapon2: 0, armour: 7, rating: 5, rf: 115, abilities: [], fly: true },
 };
 export const BONUS_COURAGE = {
   cragsmen: 2,
@@ -932,6 +999,10 @@ export const BONUS_COURAGE = {
   ahuizotl: 4,
   chieftain: 5,
   tzitzimitl: 5,
+  warden: 4,
+  panther: 4,
+  tortoise: 5,
+  manta: 4,
 };
 export const BONUS_COST = {
   cragsmen: 175,
@@ -964,21 +1035,25 @@ export const BONUS_COST = {
   shieldmaiden: 200,
   einherjar: 275,
   jotunn: 425,
-  medjay: 150,
+  medjay: 175,
   khopesh: 175,
   anubis: 275,
   ammit: 275,
   toa: 150,
   tahuanui: 250,
-  tohunga: 200,
+  tohunga: 250,
   taniwha: 375,
   coatecpatl: 200,
   ahuizotl: 175,
-  chieftain: 250,
+  chieftain: 275,
   tzitzimitl: 250,
+  warden: 400,
+  panther: 0, // the Warden's shapes are never deployed
+  tortoise: 0,
+  manta: 0,
 };
 // "You may only deploy 1 Elite unit per 1000 deployment points" — the Battlemage and the Dragon Rider count as elites.
-export const BONUS_ELITE = { battlemage: true, dragonrider: true, sunpriest: true };
+export const BONUS_ELITE = { battlemage: true, dragonrider: true, sunpriest: true, warden: true };
 
 // Sprite strips: cut from the supplied art sheets by tools/ros/bonus/import_sheet.py — 88 px frames, the whole strip
 // one attack (frame 0 a ready pose), `hitFrame` the frame the blow lands or the shot leaves on.
@@ -1402,7 +1477,7 @@ export const BONUS_TYPES = {
     projectile: "ball",
     magic: true,
     shotSpell: "ice",
-    ability: "Karakia — each turn the most wounded friend within 3 tiles mends 20 HP. Spirit Wisps at 2–5 tiles.",
+    ability: "Karakia — each turn the most wounded friend within 3 tiles mends 15 HP. Spirit Wisps at 2–5 tiles.",
   },
   taniwha: {
     name: "Taniwha",
@@ -1468,6 +1543,76 @@ export const BONUS_TYPES = {
     shotHue: 250,
     ability: "Star Hunger — half the damage of its Starfire (2–5 tiles) returns to it as health. Fear. Flies.",
   },
+  // heal / healAmount / healRange: the Priest's Heal with its own numbers (rules: the Alchemist's Elixir)
+  warden: {
+    name: "Primal Warden",
+    sprite: "warden",
+    frames: 4,
+    frameW: 128,
+    frameH: 96,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotSpell: "ice",
+    heal: true,
+    healAmount: 20,
+    healRange: 2,
+    ability:
+      "Shapeshifts into the Storm-Stalker Panther, the Volcanic Siege-Tortoise or the Astral Manta. Cleansing Touch — heals 20 HP at 2 tiles and lifts ailments. Prism Bolt at 2–4 tiles.",
+  },
+  panther: {
+    name: "Storm-Stalker Panther",
+    sprite: "panther",
+    frames: 4,
+    frameW: 128,
+    frameH: 88,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotSpell: "lightning",
+    ability: "A shape of the Primal Warden. Static Arc at 2–3 tiles, then bounds away with the move it has left.",
+  },
+  // blastArea: its mortar bursts on the whole 3 x 3 around its target (set after the merge, data/game-data.js)
+  tortoise: {
+    name: "Volcanic Siege-Tortoise",
+    sprite: "tortoise",
+    ...both(4, 2),
+    kind: "ranged",
+    projectile: "stone",
+    ability:
+      "A shape of the Primal Warden. Magma Mortar at 2–5 tiles on a 3 by 3 area; Obsidian Shell halves all but magic; moves 2.",
+  },
+  manta: {
+    name: "Astral Manta",
+    sprite: "manta",
+    frames: 4,
+    frameW: 128,
+    frameH: 88,
+    hitFrame: 2,
+    rangedFrom: 0,
+    rangedTo: 3,
+    rangedHit: 2,
+    meleeFrom: 0,
+    meleeTo: 3,
+    kind: "ranged",
+    projectile: "ball",
+    magic: true,
+    shotHue: 250,
+    ability:
+      "A shape of the Primal Warden. Void Beam: a line through its target and three tiles beyond, friend or foe. Flies.",
+  },
 };
 
 // The six bonus abilities as Field Manual / unit-card skills: the trait flag, the name, the description, the icon.
@@ -1497,6 +1642,18 @@ export const BONUS_SKILLS = [
     d: "Living stone: a Priest's Heal does nothing for it and quicksand neither stops nor hurts it. Craftsmen can Repair it like a war engine.",
   },
   {
+    flag: "cleanse",
+    n: "Cleansing Touch",
+    icon: "skill_nullify",
+    d: "Heals a friendly unit within 2 tiles for 20 HP and lifts what ails it: acid and venom, a Jotunn's chill, a Sun Priest's blindness, a Naga's or an Ahuizotl's hold.",
+  },
+  {
+    flag: "physicalHalf",
+    n: "Obsidian Shell",
+    icon: "skill_unyielding",
+    d: "Blades, arrows and stones do half damage to it. Magic does its full work.",
+  },
+  {
     flag: "opening",
     n: "First Thrust",
     icon: "skill_first",
@@ -1518,7 +1675,7 @@ export const BONUS_SKILLS = [
     flag: "karakia",
     n: "Karakia",
     icon: "skill_nullify",
-    d: "At the start of its turn the most wounded friendly unit within 3 tiles mends 20 HP, without costing the Tohunga its action.",
+    d: "At the start of its turn the most wounded friendly unit within 3 tiles mends 15 HP, without costing the Tohunga its action.",
   },
   {
     flag: "aquatic",
@@ -1802,6 +1959,7 @@ export const BONUS_UPGRADES_ALL = [
   { from: "griffon", to: "dragonrider", need: "Void", gate: 5943 }, // Mare Nostra 3, The Admiral's Deck
   { from: "priests", to: "alchemist", need: "Void", gate: 5925 }, // Isoluccia 2, The Arsenal
   { from: "sentinel", to: "golem", need: "Void", gate: 5912 }, // Tilicia raid 2, Quarry of Giants
+  { from: "druids", to: "warden", need: "Void", gate: 5906 }, // Tilicia 3, The Empty Tomb
   // the Beast Master's creatures, hidden for now (BONUS_HIDDEN)
   { from: "beastmaster", to: "unicorn", need: "Lore", gate: 5971 }, // Satoshi raid 1, The Shrine Pass
   { from: "beastmaster", to: "efreet", need: "Weapons", gate: 5983 }, // the Mirror Sea 3, The Reaver-King
@@ -2013,7 +2171,7 @@ export const BONUS_META = {
   tohunga: {
     role: "Keeper of the Spirits",
     kit: "⚔ Spirit Wisps / Carved Staff · 🛡 Holy Vestment",
-    note: "An elder who speaks for the ancestors. Each turn his karakia mends the most wounded friend within 3 tiles by 20 HP, and his wisps fly at 2–5 tiles.",
+    note: "An elder who speaks for the ancestors. Each turn his karakia mends the most wounded friend within 3 tiles by 15 HP, and his wisps fly at 2–5 tiles.",
   },
   taniwha: {
     role: "Guardian of the Waters",
@@ -2039,6 +2197,11 @@ export const BONUS_META = {
     role: "Star Demon",
     kit: "⚔ Starfire · 🛡 Minor Ward",
     note: "A skeletal spirit of the dark between the stars. Its violet fire feeds it: half of what it burns away returns to it as health.",
+  },
+  warden: {
+    role: "Shapeshifting Hero",
+    kit: "⚔ Prism Bolt / Totem Staff · 🛡 Minor Ward",
+    note: "A masked shaman of the old powers, made from a Druid with a Void Rift Crystal. Fragile as itself, where it heals and cleanses; then it is whatever the battle needs: the Storm-Stalker Panther to strike and run, the Volcanic Siege-Tortoise to hold a line and bombard, the Astral Manta to fly over anything and lance a whole rank.",
   },
 };
 // Battle ids of the six bonus regions (Tilicia 5902–5913, Isoluccia 5924–5933, Mare Nostra 5941–5952, Satoshi

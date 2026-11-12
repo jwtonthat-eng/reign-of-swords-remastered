@@ -130,7 +130,7 @@ DDDD.......mm...........
             ("advisor", "She says one fortress bars the road to the tomb: Frostgate. And that its builders never reckoned with men who climb."),
         ],
         "defeat": [("officer_hurt", "The village is lost, Commander, and the clans with it.")],
-        "reward": {"units": {"cragsmen": 2}, "spoils": {}},
+        "reward": {"units": {"cragsmen": 2}, "spoils": {"Void": 2}},
     }
 )
 
@@ -234,7 +234,7 @@ LEVELS.append(
             ("officer", "They are asking to march with us, Sir Anston. They would rather face what is in that tomb beside an army."),
         ],
         "defeat": [("officer_hurt", "We broke on the gate, Commander. Frostgate still stands.")],
-        "reward": {"units": {"spellwardens": 2}, "spoils": {}},
+        "reward": {"units": {"spellwardens": 2}, "spoils": {"Void": 2}},
     }
 )
 
@@ -345,7 +345,7 @@ LEVELS.append(
             ("advisor", "Purple sails. Isoluccia. One of the stone guardians knelt when the Warden fell, Varius. It seems to be yours now."),
         ],
         "defeat": [("officer_hurt", "The Warden holds the plateau, Commander. We could not reach him.")],
-        "reward": {"units": {"sentinel": 1}, "spoils": {}},
+        "reward": {"units": {"sentinel": 1}, "spoils": {"Void": 2}},
     }
 )
 
@@ -439,7 +439,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "The column is taken, Commander. The Warden's garrisons will go hungry.")],
         "defeat": [("officer_hurt", "They cut their way out of the trap, Commander.")],
-        "reward": {"units": {"raiders": 1}, "spoils": {"Beasts": 1, "Weapons": 1}},
+        "reward": {"units": {"raiders": 1}, "spoils": {"Beasts": 1, "Weapons": 1, "Void": 2}},
     }
 )
 
@@ -514,7 +514,7 @@ LEVELS.append(
             ("advisor", "The great one is whole under the rubble, Varius, runes and all. The craftsmen think they can raise it again, for us."),
         ],
         "defeat": [("officer_hurt", "We cannot stand against them in the open, Commander.")],
-        "reward": {"units": {"golem": 1}, "spoils": {"Lore": 2, "Armor": 1}},
+        "reward": {"units": {"golem": 1}, "spoils": {"Lore": 2, "Armor": 1, "Void": 2}},
     }
 )
 
@@ -599,7 +599,7 @@ LEVELS.append(
         ],
         "victory": [("officer", "The stores are ours, Commander. The clans will eat this winter and the Warden's men will not.")],
         "defeat": [("officer_hurt", "There is smoke over the granaries, Commander. We were too slow.")],
-        "reward": {"units": {"militiamen": 2}, "spoils": {"Armor": 1, "Spirit": 1}},
+        "reward": {"units": {"militiamen": 2}, "spoils": {"Armor": 1, "Spirit": 1, "Void": 2}},
     }
 )
 

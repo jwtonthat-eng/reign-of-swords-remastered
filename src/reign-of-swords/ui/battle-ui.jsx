@@ -170,6 +170,10 @@ export const UNIT_CATEGORY = {
   ahuizotl: "Infantry",
   chieftain: "Missile",
   tzitzimitl: "Casters",
+  warden: "Casters",
+  panther: "Cavalry",
+  tortoise: "Siege",
+  manta: "Flying",
 };
 export const CATEGORY_ORDER = ["Levy", "Infantry", "Missile", "Cavalry", "Siege", "Casters", "Flying"];
 

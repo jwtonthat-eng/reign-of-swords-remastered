@@ -126,7 +126,7 @@ LEVELS.append(
         "name": "The River Gate",
         "objective": "Force the causeway and clear the west bank. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 3500,
+        "budget": 3750,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ..s.....h..==..h.....s..
@@ -355,7 +355,7 @@ LEVELS.append(
         "name": "The Oasis Caravan",
         "objective": "Reach the caravan master's tents within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 1750,
+        "budget": 1500,
         "sides": {"P": ARMY, "E": "Caravan Guard"},
         "terrain": """
 ..s......,,......s....
