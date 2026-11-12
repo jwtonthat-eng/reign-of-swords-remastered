@@ -267,6 +267,14 @@ export class GridMethods {
   moveCost(u, tx, ty, fx, fy) {
     if (!this.inBounds(tx, ty)) return 99;
     if (this.portals && this._portalBlocks(u, tx, ty)) return 99; // Map::getMoveCost's portal gates (fliers included)
+    // BONUS (ours, MECHANICS.md §13): Climb takes Cragsmen over cliffs (type 21) and Amphibious takes Marines through
+    // deep water (type 19), at 2 a tile — the two terrain types no other ground unit may enter.
+    const crossed = moveType(this.tileAt(tx, ty));
+    if ((crossed === 21 && u.T.climb) || (crossed === 19 && u.T.amphibious)) return 2;
+    if ((crossed === 4 || crossed === 28) && u.T.forestWalk) return 1; // BONUS: Jungle Stride (Jaguar and Eagle Warriors)
+    if ([3, 22, 27, 28].includes(crossed) && u.T.desertStride) return 1; // BONUS: Desert Stride (Medjay): desert brush and rough ground
+    if (crossed === 5 && u.T.shoreStride) return 1; // BONUS: Wayfinder (Toa Warriors)
+    if ((crossed === 5 || crossed === 19) && u.T.aquatic) return 1; // BONUS: Lurker of the Deep (Taniwha)
     // Movement CATEGORY (real 5010 `al`): 0 fly · 1 skirmish · 2 formation · 3 cavalry · 4 siege. Fall back to a
     // sensible class if a unit somehow lacks it (shifted druid-forms carry their beast's T, which has al set).
     const moveClass =
@@ -404,7 +412,9 @@ export class GridMethods {
     const tileMove = moveType(this.tileAt(tx, ty)),
       row = moveRow(tileMove);
     if (!row) return 99;
-    if (fx != null && moveClass !== 0 && !this._moveAllowed(fx, fy, tx, ty)) return 99;
+    // BONUS (ours): Marines climb a ship's bulwark straight out of the sea — Amphibious waives the step-link rule there.
+    const boarding = u.T.amphibious && this.inBounds(fx, fy) && moveType(this.tileAt(fx, fy)) === 19;
+    if (fx != null && moveClass !== 0 && !boarding && !this._moveAllowed(fx, fy, tx, ty)) return 99;
     if (tileMove === 16) {
       const occupant = this.unitAt(tx, ty);
       if (occupant && !occupant.dead && occupant.team === u.team) return 1;
@@ -427,7 +437,17 @@ export class GridMethods {
     return true;
   }
   moveOf(u) {
-    const move = u._paceMove || u.T.move || 4;
+    if (u._held) return 0; // BONUS: held in a Naga's coils
+    // BONUS: Tailwind — a friendly Feathered Serpent beside it carries it a tile further
+    const wind = this.units.reduce(
+      (best, o) =>
+        !o.dead && o !== u && o.team === u.team && o.T.tailwind && Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) === 1
+          ? Math.max(best, o.T.tailwind)
+          : best,
+      0,
+    );
+    let move = (u._paceMove || u.T.move || 4) + wind;
+    if (u._chilled) move = Math.ceil(move / 2); // BONUS: chilled by a Jotunn's Frost Slam
     return u.slowed ? Math.trunc((move * 3) / 4) : move;
   } // _paceMove: a grouped AI Hero marches at its group's pace (ai/grouplogic.js)   // Ice Field: move × 3 / 4 (Unit::onTick @0x78f5c)
   // Where unit `u` can move this turn: { dist, from, stops } — the cost to each tile, the step it came from (for
@@ -485,7 +505,9 @@ export class GridMethods {
   // Android port's a.j likewise — so there a flyer goes round enemy units like everyone else.
   _passesOverFoes(u) {
     if (!(this.mission && this.mission.ep === 2)) return false;
-    return u.type === "griffon" || u.type === "greateagle" || u.type === "dunesirens";
+    return (
+      u.type === "griffon" || u.type === "greateagle" || u.type === "dunesirens" || !!(u.T.bonus && u.T.fly) // (+ the bonus fliers)
+    );
   }
   _walkReach(u, moveBudget) {
     const dist = new Map(),
@@ -733,6 +755,8 @@ export class GridMethods {
   targetsFrom(u, tx, ty, moved) {
     const hasMoved = moved != null ? moved : this._movedThisTurn(u) && tx === u.tx && ty === u.ty;
     const out = [];
+    if (u._seized) return out; // BONUS: held by an Ahuizotl's Drowning Grasp — no attack this turn
+    if (u.T.amphibious && moveType(this.tileAt(tx, ty)) === 19) return out; // BONUS: Marines can't attack from deep water
     for (const other of this.units) {
       if (other.dead || other.team === u.team || this._isHidden(other)) continue; // can't target a hidden (Stealth) unit
       const dist = Math.abs(other.tx - tx) + Math.abs(other.ty - ty); // manhattan — melee range 1 = ORTHOGONAL neighbour only
@@ -748,6 +772,11 @@ export class GridMethods {
         other.tx === u.tx + u.chargeDir.dx &&
         other.ty === u.ty + u.chargeDir.dy;
       if (this._weaponUselessVs(u, other, dist) && !this._chargeReaches(u, tx, ty, other) && !charged) continue; // Boulder / Cannonball can't hit fliers
+      // BONUS: the Marines' Boarding Musket reaches 3 only from open ground — 2 from woods, tall grass, scrub, rocks
+      // or shallows (terrain types 3, 4, 5, 22, 27, 28)
+      // BONUS: the Dragon Rider has one lance blow (range 1) and one breath (range 2+) a turn
+      if (u.T.twinAttack && (dist === 1 ? u._lanced : u._fired) === this.turn) continue;
+      if (u.T.terrainRange && dist > 2 && [3, 4, 5, 22, 27, 28].includes(moveType(this.tileAt(tx, ty)))) continue;
       if (this._inWeaponRange(u, dist, hasMoved) || this._chargeReaches(u, tx, ty, other) || charged) out.push(other);
     }
     return out;
@@ -778,12 +807,17 @@ export class GridMethods {
   }
   _canHide(u) {
     const tileDamagePct = Math.round(100 - (this.terrainAt(u.tx, u.ty).defBonus || 0) * 100);
-    if (tileDamagePct > 90) return false;
+    if (tileDamagePct > 90 && !(u.T && u.T.shadowStep)) return false; // BONUS: a Shinobi hides on any ground
     return !this.units.some((o) => !o.dead && o.team !== u.team && manhattan(o, u) === 1);
   }
   // Unit::endTurn's rule, for the units whose turn just ended.
   _endTurnHide(units) {
     for (const u of units) {
+      if (u.T.shadowStep) u._ambushReady = false;
+      if (u._held) u._held = false; // a Naga's hold lasts the one turn
+      if (u._blind) u._blind = false; // …and a Sun Priest's Eclipse
+      if (u._chilled) u._chilled = false; // …and a Jotunn's chill
+      if (u._seized) u._seized = false; // …and an Ahuizotl's grasp
       if (u.dead || !this._canHideUnit(u)) continue;
       this._setHidden(u, !u.attackedTurn && this._canHide(u));
     }

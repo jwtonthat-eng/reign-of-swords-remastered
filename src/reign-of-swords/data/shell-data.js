@@ -12,6 +12,10 @@
    ============================================================ */
 
 import { UNIT_TYPES, ASSET_V } from "../engine/engine.js";
+import { DEPLOY_COST } from "./game-data.js";
+import { BONUS_ORDER, BONUS_META, BONUS_SKILLS, BONUS_UPGRADES } from "./bonus-units.js";
+
+export { BONUS_ORDER };
 
 // Every static asset the game ships, for the "download all assets" button.
 export const ASSET_PATHS = [
@@ -85,6 +89,17 @@ export const KINGDOM_POS_EP2 = {
   zayandi: { left: "45%", top: "94%" },
   "sabbi-amar": { left: "76%", top: "90%" },
   abbisin: { left: "87%", top: "76%" },
+  // the two BONUS kingdoms (ours): on the names the Episode II map already prints
+  tilicia: { left: "87.5%", top: "44%" },
+  isoluccia: { left: "75%", top: "64%" },
+  "mare-nostra": { left: "57%", top: "72%" }, // in Mare Nostra, by its sea serpent
+  "mirror-sea": { left: "80%", top: "31%" }, // on the northern sea the map names, under its label
+  satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
+  tezcal: { left: "93%", top: "27%" }, // the land east of the Mirror Sea's shore, between Satoshi and Tilicia
+  jarnheim: { left: "46%", top: "8%" }, // the northern mountain range, between Hunewold and Rukiev
+  khemret: { left: "92%", top: "92%" }, // the east bank of the great river, in the south-east corner
+  moananui: { left: "37%", top: "70%" }, // the chain of small islands on the west side of Mare Nostra
+  coatlan: { left: "93%", top: "59%" }, // the eastern mountains, south-east of Tilicia
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -141,6 +156,7 @@ export const STAND_UNITS = new Set([
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_ORDER,
 ]);
 export const IDLE_FRAME = { griffon: 3 }; // strip idle-frame override (only used for units NOT in STAND_UNITS)
 
@@ -192,7 +208,20 @@ export const COLLECTIBLES = [
   { id: "Beasts", icon: "🐾" },
   { id: "Spirit", icon: "✨" },
   { id: "Lore", icon: "📜" },
+  // BONUS (ours; art supplied by the user): one upgrade token per culture, won only in that culture's bonus battles
+  // and spent to make its units. `token` keeps them off the Merchant's counter and out of sight until the bonus
+  // campaigns open.
+  { id: "Bloodstone", icon: "🧊", token: "Glacial Bloodstone", culture: "Jarnheim" },
+  { id: "Scarab", icon: "🪲", token: "Scarab of the Duat", culture: "Khemret" },
+  { id: "Obsidian", icon: "🌋", token: "Smoldering Obsidian", culture: "Tezcal and Coatlan" },
+  { id: "Whalebone", icon: "🦴", token: "Carved Whalebone", culture: "Moananui" },
+  { id: "Anchor", icon: "⚓", token: "Triton's Anchor", culture: "Mare Nostra and the Mirror Sea" },
+  { id: "Tsuba", icon: "🏵", token: "Tsuba of the Shogunate", culture: "Satoshi" },
+  { id: "Jade", icon: "🐆", token: "Sacred Jade Jaguar", culture: "Tezcal" },
+  { id: "Void", icon: "🔮", token: "Void Rift Crystal", culture: "Tilicia and Isoluccia" },
 ];
+// The game's own six (what the Merchant trades in).
+export const TRADE_GOODS = COLLECTIBLES.filter((c) => !c.token);
 // The Merchant (MenuScreen::handlePopUpEvent, popup 61 "Confirm Purchase" — iOS Ep1 @0x3ed2a, Ep2 @0x4ab1c; Android
 // a_m): a collectible costs THREE of one other kind (spendItem ×3; the player picks the kind, a Medal included), a
 // Militiaman one Armor, one Weapons and one Lore (spendItem 1, 2, 5). An upgrade costs one collectible per unit.
@@ -520,6 +549,75 @@ export const UNIT_META = {
     note: "Giant leeches that heal themselves each time they Bite. Slow, so they always strike last.",
   },
 };
+// BONUS units (Tilicia & Isoluccia — ours; data/bonus-units.js). `bonus` keeps them, and the upgrade branches that
+// lead to them, out of the camp and the Field Manual until the bonus campaigns open (bonusOpen below).
+for (const k of BONUS_ORDER)
+  UNIT_META[k] = {
+    name: UNIT_TYPES[k].name,
+    cost: DEPLOY_COST[k],
+    upgrades: null,
+    ep2: true,
+    bonus: true,
+    ...BONUS_META[k],
+  };
+// the Beast Master's Hounds: called, never owned (as the Conjurer's Sapper and Bodyguard)
+UNIT_META.hounds = {
+  name: UNIT_TYPES.hounds.name,
+  cost: 0,
+  role: "War Hounds",
+  kit: "⚔ Fangs · 🛡 Nature's Cloak",
+  upgrades: null,
+  ep2: true,
+  bonus: true,
+  conjured: true,
+  note: "A pack of corsair war hounds, called by a Beast Master: fast and savage, a little less than a Stag. Leashed within 8 tiles of their master, and gone if it falls.",
+};
+// …the Primal Warden's three shapes (reference only, as the Druid's beasts)
+for (const [form, role, note] of [
+  [
+    "panther",
+    "Warden's Shape",
+    "A shape of the Primal Warden: a fast skirmisher whose Static Arc strikes at 2 to 3 tiles, after which it bounds away with the move it has left.",
+  ],
+  [
+    "tortoise",
+    "Warden's Shape",
+    "A shape of the Primal Warden: slow living artillery. Its Magma Mortar bursts on a 3 by 3 area, its shell halves all but magic, and up close it has only a weak bite.",
+  ],
+  [
+    "manta",
+    "Warden's Shape",
+    "A shape of the Primal Warden: a flier whose Void Beam goes on through three tiles beyond its target, friend or foe.",
+  ],
+])
+  UNIT_META[form] = {
+    name: UNIT_TYPES[form].name,
+    cost: 0,
+    role,
+    kit: "",
+    upgrades: null,
+    ep2: true,
+    bonus: true,
+    conjured: true,
+    note,
+  };
+// …and the Alchemist's Imp
+UNIT_META.imp = {
+  name: UNIT_TYPES.imp.name,
+  cost: 0,
+  role: "Summoned Imp",
+  kit: "⚔ Claws · 🛡 Minor Ward",
+  upgrades: null,
+  ep2: true,
+  bonus: true,
+  conjured: true,
+  note: "A small winged familiar, summoned by an Alchemist: quick and weak. Leashed within 8 tiles of its master, and gone if it falls.",
+};
+for (const { from, to, need } of BONUS_UPGRADES)
+  UNIT_META[from].upgrades = [...(UNIT_META[from].upgrades || []), { to, need, ep2: true, bonus: true }];
+// The bonus campaigns open once Episode II is finished: Oasis Standoff (5432), Abbisin's last battle, is won.
+export const BONUS_OPENS_AFTER = 5432;
+export const bonusOpen = (isEp2, progress) => !!isEp2 && !!progress && progress.has(BONUS_OPENS_AFTER);
 // Your Army grid order (one flat grid, no headers): by unit class — infantry, ranged, cavalry, casters, war engines,
 // flyers — and, inside a class, by upgrade depth (TREE_COL/TREE_ROW) so every upgrade chain reads in sequence. Ep2 units
 // sit with the class they fight in and show only on the Ep2 route (they are in EP2_ORDER, not ORDER).
@@ -528,9 +626,43 @@ export const ARMY_GROUPS = [
     id: "foot",
     label: "Infantry",
     icon: "class_light",
-    units: ["militiamen", "footmen", "swordsmen", "halberdiers", "greatswordsmen", "pikemen"],
+    units: [
+      "militiamen",
+      "footmen",
+      "swordsmen",
+      "halberdiers",
+      "greatswordsmen",
+      "pikemen",
+      "marines",
+      "spellwardens",
+      "sentinel",
+      "gladiator",
+      "samurai",
+      "sohei",
+      "shinobi",
+      "oni",
+      "golem",
+      "naga",
+      "skeleton",
+      "jaguar",
+      "berserker",
+      "shieldmaiden",
+      "einherjar",
+      "jotunn",
+      "khopesh",
+      "ammit",
+      "toa",
+      "taniwha",
+      "coatecpatl",
+      "ahuizotl",
+    ],
   },
-  { id: "ranged", label: "Ranged", icon: "skill_ranged", units: ["archers", "crossbowmen", "rangers", "musketeers"] },
+  {
+    id: "ranged",
+    label: "Ranged",
+    icon: "skill_ranged",
+    units: ["archers", "crossbowmen", "rangers", "musketeers", "cragsmen", "pavisiers", "medjay", "chieftain"],
+  },
   {
     id: "cavalry",
     label: "Cavalry",
@@ -541,7 +673,22 @@ export const ARMY_GROUPS = [
     id: "caster",
     label: "Casters",
     icon: "class_caster",
-    units: ["shamans", "druids", "priests", "wizards", "dunesirens", "conjurer"],
+    units: [
+      "shamans",
+      "druids",
+      "priests",
+      "wizards",
+      "dunesirens",
+      "conjurer",
+      "battlemage",
+      "beastmaster",
+      "alchemist",
+      "sunpriest",
+      "anubis",
+      "tohunga",
+      "tzitzimitl",
+      "warden",
+    ],
   },
   {
     id: "siege",
@@ -549,7 +696,12 @@ export const ARMY_GROUPS = [
     icon: "class_siege",
     units: ["craftsmen", "catapult", "trebuchet", "cannon", "ballistae"],
   },
-  { id: "fly", label: "Flyers", icon: "class_fly", units: ["bloodgorgers", "griffon"] },
+  {
+    id: "fly",
+    label: "Flyers",
+    icon: "class_fly",
+    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet", "serpent", "tahuanui"],
+  },
 ];
 export const ORDER = [
   "militiamen",
@@ -771,6 +923,7 @@ const TRAIT_SKILLS = [
     d: "Builds a structure that provides healing — once per battle, on clear ground.",
   },
   { has: (T) => T.repair, n: "Repair", d: "Repairs a damaged adjacent structure or war engine." },
+  ...BONUS_SKILLS.map((skill) => ({ has: (T) => !!T[skill.flag], n: skill.n, d: skill.d })), // the bonus abilities (ours)
 ];
 
 // Build the skill pills for a unit from real data: its ability indices, then its trait flags. Each name once.
@@ -877,6 +1030,7 @@ export const ABILITY_ICON = {
   Build: "skill_build",
   Repair: "skill_repair",
   Conjure: "skill_conjure",
+  ...Object.fromEntries(BONUS_SKILLS.map((skill) => [skill.n, skill.icon])), // the bonus abilities (art drawn for this project)
 };
 // Field Manual: the original help text is shown verbatim; where the recreation's mechanic reads differently (the four
 // siege tags especially), a short "in this recreation" line is added under it.
@@ -947,7 +1101,8 @@ export const UPGRADE_FROM = (() => {
   return m;
 })();
 // The upgrades each episode offers: Episode I has none of Episode II's units, so its camp never lists them.
-export const upgradeOffered = (branch, isEp2) => isEp2 || !branch.ep2;
+// …and the bonus units' branches wait for the bonus campaigns (`bonus` = bonusOpen(isEp2, progress)).
+export const upgradeOffered = (branch, isEp2, bonus = false) => (isEp2 || !branch.ep2) && (bonus || !branch.bonus);
 // Episode II's new units open with its campaign (MenuScreen::onMenuEvent @0x5d2c2 and UnitSelector::createUnitInfoMenu
 // @0x8376e test the save's story bytes, Context+0x258 + story index): an upgrade TO one of them is listed but refused
 // until that story battle is won — "You have not completed the campaign mission required to unlock this unit upgrade."
@@ -959,6 +1114,7 @@ export const UPGRADE_GATES_EP2 = {
   dunesirens: 5429, // Sabbi Amar 3, Caladrin Defense
   bloodgorgers: 5430, // Abbisin 1, Dune with a View
   conjurer: 5431, // Abbisin 2, Secrets in the Sands
+  ...Object.fromEntries(BONUS_UPGRADES.map((u) => [u.to, u.gate])), // the bonus units wait on a bonus battle each
 };
 // The story battle an upgrade to `toKey` waits on, or null.
 export const upgradeGate = (toKey, isEp2) => (isEp2 && UPGRADE_GATES_EP2[toKey]) || null;
@@ -1006,10 +1162,18 @@ export const RES_ICON = {
   Beasts: "beasts",
   Spirit: "spirit",
   Lore: "lore",
+  Bloodstone: "bloodstone", // the four campaign tokens (tools/ros/bonus/import_tokens.py)
+  Scarab: "scarab",
+  Obsidian: "obsidian",
+  Whalebone: "whalebone",
+  Anchor: "anchor",
+  Tsuba: "tsuba",
+  Jade: "jade",
+  Void: "void",
 };
 
 export const GET_OPTIONS = [
-  ...COLLECTIBLES.filter((c) => c.id !== "Medal"),
+  ...TRADE_GOODS.filter((c) => c.id !== "Medal"),
   { id: "militiamen", icon: "🗡️", unit: true, label: "Militiaman" },
 ];
 
@@ -1019,6 +1183,7 @@ export const GET_OPTIONS = [
 export const MANUAL_UNIT_KEYS = [...ORDER, ...SPECIAL_ORDER, ...UNFIELDED_ORDER];
 // On the Ep2 route the Episode II units join the manual's ability/armour/movement tagging.
 const manualKeys = (ep2) => (ep2 ? [...MANUAL_UNIT_KEYS, ...EP2_ORDER] : MANUAL_UNIT_KEYS);
+// (the bonus units are listed apart: BONUS_ORDER, shown by the camp and the manual once the bonus campaigns open)
 export function unitsWithAbility(key, isEp2) {
   return manualKeys(isEp2).filter((u) => {
     const T = UNIT_TYPES[u] || {};
@@ -1254,6 +1419,48 @@ export const TREE_COL = {
   conjurer: 2,
   bloodgorgers: 3,
   ballistae: 3,
+  // the bonus units (shown once the bonus campaigns are open): one column past the unit each is upgraded from
+  cragsmen: 2,
+  spellwardens: 3,
+  sentinel: 3,
+  marines: 1,
+  pavisiers: 3,
+  battlemage: 3,
+  gladiator: 2,
+  samurai: 2,
+  dragonrider: 4,
+  beastmaster: 2,
+  sohei: 2,
+  shinobi: 2,
+  oni: 3,
+  tengu: 3,
+  alchemist: 3,
+  golem: 4,
+  unicorn: 3,
+  efreet: 3,
+  naga: 3,
+  skeleton: 3,
+  jaguar: 1,
+  eagle: 2,
+  sunpriest: 2,
+  serpent: 3,
+  berserker: 1,
+  shieldmaiden: 2,
+  einherjar: 3,
+  jotunn: 2,
+  medjay: 2,
+  khopesh: 1,
+  anubis: 3,
+  ammit: 4,
+  toa: 1,
+  tahuanui: 2,
+  tohunga: 2,
+  taniwha: 3,
+  coatecpatl: 2,
+  ahuizotl: 4,
+  chieftain: 3,
+  tzitzimitl: 2,
+  warden: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1284,6 +1491,48 @@ export const TREE_ROW = {
   conjurer: 12,
   bloodgorgers: 6,
   ballistae: 7,
+  // the bonus units: the first free rows of their columns
+  cragsmen: 13,
+  spellwardens: 8,
+  sentinel: 9,
+  marines: 5,
+  pavisiers: 10,
+  battlemage: 11,
+  gladiator: 14,
+  samurai: 15,
+  dragonrider: 0,
+  beastmaster: 16,
+  sohei: 17,
+  shinobi: 18,
+  oni: 12,
+  tengu: 13,
+  alchemist: 14,
+  golem: 2,
+  unicorn: 15,
+  efreet: 16,
+  naga: 17,
+  skeleton: 18,
+  jaguar: 6,
+  eagle: 19,
+  sunpriest: 20,
+  serpent: 19,
+  berserker: 7,
+  shieldmaiden: 21,
+  einherjar: 20,
+  jotunn: 22,
+  medjay: 23,
+  khopesh: 8,
+  anubis: 21,
+  ammit: 3,
+  toa: 9,
+  tahuanui: 24,
+  tohunga: 25,
+  taniwha: 22,
+  coatecpatl: 26,
+  ahuizotl: 4,
+  chieftain: 23,
+  tzitzimitl: 27,
+  warden: 24,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",
@@ -1292,6 +1541,14 @@ export const NEED_COLOR = {
   Spirit: "#9070b8",
   Lore: "#3a9c9c",
   Medal: "#d2a53a",
+  Bloodstone: "#7fc4e8",
+  Scarab: "#3b5fd0",
+  Obsidian: "#e0622a",
+  Whalebone: "#cfd8c8",
+  Anchor: "#3fb8a8",
+  Tsuba: "#c9a23a",
+  Jade: "#3f9a5a",
+  Void: "#9a5ce0",
 };
 
 // The heraldic tincture ramps, field/symbol/frame art tables, per-faction crests and the HeraldryShield component
@@ -1387,3 +1644,10 @@ export function drawReward(reward, random = Math.random) {
 export function unseenLines(lines, shown = []) {
   return (lines || []).filter((l) => !shown.includes(l.text));
 }
+
+// The BONUS abilities as Field Manual entries (ours — data/bonus-units.js), with the units that carry them.
+export const BONUS_ABILITY_HELP = BONUS_SKILLS.map((skill) => ({
+  title: skill.n,
+  text: skill.d,
+  units: BONUS_ORDER.filter((u) => (UNIT_TYPES[u] || {})[skill.flag]),
+})).filter((help) => help.units.length); // (an ability only hidden units have is not listed)

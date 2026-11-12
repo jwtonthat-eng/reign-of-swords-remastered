@@ -138,20 +138,76 @@ code {
   cursor: default;
 }
 
-/* Episode I / Episode II switch above the game */
-.game-switch {
+/* THE GAME FILLS THE WINDOW. The page is one screen tall and never scrolls: a slim band at the top (where the episode
+   switch stood while the page offered both games; the collapsed dev pill sits in its corner), the game takes the rest. A game screen taller than the window (the Field Manual, a long war-plans list) scrolls inside
+   its own frame instead of the page. (Phones have their own fit-to-screen layout: reign-of-swords/ui/styles.) */
+html,
+body,
+#root {
+  height: 100%;
+}
+body {
+  overflow: hidden;
+}
+.game-screen {
+  height: 100vh;
+  height: 100dvh;
   display: flex;
-  gap: 18px;
-  margin: 0 0 6px;
-  font-size: 0.9rem;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding-top: 29px; /* the top band: the sizes below (222px, 34px, 110px; desktop.css 44px) count it */
 }
-.game-switch a {
-  color: var(--text-dim);
-  text-decoration: none;
+.game-fit {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden auto;
+  scrollbar-gutter: stable both-edges;
 }
-.game-switch a:hover {
-  color: var(--text);
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
-.game-switch a.on {
-  color: var(--accent);
+/* The campaign screen on a desktop: the world map and the army panel each keep to the window and scroll on their
+   own (the army list is long), so the screen as a whole stays put. */
+@media (min-width: 821px) and (min-height: 601px) {
+  .game-fit .ros-campaign-cols {
+    height: calc(100dvh - 222px);
+    min-height: 380px;
+    align-items: stretch;
+  }
+  .game-fit .ros-campaign-cols > .ros-worldmap-col,
+  .game-fit .ros-campaign-cols > .ros-camp-panel {
+    min-height: 0;
+    overflow: hidden auto;
+  }
+  .game-fit .ros-campaign .ros-worldmap {
+    max-height: 100%;
+    max-width: min(540px, calc((100dvh - 222px) * 0.893)); /* the map is 1260 × 1411: fit its height to the column */
+  }
+}
+/* …and the game's height floor (shell.css: 700px) gives way on a short window, so the menu fits a small laptop. */
+@media (min-width: 821px) and (min-height: 601px) {
+  .game-fit .ros-shell {
+    min-height: min(700px, calc(100dvh - 34px));
+  }
+  .game-fit .ros-shell .ros-cutscene {
+    min-height: min(660px, calc(100dvh - 110px));
+  }
+}
+/* The game may use the whole width of the window (its menus keep their own widths; the desktop battle spreads out),
+   and the collapsed dev pill sits in the corner of the top row instead of taking a row of its own. */
+.game-fit .wrap {
+  max-width: none;
+  padding: 0 12px;
+}
+.game-fit .ros-admin-collapsed {
+  position: fixed;
+  top: 2px;
+  left: 10px;
+  margin: 0;
+  z-index: 6;
 }

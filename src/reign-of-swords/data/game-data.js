@@ -16,6 +16,7 @@ import {
   UNIT_COMBAT,
   UNIT_AL,
 } from "./combat-data.js";
+import { BONUS_TYPES, BONUS_COURAGE, BONUS_COST, BONUS_COMBAT } from "./bonus-units.js";
 
 // ---- Unit roster (real game units, turn-based stats) -------------------
 // Each uses a DISTINCT extracted sprite from the original (23 unit strips). Combat stats
@@ -575,6 +576,11 @@ export const UNIT_TYPES = {
   },
 };
 
+// BONUS units (Tilicia & Isoluccia — ours; data/bonus-units.js): added before the merge so they get the same derived
+// fields as the originals. move / range / atk / def are filled in by the merge below.
+for (const [k, T] of Object.entries(BONUS_TYPES))
+  UNIT_TYPES[k] = { atk: 0, def: 0, move: BONUS_COMBAT[k].move, range: 1, minRange: 1, bonus: true, ...T };
+
 // ---- Merge the REAL combat model (from data/combat-data.js) into UNIT_TYPES --------
 // weapon/weapon2/armour/rating come byte-for-byte from unit table 5010; range is the weapon's real min/max;
 // atk/def become the display numbers derived from the real weapon×armour table. Damage itself is computed from
@@ -611,7 +617,7 @@ for (const k in UNIT_TYPES) {
       const minion = MINION_WEAPON[k];
       return { name: minion ? minion.name : WEAPON_NAME[w], desc: minion ? minion.desc : WEAPON_DESC[w], min, max };
     });
-  T.armourName = ARMOUR_NAME[c.armour];
+  T.armourName = c.armourName || ARMOUR_NAME[c.armour];
   T.abilities = c.abilities || [];
   T.al = UNIT_AL[k] != null ? UNIT_AL[k] : 1; // real movement category (5010 byte 1): 0 fly·1 skirmish·2 formation·3 cavalry·4 siege
   T.formation = !!c.formation;
@@ -634,6 +640,31 @@ for (const k in UNIT_TYPES) {
   T.conjure = !!c.conjure; // Conjurer (31): summons Sapper/Bodyguard children (Conjure)
   T.build = !!c.build; // Craftsmen (29): build a village on open ground (Build)
   T.repair = !!c.repair; // Craftsmen (29): repair an adjacent damaged war engine (Repair)
+  // BONUS abilities (ours — rules/bonus.js): one trait flag per bonus unit.
+  for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
+    T[flag] = !!c[flag];
+  for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
+  for (const flag of ["shadowStep", "quake", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
+  for (const flag of ["flask", "constrict", "bulwark", "forestWalk", "eagleEye", "sunPriest"]) T[flag] = !!c[flag];
+  for (const flag of ["cleanse", "physicalHalf"]) T[flag] = !!c[flag]; // Primal Warden, Siege-Tortoise
+  for (const flag of ["shoreStride", "aquatic", "venom", "seize", "vanguard"]) T[flag] = !!c[flag]; // Moananui, Coatlan
+  for (const flag of ["opening", "skyHunter", "karakia", "lurker", "drain"]) T[flag] = c[flag] || 0;
+  for (const flag of ["frost", "desertStride", "hook"]) T[flag] = !!c[flag]; // Jotunn, Medjay, Khopesh Warriors
+  for (const flag of ["rage", "shieldWall", "valhalla", "judgement", "devour"]) T[flag] = c[flag] || 0;
+  for (const flag of ["pounce", "sunbeam", "tailwind"]) T[flag] = c[flag] || 0; // Jaguar, Sun Priest, Feathered Serpent // Alchemist, Naga
+  for (const flag of ["stoneskin", "purity", "burn", "undying"]) T[flag] = c[flag] || 0; // Golem, Unicorn, Efreet, Skeleton
+  T.sutra = c.sutra || 0; // Sohei: HP mended by each friend beside it at the start of its turn
+  T.grapple = c.grapple || 0; // Marines: the reach of their once-a-battle Grapple
+  T.conjures = c.conjures || null; // Beast Master: what its Conjure calls (Hounds)
+  if (c.summoned) T.summoned = true; // Hounds: leashed, never deployed
+  if (c.teleport) T.teleport = true; // the Battlemage moves as the Wizard does
+  if (c.fly) T.fly = true; // the Dragon Rider
+  T.regen = c.regen || 0; // HP mended at the start of its turn (Spellwardens)
+  T.dmgBonus = c.dmgBonus || 0; // added to the weapon x armour cell of its blows (Samurai)
+  T.armourBonus = c.armourBonus || 0; // …and taken off the cell of blows against it
+  if (T.dmgBonus) T.atk += Math.round((T.dmgBonus * c.rf) / 100); // (the display numbers follow)
+  if (T.armourBonus) T.def = Math.min(0.95, T.def + T.armourBonus / 100);
+  T.shroudRange = c.shroudRange || 4; // how far a Spirit Shroud reaches (the Samurai's lesser one: 2)
   // more real abilities (index from data/combat-data.js): 1 First Strike, 4 Fearless, 7 Move-or-Shoot,
   // 3 Blast Area / 24 Barrage / 25 Low Arc (siege area), 14 Fear. Prayer is 19 (Old Priest) / 23 (Priest);
   // ability 18/22 is FIREBALL (the Wizard), NOT Prayer — do not include 22 here or wizards wrongly gain Retribution.
@@ -709,6 +740,7 @@ const COURAGE_TIER = {
   dunesirens: 3,
   bloodgorgers: 2,
 };
+Object.assign(COURAGE_TIER, BONUS_COURAGE);
 for (const k in COURAGE_TIER) if (UNIT_TYPES[k]) UNIT_TYPES[k].courage = COURAGE_TIER[k];
 UNIT_TYPES.druids.shapeshiftForms = ["stag", "greateagle", "bear"]; // string 542: Stag / Great Eagle / Guardian Bear
 // …and each form shapeshifts on (the menu GameScreen offers types 20/26/27/28; Android a.g): the Druid first, then the
@@ -716,6 +748,13 @@ UNIT_TYPES.druids.shapeshiftForms = ["stag", "greateagle", "bear"]; // string 54
 UNIT_TYPES.stag.shapeshiftForms = ["druids", "greateagle", "bear"];
 UNIT_TYPES.greateagle.shapeshiftForms = ["druids", "stag", "bear"];
 UNIT_TYPES.bear.shapeshiftForms = ["druids", "stag", "greateagle"];
+// BONUS: the Primal Warden's three shapes, by the same rule ("druids" = the unit's own first form, here the Warden)
+UNIT_TYPES.warden.shapeshiftForms = ["panther", "tortoise", "manta"];
+UNIT_TYPES.panther.shapeshiftForms = ["druids", "tortoise", "manta"];
+UNIT_TYPES.tortoise.shapeshiftForms = ["druids", "panther", "manta"];
+UNIT_TYPES.manta.shapeshiftForms = ["druids", "panther", "tortoise"];
+UNIT_TYPES.tortoise.blastArea = true; // the Magma Mortar bursts on the 3 x 3 around its target
+UNIT_TYPES.tortoise.splash = true;
 UNIT_TYPES.wizards.canLightning = true; // alternate spell: Lightning Storm (weapon 26)
 UNIT_TYPES.wizards.splash = true; // Fireball is a + CROSS area hit — enables the splash resolve + the blast preview
 // Movement traits (help "MOVEMENT"): flyers ignore terrain (Griffon Riders / Great Eagles); wizards Teleport
@@ -784,6 +823,8 @@ export const DEPLOY_COST = {
   dunesirens: 250,
   bloodgorgers: 100,
 };
+
+Object.assign(DEPLOY_COST, BONUS_COST);
 
 // ---- Battlefield tall tiles + faction colours / crests -----------------
 // Tiles whose art RISES above the ground, drawn ~1.3× tall (anchored at the cell base): trees (0,1,4), the spiked

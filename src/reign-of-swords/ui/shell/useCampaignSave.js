@@ -22,7 +22,7 @@ import {
   UNIT_META,
   upgradeGate,
 } from "../../data/shell-data.js";
-import { makeTransfer, readTransfer, applyTransfer } from "../../data/save-transfer.js";
+import { makeTransfer, readTransfer, applyTransfer, readResume, resumeDelta } from "../../data/save-transfer.js";
 
 // The campaign save, one per episode (localStorage): which battles are won (`progress`, a Set of map ids), the army
 // changes made in camp (`upDelta`: upgrades, recruits, extra raid units) and the collectibles in hand (`spoils`).
@@ -144,6 +144,18 @@ export function useCampaignSave({ isEp2, rewards, playSfx }) {
     if (Object.keys(more).length) addSpoils(more);
     return incoming;
   };
+  // RESUME EPISODE II (ours — ⚙ Settings): continue from the end of Episode II with the army in an Episode II army
+  // file. `won` = the map ids to mark won (every Episode II battle and raid); the army and collectibles become the
+  // file's exactly, replacing the save. Returns what was read; throws on a wrong file.
+  const resumeEpisode = (data, won) => {
+    const got = readResume(data);
+    const earned = combineCounts(...[...won].map((mapId) => (rewards[mapId] && rewards[mapId].units) || {}));
+    replaceProgress(new Set(won));
+    setTransfer({ units: {}, granted: {} });
+    setUpDelta(resumeDelta(got.units, earned));
+    setSpoils(got.spoils);
+    return got;
+  };
   // DEV: +20 of every upgrade collectible.
   const giveResources = () => addSpoils(Object.fromEntries(COLLECTIBLES.map((c) => [c.id, 20])));
   // Wipe this episode's save (the keys go, the state returns to a fresh campaign) — with the kept musters
@@ -179,6 +191,7 @@ export function useCampaignSave({ isEp2, rewards, playSfx }) {
     replaceProgress,
     exportArmy,
     importArmy,
+    resumeEpisode,
     giveResources,
     resetSave,
   };

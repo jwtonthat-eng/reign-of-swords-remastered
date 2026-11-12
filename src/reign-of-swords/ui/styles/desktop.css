@@ -1,0 +1,100 @@
+/* ============================================================
+   DESKTOP BATTLE — the board takes the window, the controls stand beside it.
+   On a desktop window the battle is two columns as tall as the window: the battlefield on the left, as large as the
+   window allows, and on the right a side column with the mission bar, the control buttons and the unit card (or the
+   muster roster), which scrolls on its own if it has to. Nothing sits under the board, so the page never scrolls and
+   a short window costs board rows, not buttons. The engine sizes the board from this grid (engine.js _stageFrame).
+   The query is the complement of the phone layouts' (mobile.css / phone.css).
+   ============================================================ */
+@media (min-width: 821px) and (min-height: 501px) {
+  .ros.ros-battle {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) clamp(300px, 27vw, 380px);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    column-gap: 12px;
+    max-width: none;
+    height: calc(100dvh - 44px); /* the window, less the page's top band (app.css .game-screen) */
+    margin-top: 8px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+  .ros.ros-battle > * {
+    grid-column: 2;
+    min-width: 0;
+  }
+  .ros.ros-battle > .ros-stage {
+    grid-column: 1;
+    grid-row: 1 / 4;
+    align-self: center;
+    justify-self: center;
+  }
+  .ros.ros-battle > .ros-topbar {
+    grid-row: 1;
+    margin-bottom: 8px;
+  }
+  .ros.ros-battle > .ros-panel {
+    grid-row: 2;
+    margin: 0;
+    min-height: 0;
+    overflow: hidden auto;
+    align-content: start;
+  }
+  .ros.ros-battle > .ros-hint {
+    grid-row: 3;
+    margin: 8px 0 0;
+    max-height: 22vh;
+    overflow: hidden auto;
+  }
+  /* the frame's corner ornaments stay on the frame itself, and the game frame around the battle (.ros-shell)
+     gives up its menu width so the battle can take the window */
+  .ros.ros-battle > .ros-corner {
+    grid-column: 1 / -1;
+    grid-row: 1 / -1;
+  }
+  .ros-shell:has(> .ros-battle) {
+    max-width: none;
+  }
+  /* the side column is narrow: the mission bar's buttons take a row of their own, four across, icons only */
+  .ros.ros-battle .ros-mission-bar {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 6px;
+    padding: 6px 8px;
+  }
+  .ros.ros-battle .ros-menu-btns-top {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    margin: 0;
+  }
+  .ros.ros-battle .ros-menu-btns-top .ros-menu-btn {
+    margin: 0;
+    min-width: 0;
+    padding-left: 4px;
+    padding-right: 4px;
+    white-space: nowrap;
+  }
+  .ros.ros-battle .ros-song-txt {
+    display: none;
+  }
+  .ros.ros-battle .ros-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+  .ros.ros-battle .ros-controls > * {
+    margin: 0;
+    width: 100%;
+  }
+  /* the muster roster scrolls in the side column: its header (points, Fight) stays in view */
+  .ros.ros-battle > .ros-deploy .ros-deploy-head {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    background: #e3d0a2; /* opaque parchment: the roster scrolls under it */
+    margin: -8px -8px 6px;
+    padding: 8px;
+    box-shadow: 0 3px 6px rgba(74, 54, 32, 0.25);
+  }
+}

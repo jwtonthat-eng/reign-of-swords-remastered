@@ -1,12 +1,12 @@
-// The two pages' search metadata (seo.js) and the dependency-free asset .zip builder (util/zip-assets.js).
+// The page's search metadata (seo.js) and the dependency-free asset .zip builder (util/zip-assets.js).
 import { describe, it, expect, vi, afterEach } from "vitest";
 import { ROS_SEO } from "../seo.js";
 import { zipAndDownload } from "../util/zip-assets.js";
 import { SITE_URL } from "../../site.js";
 
 describe("SEO metadata", () => {
-  it("describes both episodes with a canonical path and a blurb in all three site languages", () => {
-    expect(Object.keys(ROS_SEO)).toEqual(["reign-of-swords", "reign-of-swords-2"]);
+  it("describes Episode II alone (the site no longer offers Episode I), with a path and a blurb in three languages", () => {
+    expect(Object.keys(ROS_SEO)).toEqual(["reign-of-swords-2"]);
     for (const [slug, s] of Object.entries(ROS_SEO)) {
       expect(s.path).toBe("/games/" + slug);
       expect(Object.keys(s.blurb)).toEqual(["en", "ru", "uk"]);
@@ -25,7 +25,6 @@ describe("SEO metadata", () => {
       publisher: { name: "Punch Entertainment" },
       playMode: "SinglePlayer",
     });
-    expect(ROS_SEO["reign-of-swords"].jsonLd().about.datePublished).toBe("2008");
   });
 });
 

@@ -362,6 +362,20 @@ export class TurnFlowMethods {
         desc: "Lob a boulder at any tile in range — an enemy, a structure or empty ground.",
       };
     };
+    // BONUS — the Dragon Rider: a tap on a reachable foe uses the lance, so breathing at it instead is a button
+    if (sel.T.twinAttack)
+      return sel._fired === this.turn
+        ? null
+        : [
+            {
+              id: "dragonfire",
+              name: "Dragonfire",
+              icon: "skill_fireball",
+              min: 2,
+              max: 8,
+              desc: "Breathe fire at a foe 2–8 tiles away instead of flying in with the lance: full damage, then 60% and 35% on the two tiles beyond it. Once a turn, before or after the lance.",
+            },
+          ];
     if (this._isGrapeshotAimer(sel))
       return [
         {
@@ -383,6 +397,7 @@ export class TurnFlowMethods {
     if (!sel || !this.aimMode) return null;
     if (this._abilityAim) return this._abilityAim;
     if (sel.T.canLightning) return sel.spell || "fireball";
+    if (sel.T.twinAttack) return "dragonfire";
     if (this._isGrapeshotAimer(sel)) return this._aimKind === "shot" ? "aim" : "grapeshot";
     if (this._aimShot(sel)) return "aim";
     return null;
@@ -393,6 +408,14 @@ export class TurnFlowMethods {
     const sel = this.selected;
     if (!sel || sel.acted || this.phase !== "player" || this.anim || sel.ally || sel.team !== "blue") return;
     if (this._abilityArm(id)) return; // an Ep2 unit skill (Build / Repair / Quicksand / Conjure / Detonate)
+    if (sel.T.twinAttack && id === "dragonfire") {
+      // BONUS: arm / disarm the Dragon Rider's breath; armed, only foes the fire reaches are targets
+      this.aimMode = !this.aimMode;
+      this.targets = this.targetsFrom(sel, sel.tx, sel.ty).filter((e) => !this.aimMode || manhattan(e, sel) > 1);
+      this.audio.play("click", 0.4);
+      this._emit();
+      return;
+    }
     if (sel.T.canLightning && ["fireball", "lightning", "ice"].includes(id)) {
       if (this.aimMode && (sel.spell || "fireball") === id) {
         this.aimMode = false;
@@ -735,6 +758,7 @@ export class TurnFlowMethods {
   }
   _endTurnBrace(units) {
     for (const u of units) if (u.T.pikeWall) u.walled = !u.attackedTurn;
+    for (const u of units) if (u.T.pavise) u.planted = !this._movedThisTurn(u); // BONUS: Pavise — plant when it did not move
     for (const u of units) this._unitEndTurn(u); // the idle ones' Unit::endTurn (shroud, charge)
   }
   _startFriendlyTurnEnd() {

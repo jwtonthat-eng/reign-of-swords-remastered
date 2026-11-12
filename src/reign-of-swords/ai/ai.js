@@ -407,7 +407,8 @@ export class AiMethods {
     let target = null,
       targetScore = 0;
     for (const a of this.game.units) {
-      if (a.dead || a.team !== self || a.hp >= 100 || manhattan(a, u) > 1) continue;
+      if (a.dead || a.team !== self || a.hp >= 100 || a.T.unyielding || manhattan(a, u) > (u.T.healRange || 1))
+        continue;
       const score = (100 - a.hp) * this._aiValue(a);
       if (score > targetScore) {
         targetScore = score;
@@ -478,8 +479,8 @@ export class AiMethods {
       hScore = 0;
     for (const spot of stops)
       for (const a of this.game.units) {
-        if (a.dead || a.team !== self || a.hp >= 100) continue;
-        if ((a === u ? 0 : manhattan(a, spot)) > 1) continue; // the priest itself heals wherever it stands
+        if (a.dead || a.team !== self || a.hp >= 100 || a.T.unyielding) continue;
+        if ((a === u ? 0 : manhattan(a, spot)) > (u.T.healRange || 1)) continue; // the priest itself heals wherever it stands
         const score = (100 - a.hp) * this._aiValue(a);
         if (score > hScore) {
           hScore = score;
@@ -591,6 +592,17 @@ export class AiMethods {
           if (!allFree && pace === 4 && u.type !== druid) form = druid;
         } else form = !allFree && pace <= 8 ? "stag" : "greateagle";
       } else form = "greateagle";
+    }
+    // BONUS: a Primal Warden makes the Druid's choices with its own shapes — the Panther where a Druid would run as a
+    // Stag, the Siege-Tortoise where it would stand as a Bear, the Manta where it would fly as an Eagle; and with foes
+    // near and no move made, the Manta again (the Tortoise is too slow to be worth taking on the march)
+    if (druid === "warden") {
+      form = { stag: "panther", bear: "tortoise", greateagle: "manta" }[form] || form;
+      if (form === druid || form === u.type) form = nearestDist <= 5 ? (moved ? "tortoise" : "manta") : "panther";
+      if (!UNIT_TYPES[form] || form === u.type) return false;
+      if (!this.game._shapeshift(u, form)) return false;
+      if (!moved) u._shiftFx = true;
+      return true;
     }
     if (form !== druid && !has(form)) return false;
     if (form === u.type || !this.game._shapeshift(u, form === druid ? "druids" : form)) return false;
@@ -708,7 +720,9 @@ export class AiMethods {
       }
       if (spot && UNIT_TYPES.sapper && UNIT_TYPES.bodyguard) {
         this.game.reach = reach;
-        const summonType = children.length === 1 && children[0].type === "bodyguard" ? "sapper" : "bodyguard";
+        const summonType =
+          u.T.conjures || // BONUS: the Beast Master calls Hounds
+          (children.length === 1 && children[0].type === "bodyguard" ? "sapper" : "bodyguard");
         const cast = () => {
           const minion = this.game._makeUnit(summonType, u.team, spot[0], spot[1], false);
           minion.group = u.group;
@@ -1370,6 +1384,17 @@ export class AiMethods {
     this.game._emit();
   }
   _aiActDone(attacker, onDone) {
+    // BONUS — the Dragon Rider has a lance blow and a breath each turn (targetsFrom leaves out the one it has spent):
+    // under the computer it follows one with the other, on the foe it hurts most.
+    if (!attacker.dead && attacker.T.twinAttack) {
+      const foes = this.game.targetsFrom(attacker, attacker.tx, attacker.ty);
+      if (foes.length) {
+        const worth = (foe) => this.game.estimateDamage(attacker, foe) || 0;
+        const foe = foes.reduce((best, next) => (worth(next) > worth(best) ? next : best));
+        this._doAttackAICore(attacker, foe, false, onDone);
+        return;
+      }
+    }
     // The dwell only starts once the settle gate (engine/loop) sees every bolt/FX/shot resolved — then hold a beat so
     // the damage number is read before the camera moves to the next unit.
     if (onDone) {
@@ -1381,6 +1406,9 @@ export class AiMethods {
     }
   }
   _doAttackAICore(attacker, defender, noCounter, onDone) {
+    if (attacker.T.twinAttack)
+      attacker[Math.abs(attacker.tx - defender.tx) + Math.abs(attacker.ty - defender.ty) === 1 ? "_lanced" : "_fired"] =
+        this.game.turn;
     attacker.face = Math.sign(defender.tx - attacker.tx) || 1;
     this.game.anim = {
       type: "attack",

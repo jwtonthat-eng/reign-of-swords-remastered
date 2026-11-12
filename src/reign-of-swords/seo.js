@@ -1,37 +1,13 @@
-// Search metadata for the two Reign of Swords pages — same shape as story-game/seo.js (GAME_SEO), so the runtime
-// <Seo> (GamePage) and the build step that writes a static index.html per page (vite.config.js) both pick it up.
-// Worded for people searching for the ORIGINAL games: Punch Entertainment's "Mobile Battles: Reign of Swords"
-// (iPhone, 2008) and "Reign of Swords Episode II" (2009). Facts come from the original builds' own about/credits.
+// Search metadata for the Reign of Swords page — same shape as story-game/seo.js (GAME_SEO), so the runtime <Seo>
+// (GamePage) and a build step that writes a static index.html per page both pick it up.
+// THE SITE OFFERS EPISODE II ONLY (user decision; src/site.js): Episode I's entry was removed with its page, so nothing
+// here advertises a game the page no longer shows. Worded for people searching for the ORIGINAL game, Punch
+// Entertainment's "Reign of Swords Episode II" (iPhone, 2009). Facts come from the original build's own about/credits.
 import { SITE_URL } from "../site.js";
 
 const PUNCH = { "@type": "Organization", name: "Punch Entertainment" };
 
 export const ROS_SEO = {
-  "reign-of-swords": {
-    path: "/games/reign-of-swords",
-    lang: "en",
-    locale: "en_US",
-    title: "Reign of Swords (Mobile Battles, iPhone 2008) — play online",
-    description:
-      "An unofficial fan remake of Mobile Battles: Reign of Swords, Punch Entertainment's 2008 iPhone turn-based tactics game, playable in the browser: the full campaign, Sir Varius, real units and maps.",
-    heading: "Reign of Swords",
-    blurb: {
-      en: "An unofficial fan remake of Mobile Battles: Reign of Swords, Punch Entertainment's 2008 iPhone tactics game, rebuilt from the original game data so it plays in the browser.",
-      ru: "Неофициальный фанатский ремейк Mobile Battles: Reign of Swords — тактической игры Punch Entertainment для iPhone (2008), восстановленный по данным оригинала: играйте прямо в браузере.",
-      uk: "Неофіційний фанатський ремейк Mobile Battles: Reign of Swords — тактичної гри Punch Entertainment для iPhone (2008), відновлений з даних оригіналу: грайте просто в браузері.",
-    },
-    intro: [
-      "Reign of Swords (Mobile Battles: Reign of Swords) is a turn-based fantasy tactics game released by Punch Entertainment for iPhone and iPod touch in 2008. You lead Sir Varius and the armies of the Empire of Carrone to win back the breakaway kingdoms — Bordavia, Merovin, Marsur, Sangsoleil, Aguilleon, Hunewold and Rukiev — over a 24-mission campaign of field battles, sieges and raids.",
-      "This page is an unofficial browser remake, rebuilt from the original iOS game's own data and code: the real maps, unit stats, damage table, scripted missions and enemy AI, with every difference from the original documented and a new interface. Knights, Pikemen, Swordsmen, Militiamen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen, Griffon Riders, Wizards, Catapults, Cannon and Trebuchets fight with the original type-counters. No download or install — it runs in any modern browser, on desktop or phone.",
-    ],
-    game: {
-      name: "Mobile Battles: Reign of Swords",
-      alternateName: ["Reign of Swords", "Mobile Battles Reign of Swords", "Clash of Kingdoms"],
-      genre: ["Turn-based tactics", "Strategy", "Fantasy"],
-      datePublished: "2008",
-      gamePlatform: ["iOS", "iPhone", "Web browser"],
-    },
-  },
   "reign-of-swords-2": {
     path: "/games/reign-of-swords-2",
     lang: "en",

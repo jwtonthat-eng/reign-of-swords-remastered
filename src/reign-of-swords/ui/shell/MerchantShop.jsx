@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { COLLECTIBLES, MERCHANT_PRICE, MILITIA_PRICE, MAX_HELD, GET_OPTIONS } from "../../data/shell-data.js";
+import { TRADE_GOODS, MERCHANT_PRICE, MILITIA_PRICE, MAX_HELD, GET_OPTIONS } from "../../data/shell-data.js";
 import { tr } from "../../i18n/i18n.js";
 import { UnitSprite, SvgIcon, ResIcon, CountPicker } from "./common.jsx";
 
@@ -46,7 +46,7 @@ export function MerchantShop({ spoils, militia = 0, onTrade, onRecruit, onBack }
           <div className="ros-mch-h">
             {tr("Give")} <i>×{MERCHANT_PRICE}</i>
           </div>
-          {COLLECTIBLES.map((c) => (
+          {TRADE_GOODS.map((c) => (
             <button
               key={c.id}
               disabled={recruit || have(c.id) < MERCHANT_PRICE}

@@ -1,14 +1,12 @@
 <h1 align="center">⚔️ Reign of Swords Remastered</h1>
 
 <p align="center">
-  <b>An unofficial fan remaster of Punch Entertainment's iPhone tactics games<br>
-  <i>Mobile Battles: Reign of Swords</i> (2008) and <i>Reign of Swords Episode II</i> (2009),<br>
+  <b>An unofficial fan remaster of Punch Entertainment's iPhone tactics game<br>
+  <i>Mobile Battles: Reign of Swords Episode II</i> (2009),<br>
   rebuilt from the original game data to play in the browser.</b>
 </p>
 
 <p align="center">
-  <a href="https://dmytro-portfolio-website.vercel.app/games/reign-of-swords"><b>▶ Play Episode I</b></a>
-  &nbsp;·&nbsp;
   <a href="https://dmytro-portfolio-website.vercel.app/games/reign-of-swords-2"><b>▶ Play Episode II</b></a>
   &nbsp;·&nbsp;
   <a href="#run-it-locally">Run it locally</a>
@@ -41,11 +39,18 @@ map, unit, mission and line of dialogue) and the original rules, rebuilt from th
 every difference documented in [`MECHANICS.md`](public/games/reign-of-swords/MECHANICS.md) §13, and a new interface.
 It is a remake, not an exact copy.
 
-- **Two full campaigns.** Episode I's 24 missions to win back the breakaway kingdoms of the Empire, and Episode II's 33
-  missions that carry the war into the desert lands of Zayandi, Sabbi Amar and Abbisin.
+- **The full Episode II campaign.** Its 33 missions carry the war into the desert lands of Zayandi, Sabbi Amar and
+  Abbisin. (The page plays Episode II only. Episode I, *Mobile Battles: Reign of Swords* of 2008, is still in the
+  repository — its data, its rules in the engine and its tests, and the sprites and sounds Episode II shares — but
+  the page no longer offers it.)
 - **The original army.** Knights, Pikemen, Swordsmen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen,
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
+- **Ten fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
+  Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi, the jungles of Tezcal, Norse
+  Jarnheim, Egyptian Khemret, Polynesian Moananui and the highlands of Coatlan: 30 battles and 22 raids, with
+  thirty-seven new units, each with an ability of its own, and eight culture tokens that pay for their upgrades.
+  `docs/images/all-units.png` shows every unit; `docs/unit-balance.md` has the balance numbers.
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.
@@ -95,8 +100,8 @@ npm install
 npm start
 ```
 
-`npm start` opens the game at <http://localhost:5173>. Episode I opens by default; switch to Episode II with the
-link above the game, or open <http://localhost:5173/#reign-of-swords-2>.
+`npm start` opens the game at <http://localhost:5173>, straight into Episode II. There is no episode switch: an old
+address with an episode in it (`#reign-of-swords`, `#reign-of-swords-2`) lands on Episode II too.
 
 | Command | What it does |
 | --- | --- |
@@ -108,6 +113,9 @@ link above the game, or open <http://localhost:5173/#reign-of-swords-2>.
 | `npm run lint` | ESLint over the game code |
 | `npm run format` | Prettier over the game code |
 | `npm run e2e:maps` | The map runner: whole battles played by the Autopilot (slow) |
+| `npm run e2e:arena` | Unit arena: every bonus unit against the originals in duels, against cavalry, holding a castle and behind a spear line |
+| `npm run e2e:stress` | Random play with an army of bonus units, under the fuzzer's checks |
+| `npm run e2e:arena:report` | Gather the arena's rows into `docs/unit-balance.md` |
 
 ## How it is built
 
@@ -122,14 +130,17 @@ src/
   components/GameLoader.*   the loading spinner the game uses
   auth/AuthContext.jsx      offline stand-in: nobody is signed in
   lib/supabase.js           offline stand-in: no backend, online battles are off
-  site.js                   the origin the game's search metadata uses
-  main.jsx, app.css         the page around the game (theme, buttons, Episode I / II switch)
+  site.js                   the origin the game's search metadata uses, and the one game the page shows (Episode II)
+  main.jsx, app.css         the page around the game (theme, buttons)
 public/games/
-  reign-of-swords/          Episode I data, sprites, audio, UI art, MECHANICS.md, DATA-NOTES.md
+  reign-of-swords/          Episode I data (not offered on the page); the sprites, audio and UI art both episodes
+                            share; MECHANICS.md, DATA-NOTES.md
   reign-of-swords-2/        Episode II data (shares Episode I's sprites and audio)
 public/ros-atlas/           the interactive map and animation atlases (Story & Assets)
 tools/ros/                  Python tools that extracted and audited the data from the original iOS games
-docs/images/                the screenshots in this README
+tools/ros/bonus/            the ten fan-made bonus campaigns: level sources, sprite-sheet and token importers and their builder
+docs/images/                the screenshots in this README, and all-units.png: every unit the game offers
+                            (rebuilt by tools/ros/bonus/unit_gallery.py)
 ```
 
 React and Vite, an HTML canvas for the battlefield, no other runtime dependencies. The game rules, the decoded

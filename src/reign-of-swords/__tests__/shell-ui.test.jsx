@@ -926,6 +926,29 @@ describe("Settings panel", () => {
     click.mockRestore();
   });
 
+  it("in Episode II the group is the export alone: no import from Episode I, no mention of it (the site hides Episode I)", () => {
+    const onExport = vi.fn(() => ({ kind: "reign-of-swords-army", episode: 2, army: { footmen: 2 }, spoils: {} }));
+    Object.assign(URL, { createObjectURL: vi.fn(() => "blob:x"), revokeObjectURL: vi.fn() });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+    const { container } = render(
+      <SettingsPanel
+        onClose={() => {}}
+        musicMuted={false}
+        sfxMuted={false}
+        transfer={{ ep2: true, onExport, onImport: vi.fn() }}
+      />,
+    );
+    expect(screen.getByText("Army file")).toBeTruthy();
+    expect(screen.queryByText("Army transfer")).toBeNull();
+    expect(container.querySelector("#ros-army-import")).toBeNull();
+    expect(screen.queryByText(/Import from/)).toBeNull();
+    expect(/Episode I(?!I)/.test(container.textContent)).toBe(false);
+    fireEvent.click(btn(/Export army/));
+    expect(onExport).toHaveBeenCalled();
+    expect(screen.getByRole("status").textContent).toBe("Army saved to a file.");
+    click.mockRestore();
+  });
+
   it("Report a bug: where (GitHub Issues, LinkedIn) and what to attach — in the menu and in a battle", () => {
     render(<SettingsPanel onClose={() => {}} musicMuted={false} sfxMuted={false} />);
     expect(screen.getByText("Report a bug")).toBeTruthy();

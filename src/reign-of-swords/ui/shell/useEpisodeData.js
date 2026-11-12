@@ -11,22 +11,25 @@ export function useEpisodeData(dataBase) {
   const [levels, setLevels] = useState([]); // levels.json — every map (hidden ones left out)
   const [rewards, setRewards] = useState({}); // rewards.json — per-mission spoils, from the scenario records
   useEffect(() => {
-    fetch(dataBase + "campaign.json")
-      .then((r) => r.json())
-      .then(setCamp)
-      .catch(() => setCamp({ kingdoms: [] }));
-    fetch(dataBase + "battle_events.json")
-      .then((r) => r.json())
-      .then(setBattleEvents)
-      .catch(() => {});
-    fetch(dataBase + "levels.json")
-      .then((r) => r.json())
-      .then((d) => setLevels((d.levels || []).filter((l) => !l.hidden).map((l) => ({ ...l, name: levelTitle(l) }))))
-      .catch(() => {});
-    fetch(dataBase + "rewards.json")
-      .then((r) => r.json())
-      .then(setRewards)
-      .catch(() => {});
+    const get = (file, fallback) =>
+      fetch(dataBase + file)
+        .then((r) => r.json())
+        .catch(() => fallback);
+    const shown = (list) => (list || []).filter((l) => !l.hidden).map((l) => ({ ...l, name: levelTitle(l) }));
+    // bonus.json: Episode II's two BONUS campaigns (ours — tools/ros/bonus/build_bonus.py). Its kingdoms, levels and
+    // rewards join the episode's own; Episode I has no such file.
+    Promise.all([
+      get("campaign.json", { kingdoms: [] }),
+      get("levels.json", {}),
+      get("rewards.json", {}),
+      get("bonus.json", null),
+    ]).then(([campaign, levelData, rewardData, bonus]) => {
+      const extra = bonus || {};
+      setLevels(shown([...(levelData.levels || []), ...(extra.levels || [])]));
+      setRewards({ ...rewardData, ...extra.rewards });
+      setCamp({ ...campaign, kingdoms: [...(campaign.kingdoms || []), ...(extra.kingdoms || [])] });
+    });
+    get("battle_events.json", null).then((events) => events && setBattleEvents(events));
   }, [dataBase]);
   return { camp, battleEvents, levels, rewards };
 }

@@ -14,6 +14,7 @@ import {
   ARMY_GROUPS,
   SPECIAL_ORDER,
   EP2_ORDER,
+  BONUS_ORDER,
   UNFIELDED_ORDER,
   UPGRADE_FROM,
   RES_ICON,
@@ -54,6 +55,7 @@ export function UpgradeArmy({
   onHeraldry,
   heraldTier = 0,
   ep2: isEp2 = false,
+  bonus = false, // the bonus campaigns are open: their six units and the branches to them are shown
   progress, // the story battles won (a Set of map ids): Episode II's new units open with them
   missionTitle = () => "", // map id → that battle's title, for the locked-upgrade hint
 }) {
@@ -68,7 +70,9 @@ export function UpgradeArmy({
   };
   // Episode II: the fieldable new units (Craftsmen/Ballistae/Conjurer/Dune Sirens/Blood Gorgers) join the roster
   // grid; the conjured ones (Sapper/Bodyguard) join the "not recruitable" reference shelf.
-  const rosterOrder = isEp2 ? [...ORDER, ...EP2_ORDER.filter((k) => !(UNIT_META[k] || {}).conjured)] : ORDER;
+  const rosterOrder = isEp2
+    ? [...ORDER, ...EP2_ORDER.filter((k) => !(UNIT_META[k] || {}).conjured), ...(bonus ? BONUS_ORDER : [])]
+    : ORDER;
   const refOrder = isEp2
     ? [...SPECIAL_ORDER, ...UNFIELDED_ORDER, ...EP2_ORDER.filter((k) => (UNIT_META[k] || {}).conjured)]
     : [...SPECIAL_ORDER, ...UNFIELDED_ORDER];
@@ -76,15 +80,15 @@ export function UpgradeArmy({
   const u = UNIT_META[selKey],
     T = UNIT_TYPES[selKey] || {},
     have = army[selKey] || 0,
-    upgrades = (u.upgrades || []).filter((e) => upgradeOffered(e, isEp2)),
+    upgrades = (u.upgrades || []).filter((e) => upgradeOffered(e, isEp2, bonus)),
     upgradeFrom = UPGRADE_FROM[selKey];
   const resbar = (
     <div className="ros-resbar">
-      {COLLECTIBLES.map((c) => (
+      {COLLECTIBLES.filter((c) => !c.token || bonus).map((c) => (
         <span
           key={c.id}
           className={"ros-res" + ((spoils[c.id] || 0) > 0 ? " has" : "")}
-          title={tr(c.id) + " — " + tr("Spoils of War")}
+          title={(c.token ? c.token : tr(c.id)) + " — " + tr("Spoils of War")}
         >
           {RES_ICON[c.id] ? (
             <img className="ros-res-img" src={base + "icons/" + RES_ICON[c.id] + ".png"} alt={c.id} draggable="false" />

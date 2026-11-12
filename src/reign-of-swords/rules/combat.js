@@ -15,6 +15,18 @@
 import { manhattan, cheb, clamp, key, strictMost, toHp256, wholeHp, shownDamage, healStep } from "../util/util.js";
 import { WEAPON_DMG, WEAPON_RANGE, WEAPON_TAGS, BLAST_SHARE, spellStats } from "../data/combat-data.js";
 import { UNIT_TYPES, FX_TYPES, meleeHitFx } from "../data/game-data.js";
+import {
+  MAGIC_WEAPONS,
+  CHAIN_WEAPON,
+  CHAIN_BONUS,
+  CHAIN_SHARE,
+  CHAIN_REACH,
+  FLASK_WEAPON,
+  ACID,
+  BONUS_RANGED,
+  BEAM_WEAPONS,
+  BEAM_SHARE,
+} from "../data/bonus-units.js";
 import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
 
 // Which weapon a unit swings at a target `dist` tiles away. A unit can carry two
@@ -38,7 +50,7 @@ const isFireWeapon = (w) => w === 25 || (WEAPON_TAGS[w] || []).some((t) => t ===
 // bolt, shock) — their hits are area cells, not a state-2 strike.
 const AREA_WEAPONS = new Set([20, 21, 22, 23, 24, 25, 26, 27, 28, 34]);
 // every weapon that is not swung in melee: the bows and the Musket, the area weapons, the Hammer Throw
-const RANGED_WEAPONS = new Set([16, 17, 18, 19, 29, ...AREA_WEAPONS]);
+const RANGED_WEAPONS = new Set([16, 17, 18, 19, 29, ...AREA_WEAPONS, ...BONUS_RANGED]); // + the bonus units' missiles
 // The Lightning Storm's switch tables (see _resolveLightning): index → code, and code → the cell offset it strikes.
 const LIGHTNING_CODE = [0, 9, 1, 5, 8, 4, 10, 2, 6];
 const LIGHTNING_CELL = {
@@ -101,7 +113,53 @@ export class CombatMethods {
   // Great Eagle type 26) and the Sirens themselves. Quicksand only forms on getTileType ∈ {2,3,18,22,26,27}
   // (terrain-types.json — the real per-tile type legend). Enemy-only; the Siren lays a 3-tile line (see ai/ai).
   _quicksandImmune(u) {
-    return u.T.al === 0 || u.type === "dunesirens";
+    return u.T.al === 0 || u.type === "dunesirens" || !!u.T.unyielding || this._warded(u); // (+ the bonus units' Unyielding / Nullify)
+  }
+  // ===== BONUS abilities (Tilicia & Isoluccia — ours, MECHANICS.md §13) ===================================
+  // NULLIFY: a unit within 2 tiles of a living Spellwarden of its own side (the Spellwarden included) is warded —
+  // enemy spells deal it nothing and do not slow it, an enemy Spirit Shroud saps nothing, quicksand lets it pass.
+  _warded(u) {
+    return this.units.some((w) => !w.dead && w.T.nullify && w.team === u.team && manhattan(w, u) <= 2);
+  }
+  // PAVISE: Pavisiers that ended their last turn without moving stand behind a planted pavise (a unit that has not
+  // had a turn yet is planted). It covers the Pavisiers and a friendly unit directly behind them — next to them, and
+  // farther from the shooter than they are.
+  _planted(u) {
+    return !!u.T.pavise && !u.dead && u.planted !== false;
+  }
+  _pavised(defender, attacker) {
+    if (this._planted(defender)) return true;
+    const range = manhattan(attacker, defender);
+    return this.units.some(
+      (p) =>
+        p.team === defender.team && this._planted(p) && manhattan(p, defender) === 1 && manhattan(p, attacker) < range,
+    );
+  }
+  // CHAIN LIGHTNING: after the Battlemage's bolt lands, it leaps to up to two enemies standing next to the target, at
+  // half strength — the weakest first.
+  _resolveChain(attacker, defender) {
+    const tile = this.tile;
+    // the path is fixed as the bolt lands: each leap goes from the unit last struck to the nearest enemy not yet
+    // struck within CHAIN_REACH tiles of it (the weakest on a tie), and carries a smaller share of the bolt
+    const struck = [defender];
+    for (let last = defender; struck.length <= CHAIN_SHARE.length;) {
+      const from = last;
+      const next = this.units
+        .filter((e) => !e.dead && !struck.includes(e) && e.team !== attacker.team && !this._isHidden(e))
+        .filter((e) => manhattan(e, from) <= CHAIN_REACH)
+        .sort((a, b) => manhattan(a, from) - manhattan(b, from) || a.hp - b.hp || a.id - b.id)[0];
+      if (!next) break;
+      struck.push(next);
+      last = next;
+    }
+    struck.slice(1).forEach((e, i) =>
+      this._after(0.12 * (i + 1), () => {
+        if (e.dead) return;
+        this.spawnFx("bolt", e.tx * tile + tile / 2, e.ty * tile + tile * 0.42 - tile * 0.5, {});
+        const blow = this.computeDamage(attacker, e, { weapon: CHAIN_WEAPON });
+        this._applyHit(e, attacker, shared(blow, CHAIN_SHARE[i]), false);
+      }),
+    );
   }
   _quicksandAt(tx, ty) {
     return this.quicksand ? this.quicksand.get(tx + "," + ty) || 0 : 0;
@@ -207,7 +265,7 @@ export class CombatMethods {
   _repairTargetFor(u) {
     for (const other of this.units) {
       if (other.dead || other === u || other.team !== u.team) continue;
-      if (other.T.al === 4 && other.hp < 100 && manhattan(other, u) === 1) return other;
+      if ((other.T.al === 4 || other.T.unyielding) && other.hp < 100 && manhattan(other, u) === 1) return other; // (+ BONUS: a Stone Sentinel)
     }
     return null;
   }
@@ -282,24 +340,72 @@ export class CombatMethods {
     const dist = manhattan(attacker, defender);
     const weapon = opts.weapon != null ? opts.weapon : weaponAt(attacker, dist);
     if (weapon === 0) return 0; // no weapon slot (0xff): calculateAttackDamage @0x6af68 deals nothing
+    if (MAGIC_WEAPONS.includes(weapon) && attacker.team !== defender.team && this._warded(defender)) return 0; // BONUS: Nullify
     const siegeShot = weapon === 21 || weapon === 23;
     if (siegeShot && defender.T.al === 0) return 0; // Boulder / Cannonball cannot touch a flier (class 0)
     let base = weaponBase(defender, weapon);
+    // BONUS: Shield Hook — against a Khopesh Warrior's blow a shield counts for nothing (the armour column without it)
+    if (attacker.T.hook && dist === 1) {
+      const bare = { 1: 0, 6: 3, 10: 8 }[defender.T.armour];
+      if (bare != null && WEAPON_DMG[weapon]) base = WEAPON_DMG[weapon][bare];
+    }
     if (isFireWeapon(weapon) && defender.T.flammable) base *= 2;
-    if (opts.charge) base += 30; // the rider's charging flag
+    if (opts.charge && !defender.T.bulwark) base += 30; // the rider's charging flag (BONUS: none against a Bulwark)
+    if (attacker._ambushReady && attacker.T.shadowStep) base += 30; // BONUS: a Shinobi striking from hiding
     if (opts.brace) base += 30; // Ep1: a braced Pike Wall's first strike
     if (base <= 0) return 0;
-    const tileDef = Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
+    if (dist > 1 && this._planted(attacker)) base += 10; // BONUS: a planted Pavisier's braced shot
+    if (weapon === 61) base += attacker.T.sunbeam || 0; // BONUS: the Sun Priest's Sunbeam
+    if (attacker.T.opening && dist === 1 && defender.hp >= 100) base += attacker.T.opening; // BONUS: a Toa's First Thrust
+    // BONUS: Sky Hunter — a Tahuanui Rider stooping on archers, casters and war engines
+    if (attacker.T.skyHunter && dist === 1 && (defender.T.al === 4 || (defender.T.range || 1) > 1))
+      base += attacker.T.skyHunter;
+    // BONUS: Lurker of the Deep — a Taniwha striking from water
+    if (attacker.T.lurker && dist === 1 && [5, 19].includes(moveType(this.tileAt(attacker.tx, attacker.ty))))
+      base += attacker.T.lurker;
+    if (attacker.T.rage) base += Math.floor((100 - clamp(attacker.hp, 0, 100)) / attacker.T.rage); // BONUS: a Berserker's Rage
+    // BONUS: Weighing of the Heart — an Anubis Priest's Soulfire on a wounded foe
+    if (weapon === 70 && attacker.T.judgement)
+      base += Math.floor((100 - clamp(defender.hp, 0, 100)) / attacker.T.judgement);
+    // BONUS: Pounce — a Jaguar Warrior striking out of woods, tall grass, scrub or rocks
+    if (attacker.T.pounce && dist === 1 && [3, 4, 22, 27, 28].includes(moveType(this.tileAt(attacker.tx, attacker.ty))))
+      base += attacker.T.pounce;
+    if (weapon === CHAIN_WEAPON) base += CHAIN_BONUS; // BONUS: the Battlemage's bolt, and each of its leaps
+    // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
+    base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (defender.T.armourBonus || 0));
+    // BONUS — Breach (Marines): the cover of a fortification (palisade, rampart, gate, tower, wall — terrain types
+    // 6, 8, 10, 12, 14, 16) counts for nothing against them
+    const fortified =
+      attacker.T.breach && [6, 8, 10, 12, 14, 16].includes(moveType(this.tileAt(defender.tx, defender.ty)));
+    const open = fortified || (attacker.T.eagleEye && dist > 1); // BONUS: Eagle Eye — no cover turns an Eagle Warrior's dart
+    const tileDef = open ? 100 : Math.round(100 - (this.terrainAt(defender.tx, defender.ty).defBonus || 0) * 100);
     let cover = tileDef - (defender.T.formation && !siegeShot ? 10 * this.formationAllies(defender) : 0);
     if (siegeShot && tileDef <= 80) cover += Math.trunc((100 - tileDef) / 2);
     let rating = (attacker.T.rf || 75) + this.ratingAura(attacker);
-    if (dist === 1) rating += this._flankBonus(attacker, defender); // calcFlankBonuses: +30 opposite, +15 on a side
+    if (dist === 1 && !defender.T.bulwark) rating += this._flankBonus(attacker, defender); // calcFlankBonuses: +30 opposite, +15 on a side
     const skill = (Math.trunc((rating * 256) / 100) * toHp256(clamp(attacker.hp, 0, 100))) >> 8;
     let dmg = (Math.trunc((cover * 256) / 100) * Math.trunc((base * 256) / 100)) >> 8;
     dmg = (dmg * skill) >> 8;
     if (dist > 1) {
-      if (this._shielded(defender)) dmg = Math.trunc(dmg / 2); // Map::isUnitShielded — a Priest's Shield
-    } else if (this._siegeArmored(defender)) dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
+      // Map::isUnitShielded — a Priest's Shield; BONUS: a planted Pavise halves a shot the same way (they don't stack)
+      if (this._shielded(defender) || this._pavised(defender, attacker)) dmg = Math.trunc(dmg / 2);
+    } else if (this._siegeArmored(defender))
+      dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
+    else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
+    if (attacker._blind) dmg = Math.trunc(dmg / 2); // BONUS: blinded by a Sun Priest's Eclipse
+    if (defender.T.physicalHalf && !MAGIC_WEAPONS.includes(weapon)) dmg = Math.trunc(dmg / 2); // BONUS: the Siege-Tortoise's Obsidian Shell
+    // BONUS: Shield Wall — a friend standing beside a Shieldmaiden is spared a share of a blow hand to hand
+    if (dist === 1) {
+      const wall = this.units.reduce(
+        (best, o) =>
+          !o.dead && o !== defender && o.team === defender.team && o.T.shieldWall && manhattan(o, defender) === 1
+            ? Math.max(best, o.T.shieldWall)
+            : best,
+        0,
+      );
+      if (wall) dmg = Math.trunc((dmg * (100 - wall)) / 100);
+    }
+    if (defender.T.stoneskin) dmg = Math.min(dmg, toHp256(defender.T.stoneskin)); // BONUS: the Golem's Stoneskin
     return Math.max(0, dmg);
   }
   // PRAYER MARKS — the Shield prayer and Unit::retribution push the casting Priest's TILE on a per-group list on the
@@ -389,6 +495,9 @@ export class CombatMethods {
   }
   // Ability 1 as Unit::_hasAbility answers it (@0x666e4): First Strike, or a braced Pike Wall (Unit+0x10f).
   _hasFirstStrike(u) {
+    // BONUS: Vanguard — a unit beside a friendly Cuahchic Chieftain strikes first
+    if (this.units.some((o) => !o.dead && o !== u && o.team === u.team && o.T.vanguard && manhattan(o, u) === 1))
+      return true;
     return !!u.T.firstStrike || !!u.walled;
   }
   // Unit::isFirstStrike(a, b) (iOS Ep2 @0x66fb4) as a plain order — true when `a` lands before `b`, with no range test:
@@ -520,12 +629,15 @@ export class CombatMethods {
     let rally = false,
       shroud = false;
     for (const other of this.units) {
-      if (other.dead || manhattan(other, u) > 4) continue;
+      const dist = manhattan(other, u);
+      if (other.dead || dist > 4) continue;
+      const shrouds = other.T.shroud && dist <= other.T.shroudRange; // (BONUS: the Samurai's lesser Shroud reaches 2)
       if (other.team === u.team) {
         if (other !== u && (courage || u.type !== "king") && other.T.standard) rally = true;
-        else if (other.T.shroud && other._shroudOn) rally = true;
-      } else if (other.T.shroud) shroud = true;
+        else if (shrouds && other._shroudOn) rally = true;
+      } else if (shrouds) shroud = true;
     }
+    if (shroud && this._warded(u)) shroud = false; // BONUS: Nullify — an enemy Spirit Shroud saps nothing here
     return { rally, shroud };
   }
   ratingAura(u) {
@@ -598,6 +710,18 @@ export class CombatMethods {
         icon: "status_rally",
         name: "Holding the objective +15",
         desc: "Its side holds the objective (more units on the capture tiles than the enemy): +15 attack and +15 courage.",
+      });
+    if (this._warded(u))
+      out.push({
+        icon: "skill_nullify",
+        name: "Warded",
+        desc: "A friendly Spellwarden within 2 tiles nullifies enemy magic: spells deal it no damage and do not slow it, an enemy Spirit Shroud saps nothing, and quicksand does not hold it.",
+      });
+    if (this._planted(u))
+      out.push({
+        icon: "skill_pavise",
+        name: "Pavise planted",
+        desc: "It did not move on its last turn: it and a friendly unit directly behind it take half damage from ranged attacks.",
       });
     if (this._shielded(u))
       out.push({
@@ -936,6 +1060,7 @@ export class CombatMethods {
   }
   _fearCheck(attacker, defender, onBalk) {
     if (!defender || !defender.T.fear || attacker.T.fearless || attacker.T.fear) return false;
+    if (this._purified(attacker)) return false; // BONUS: a Unicorn's Purity
     const courage = this._courage(attacker);
     // Unit::attack's roll: r = (getRandom % 1000)·256/1000 (0..255) passes when r <= courage·256/100 — so 100+ never balks.
     let passed = this._courageChance(attacker) >= 1;
@@ -986,6 +1111,8 @@ export class CombatMethods {
     }
     this.targets = null; // drop the damage-preview overlay the instant the blow is ordered — it must NOT linger over the swing/retaliation
     attacker.attackedTurn = true;
+    // BONUS: the Dragon Rider spends its lance blow or its breath (it has one of each a turn — targetsFrom)
+    if (attacker.T.twinAttack) attacker[manhattan(attacker, defender) === 1 ? "_lanced" : "_fired"] = this.turn;
     if (attacker.T.pikeWall) attacker.walled = false; // giving an attack order lowers your own wall
     // Pike Wall: a braced defending pikeman strikes first; the wall replaces its later counter.
     // A CHARGE is the whole attack: onTick runs the defender's return blow only as a survival test and restores the
@@ -1158,17 +1285,127 @@ export class CombatMethods {
     if (attacker.T.grapeshot && manhattan(attacker, defender) === 1)
       return this._resolveGrapeshot(attacker, defender, opts);
     const wMain = opts.weapon != null ? opts.weapon : weaponAt(attacker, manhattan(attacker, defender));
+    if (wMain === CHAIN_WEAPON) {
+      // BONUS: Chain Lightning — a bolt on the target, then the leaps
+      this.spawnFx("bolt", defender.tx * this.tile + this.tile / 2, defender.ty * this.tile - this.tile * 0.08, {});
+      this.audio.play("thunder", 0.5, 1.0);
+      this._resolveChain(attacker, defender);
+    }
     const pierceShot = attacker.T.pierce && !!this._ballistaStep(attacker, defender.tx, defender.ty); // Piercing Bolt: the aimed cell is the bolt's first (85%)
     const damage = shared(this.computeDamage(attacker, defender, opts), pierceShot ? blastShare(28, 0) : 1);
     this._applyHit(defender, attacker, damage, damage >= 55, !!opts.siege, wMain);
+    if (wMain === FLASK_WEAPON) this._acidify(defender, attacker); // BONUS: the Alchemist's flask leaves acid
+    if (attacker.T.venom && manhattan(attacker, defender) === 1) this._acidify(defender, attacker); // …and a Coatecpatl's venom
+    // BONUS: Drowning Grasp — the foe an Ahuizotl strikes cannot attack on its next turn (grid targetsFrom; the
+    // grasp ends with that turn, so a blow struck during the victim's own turn holds nothing)
+    if (attacker.T.seize && !defender.dead && manhattan(attacker, defender) === 1 && defender.T.al !== 4) {
+      defender._seized = true;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 8,
+        t: 0,
+        life: 0.9,
+        vy: -14,
+        text: "Seized",
+        crit: true,
+      });
+    }
+    // BONUS: Star Hunger — half of what a Tzitzimitl's Starfire burns away returns to it
+    if (attacker.T.drain && wMain === 80 && !attacker.dead && attacker.hp < 100 && damage > 0) {
+      const before = attacker.hp;
+      attacker.hp = Math.min(100, before + Math.round((damage * attacker.T.drain) / 100));
+      this.floaters.push({
+        x: attacker.px + this.tile / 2,
+        y: attacker.py - 4,
+        t: 0,
+        life: 0.9,
+        vy: -22,
+        text: "+" + Math.round(attacker.hp - before),
+        heal: true,
+      });
+    }
+    // BONUS: Frost Slam — a Jotunn's blow chills its target and every other enemy beside that target: half movement
+    // until their own next turn ends (grid moveOf / _endTurnHide)
+    if (attacker.T.frost && manhattan(attacker, defender) === 1)
+      for (const e of this.units)
+        if (!e.dead && e.team !== attacker.team && e.T.al !== 4 && (e === defender || manhattan(e, defender) === 1)) {
+          e._chilled = true;
+          this.floaters.push({
+            x: e.px + this.tile / 2,
+            y: e.py - 8,
+            t: 0,
+            life: 0.9,
+            vy: -14,
+            text: "Chilled",
+            crit: true,
+          });
+        }
+    // BONUS: Constrict — the foe a Naga strikes hand to hand is held: it cannot move on its next turn (the hold ends
+    // with that turn — grid _endTurnHide — so a blow struck during the victim's own turn holds nothing)
+    if (attacker.T.constrict && !defender.dead && manhattan(attacker, defender) === 1 && defender.T.al !== 4) {
+      defender._held = true;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 8,
+        t: 0,
+        life: 0.9,
+        vy: -14,
+        text: "Held",
+        crit: true,
+      });
+    }
     // The struck cell's STRUCTURE takes the blow too (Unit::onTick → Map::applyDamage on the attack location) — a
     // unit sheltering in a house or on a rampart, or a shot aimed at the empty building itself.
     this._structureBlow(attacker, defender.tx, defender.ty, pierceShot ? blastShare(28, 0) : 1, wMain);
     // EPISODE II — Ballistae Piercing Bolt (help string 758): the bolt "damages three squares in a row" —
     // after the main hit it pierces the next two tiles behind the target, in the direction _ballistaStep picks.
     this._resolvePierce(attacker, defender, opts, wMain);
+    // BONUS: Dragonfire burns on through the two tiles beyond its target, in the line the Ballistae's bolt would take
+    // (60% then 35%), on whoever stands there and on any structure
+    if (BEAM_WEAPONS.includes(wMain)) {
+      const line = this._ballistaStep(attacker, defender.tx, defender.ty),
+        shares = BEAM_SHARE[wMain] || [];
+      for (let k = 1; line && k <= shares.length; k++) {
+        const x = defender.tx + line.fx * k,
+          y = defender.ty + line.fy * k;
+        if (!this.inBounds(x, y)) break;
+        const e = this.unitAt(x, y);
+        this.spawnFx("fire", x * this.tile + this.tile / 2, y * this.tile + this.tile * 0.42, { delay: 0.08 * k });
+        if (e && !e.dead && e !== attacker)
+          this._applyHit(e, attacker, shared(this.computeDamage(attacker, e, { weapon: wMain }), shares[k - 1]), false);
+        this._areaStructureHit(attacker, x, y, shares[k - 1], wMain);
+      }
+    }
+    // BONUS: Whirl — the Gladiators' blow spins on through every other enemy standing next to them, at 3/4 strength
+    if (attacker.T.whirl && manhattan(attacker, defender) === 1 && opts.weapon == null)
+      for (const e of this.units)
+        if (!e.dead && e !== defender && e.team !== attacker.team && manhattan(e, attacker) === 1 && !this._isHidden(e))
+          this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.75), false, false, wMain);
+    if (manhattan(attacker, defender) === 1 && opts.weapon == null) {
+      // BONUS: Earthshaker — the Oni's blow shakes every other enemy standing next to its TARGET, at half strength
+      if (attacker.T.quake)
+        for (const e of this.units)
+          if (
+            !e.dead &&
+            e !== defender &&
+            e.team !== attacker.team &&
+            manhattan(e, defender) === 1 &&
+            !this._isHidden(e)
+          )
+            this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.5), false, false, wMain);
+      // BONUS: Gale — the Tengu's foe is thrown one tile straight back (so it is out of reach to strike back), unless
+      // it is a war engine or the tile behind is taken or no ground it could stand on
+      if (attacker.T.gale && !defender.dead && defender.T.al !== 4 && !defender.T.bulwark) {
+        const bx = defender.tx * 2 - attacker.tx,
+          by = defender.ty * 2 - attacker.ty;
+        if (this.inBounds(bx, by) && !this.unitAt(bx, by) && this.moveCost(defender, bx, by) < 99) {
+          Object.assign(defender, { tx: bx, ty: by, px: bx * this.tile, py: by * this.tile });
+          this.spawnFx("sand_puff", bx * this.tile + this.tile / 2, by * this.tile + this.tile * 0.5, {});
+        }
+      }
+    }
     // A wizard jabbing point-blank uses its Wand (weapon 7) — a plain melee hit, no spell splash.
-    if (attacker.T.splash && !(attacker.T.canLightning && manhattan(attacker, defender) <= 1))
+    if (attacker.T.splash && !((attacker.T.canLightning || attacker.T.bonus) && manhattan(attacker, defender) <= 1))
       this._resolveSplash(attacker, defender, opts, wMain);
   }
 
@@ -1230,7 +1467,7 @@ export class CombatMethods {
       const e = this.unitAt(centerX + dx, centerY + dy);
       if (e && !e.dead) {
         this._applyHit(e, attacker, shared(this.computeDamage(attacker, e, { weapon: 27 }), blastShare(27)), false); // weapon 27, 100% per cell
-        if (!e.slowed) e.slowed = true; // Unit::onTick (@0x78f44): only an unslowed unit is slowed (a second Ice doesn't extend it)
+        if (!e.slowed && !(e.team !== attacker.team && this._warded(e))) e.slowed = true; // (BONUS: Nullify stops the slow) Unit::onTick (@0x78f44): only an unslowed unit is slowed (a second Ice doesn't extend it)
       }
       this._areaStructureHit(attacker, centerX + dx, centerY + dy, blastShare(27), 27);
     }
@@ -1318,7 +1555,7 @@ export class CombatMethods {
       const dx = Math.abs(e.tx - defender.tx),
         dy = Math.abs(e.ty - defender.ty);
       const inArea = square ? Math.max(dx, dy) <= 1 : dx + dy <= 1;
-      if (inArea)
+      if (inArea) {
         this._applyHit(
           e,
           attacker,
@@ -1326,6 +1563,8 @@ export class CombatMethods {
           false,
           !!opts.siege,
         );
+        if (wMain === FLASK_WEAPON) this._acidify(e, attacker);
+      }
     }
     // …and every structure in the blast (the onTick blast loop applies Map::applyDamage per destination cell, scaled
     // by the cell's blast share — the same share the units there take: Rock 50%, Pitch 40%, Fireball 60%).
@@ -1647,6 +1886,64 @@ export class CombatMethods {
         });
       }
     }
+    // BONUS: Devourer — a foe an Ammit's bite leaves nearly dead is swallowed whole (not a war engine)
+    if (
+      attacker &&
+      attacker.T.devour &&
+      attacker !== defender &&
+      defender.hp > 0 &&
+      defender.hp <= attacker.T.devour &&
+      defender.T.al !== 4 &&
+      manhattan(attacker, defender) === 1
+    ) {
+      defender.hp = 0;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 10,
+        t: 0,
+        life: 1,
+        vy: -14,
+        text: "Devoured",
+        crit: true,
+      });
+    }
+    // BONUS: Chosen of the Slain — an Einherjar that strikes a foe down takes heart
+    if (
+      defender.hp <= 0 &&
+      attacker &&
+      !attacker.dead &&
+      attacker.T.valhalla &&
+      attacker.team !== defender.team &&
+      attacker.hp < 100
+    ) {
+      const before = attacker.hp;
+      attacker.hp = Math.min(100, before + attacker.T.valhalla);
+      this.floaters.push({
+        x: attacker.px + this.tile / 2,
+        y: attacker.py - 4,
+        t: 0,
+        life: 0.9,
+        vy: -22,
+        text: "+" + Math.round(attacker.hp - before),
+        heal: true,
+      });
+    }
+    // BONUS: Rise Again — a Skeleton struck down for the first time gets back up
+    if (defender.hp <= 0 && defender.T.undying && !defender._risen) {
+      defender._risen = true;
+      defender.hp = defender.T.undying;
+      defender._acid = null;
+      this.floaters.push({
+        x: defender.px + this.tile / 2,
+        y: defender.py - 10,
+        t: 0,
+        life: 1.1,
+        vy: -14,
+        text: "Rises again",
+        crit: true,
+        heal: true,
+      });
+    }
     if (defender.hp <= 0) {
       defender.dead = true;
       defender.dieT = 0; // no death sound / fall animation — the unit just leaves the field
@@ -1658,10 +1955,63 @@ export class CombatMethods {
   // Unit::onTick's heal state (iOS Ep2 @0x79476 — the Priest's Heal and the Craftsmen mending a war engine): the original
   // adds 51 of 256 (19.9 HP); in whole HP (DELIBERATE DEVIATION, MECHANICS.md §13) it is +20, capped at 100 — so always
   // 20 unless the unit is above 80. Returns the gain shown.
-  _healTick(u) {
+  _healTick(u, amount) {
+    if (amount) {
+      // BONUS: the Alchemist's Elixir heals its own amount, on the shown HP
+      const before = u.hp;
+      u.hp = Math.min(100, before + amount);
+      return Math.round(u.hp - before);
+    }
     const step = healStep(u.hp);
     u.hp = step.hp;
     return step.shown;
+  }
+  // BONUS — the flask's acid: ACID.damage HP at the start of each of the victim's next ACID.turns turns (a fresh
+  // flask restarts the count; war engines and structures do not corrode), and the tick itself.
+  _acidify(e, by) {
+    if (!e || e.dead || e.T.al === 4) return;
+    e._acid = { turns: ACID.turns, by };
+  }
+  // BONUS — what a unit suffers as its side's turn begins (engine healOnKeeps): acid, and an Efreet's Burning Aura.
+  // A Unicorn's Purity washes acid from friends within its reach first.
+  _turnStartAilments(u) {
+    if (u.dead) return;
+    const near = (o, n) => !o.dead && Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) <= n;
+    if (u._acid && this.units.some((o) => o.team === u.team && o.T.purity && near(o, o.T.purity))) u._acid = null;
+    if (u._acid) {
+      const { by } = u._acid;
+      if (--u._acid.turns <= 0) u._acid = null;
+      this._applyHit(u, by, ACID.damage, false, true);
+    }
+    if (u.dead) return;
+    // BONUS: Karakia — a Tohunga mends the most wounded friend within 3 tiles as its own turn begins
+    if (u.T.karakia) {
+      const hurt = this.units
+        .filter((o) => !o.dead && o.team === u.team && o.hp < 100 && o.T.al !== 4 && !o.T.unyielding)
+        .filter((o) => Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) <= 3)
+        .sort((a, b) => a.hp - b.hp || a.id - b.id)[0];
+      if (hurt) {
+        const gained = this._healTick(hurt, u.T.karakia);
+        this.spawnFx("spark", hurt.px + this.tile / 2, hurt.py + this.tile * 0.42, {});
+        this.floaters.push({
+          x: hurt.px + this.tile / 2,
+          y: hurt.py,
+          t: 0,
+          life: 0.9,
+          vy: -22,
+          text: "+" + gained,
+          heal: true,
+        });
+      }
+    }
+    const efreet = this.units.find((o) => o.team !== u.team && o.T.burn && near(o, 1));
+    if (efreet) this._applyHit(u, efreet, efreet.T.burn, false, true);
+  }
+  // BONUS — Purity: a unit within reach of a friendly Unicorn feels no Fear
+  _purified(u) {
+    return this.units.some(
+      (o) => !o.dead && o.team === u.team && o.T.purity && Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) <= o.T.purity,
+    );
   }
   _killConjuredChildren(conjurer) {
     let any = false;
@@ -1717,6 +2067,7 @@ export class CombatMethods {
       scale: opts.scale,
       flip: opts.flip,
       angle: opts.angle || 0,
+      hue: opts.hue || 0, // BONUS: a hue shift, in degrees (the green flask)
     });
   }
   // Schedule fn to run after `delay` seconds, driven by update(dt). Used for cascading effects (Lightning Storm bolts).
@@ -1991,7 +2342,9 @@ export class CombatMethods {
       ang: angle,
       cannon: isCannon,
       magic: !!u.T.magic,
-      spell: u.T.magic ? u.spell || "fireball" : null,
+      spell: u.T.magic ? u.spell || u.T.shotSpell || "fireball" : null, // (shotSpell: the Unicorn's bolt flies as an ice bolt)
+      green: !!u.T.greenShot, // the Alchemist's flask
+      hue: u.T.shotHue || 0, // …or any other hue shift (the Anubis Priest's violet Soulfire)
       impactSnd: this._impactSound(u, kind, lobbed, isCannon),
       impactVol: lobbed ? 0.5 : 0.55,
     });
@@ -2016,7 +2369,7 @@ export class CombatMethods {
   // fireball → 13 (the burst), the Catapult's Rocks → 25, the Trebuchet (unit type 24) → 32, the Ballistae → 52. A
   // direct shot (arrow, musket ball, hammer) lands without a clip.
   _impactSound(u, kind, lobbed, isCannon) {
-    if (isCannon || (u.T.magic && (u.spell === "fireball" || !u.spell))) return "explosion";
+    if (isCannon || (u.T.magic && (u.spell === "fireball" || (!u.spell && !u.T.shotSpell)))) return "explosion";
     if (lobbed) return u.type === "trebuchet" ? "boulder_hit" : "rock_hit";
     if (kind === "bolt") return "bolt_hit";
     return null;
@@ -2030,7 +2383,7 @@ export class CombatMethods {
   _launchSound(u, kind, lobbed, isCannon) {
     if (u.T.magic) {
       if (u.spell === "lightning") return "thunder";
-      if (u.spell === "ice") return "spell";
+      if (u.spell === "ice" || (!u.spell && u.T.shotSpell === "ice")) return "spell";
       return "spellfire"; // default/undefined = Fireball → spellfire (snd_002); only Ice uses "spell" (snd_011)
     }
     if (isCannon) return "cannon";
@@ -2068,12 +2421,13 @@ export class CombatMethods {
     } else if (kind === "ball") {
       // Cannon shell & the wizard's FIREBALL burst in fire; ice/lightning do NOT (their own area FX resolve
       // separately in resolveDamage — a blue ice bolt shouldn't explode in flame).
-      if (!u.T.magic || u.spell === "fireball" || !u.spell) {
+      const hue = u.T.shotHue || (u.T.greenShot ? 80 : 0); // the flask bursts green, Soulfire violet
+      if (!u.T.magic || u.spell === "fireball" || (!u.spell && !u.T.shotSpell)) {
         // the Fireball bursts in the explosion (5017 #35, android z_024), the Cannonball in the fire burst (#37) —
         // startAreaAttack's impact strips (@0x72bd6 / @0x72f24)
-        this.spawnFx(u.T.magic ? "blast" : "fire", hitX, hitY, { delay: dur, scale: 1.0 });
+        this.spawnFx(u.T.magic ? "blast" : "fire", hitX, hitY, { delay: dur, scale: 1.0, hue });
         // DELIBERATE DEVIATION — the flames a Wizard's Fireball leaves behind (not in the original)
-        if (u.T.magic) this.spawnFx("fire", hitX, hitY + tile * 0.04, { delay: dur + 0.12 });
+        if (u.T.magic) this.spawnFx("fire", hitX, hitY + tile * 0.04, { delay: dur + 0.12, hue });
         this._burst(hitX, hitY, {
           delay: dur,
           big: false,

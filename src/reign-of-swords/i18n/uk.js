@@ -320,6 +320,11 @@ export default {
   "Main Menu": "Головне меню",
   "Episode II": "Епізод II",
   "Army transfer": "Перенесення армії",
+  // the site offers Episode II only: its Settings keep the export alone (ui/shell/SettingsPanel.jsx)
+  "Army file": "Файл армії",
+  "Army saved to a file.": "Армію збережено у файл.",
+  "Save your army and collectibles to a file: Resume Episode II, below, reads it back in.":
+    "Збережіть армію й трофеї у файл: пункт «Продовжити Епізод II» нижче завантажить його назад.",
   "Export army": "Експорт армії",
   "Import from {ep}": "Імпорт з: {ep}",
   "Army saved to a file — import it in {ep}'s Settings.":
@@ -519,16 +524,20 @@ export default {
   Gameplay: "Ігровий процес",
   "Auto-charge: on": "Авторозгін: увімк",
   "Auto-charge: off": "Авторозгін: вимк",
-  "On: your riders charge whenever they gallop 2+ tiles in a straight line and then strike the foe ahead. Off — the original: they charge only when you tap the foe at the end of the lane, and the gallop and the strike are one action. The AI always charges as in the original. Online battles keep it on. Applies at once.": "Увімк: ваші вершники йдуть у розгін щоразу, коли проскачуть 2+ клітинки по прямій і потім ударять ворога попереду. Вимк — як в оригіналі: розгін лише коли ви торкаєтеся ворога в кінці смуги, і скік з ударом — одна дія. ШІ завжди розганяється як в оригіналі. В онлайн-битвах завжди увімк. Діє одразу.",
-  "Charge: press ⚡ Charge, then tap a highlighted foe — the rider gallops 2+ tiles in a straight line and strikes at once. A tap on a foe without it, or a gallop you make by hand, is an ordinary blow.": "Розгін: натисніть ⚡ Розгін і торкніться підсвіченого ворога — вершник проскаче 2+ клітинки по прямій і одразу вдарить. Дотик до ворога без кнопки або скік уручну — звичайний удар.",
+  "On: your riders charge whenever they gallop 2+ tiles in a straight line and then strike the foe ahead. Off — the original: they charge only when you tap the foe at the end of the lane, and the gallop and the strike are one action. The AI always charges as in the original. Online battles keep it on. Applies at once.":
+    "Увімк: ваші вершники йдуть у розгін щоразу, коли проскачуть 2+ клітинки по прямій і потім ударять ворога попереду. Вимк — як в оригіналі: розгін лише коли ви торкаєтеся ворога в кінці смуги, і скік з ударом — одна дія. ШІ завжди розганяється як в оригіналі. В онлайн-битвах завжди увімк. Діє одразу.",
+  "Charge: press ⚡ Charge, then tap a highlighted foe — the rider gallops 2+ tiles in a straight line and strikes at once. A tap on a foe without it, or a gallop you make by hand, is an ordinary blow.":
+    "Розгін: натисніть ⚡ Розгін і торкніться підсвіченого ворога — вершник проскаче 2+ клітинки по прямій і одразу вдарить. Дотик до ворога без кнопки або скік уручну — звичайний удар.",
   "⚡ Charge": "⚡ Розгін",
   "tap a highlighted foe; press again to cancel": "торкніться підсвіченого ворога; натисніть ще раз, щоб скасувати",
   "gallop at a foe and strike: +30, no counter-attack": "скік на ворога й удар: +30, без відповідного удару",
-  "About": "Про гру",
-  "The original game's credits, as its About screen lists them. This remaster is an unofficial fan project.": "Титри оригінальної гри — так, як їх показував її екран «Про гру». Цей ремастер — неофіційний фанатський проєкт.",
+  About: "Про гру",
+  "The original game's credits, as its About screen lists them. This remaster is an unofficial fan project.":
+    "Титри оригінальної гри — так, як їх показував її екран «Про гру». Цей ремастер — неофіційний фанатський проєкт.",
   "Android version": "Версія для Android",
   "PC version": "Версія для ПК",
-  "Credited in the PC build, per community research; not in any build we have, so their roles aren't listed.": "Зазначені в титрах ПК-версії — за даними дослідження спільноти; у жодній з наявних у нас версій їх немає, тому ролі не вказано.",
+  "Credited in the PC build, per community research; not in any build we have, so their roles aren't listed.":
+    "Зазначені в титрах ПК-версії — за даними дослідження спільноти; у жодній з наявних у нас версій їх немає, тому ролі не вказано.",
   "Also credited": "Також у титрах",
   "Realistic siege: off": "Реалістична облога: вимк",
   "Realistic siege: on": "Реалістична облога: увімк",
@@ -1441,6 +1450,14 @@ export default {
   Beasts: "Звірі",
   Spirit: "Дух",
   Lore: "Знання",
+  Bloodstone: "Кривавий лід",
+  Scarab: "Скарабей",
+  Obsidian: "Обсидіан",
+  Whalebone: "Китова кістка",
+  Anchor: "Якір",
+  Tsuba: "Цуба",
+  Jade: "Нефрит",
+  Void: "Кристал Безодні",
   Slowed: "Сповільнений",
   "An Ice Field cuts its movement to three quarters until the end of its next turn.":
     "Крижане поле скорочує його рух до трьох чвертей до кінця його наступного ходу.",
@@ -1508,4 +1525,24 @@ export default {
   "too open to hide": "надто відкрито, щоб сховатися",
   "Boulders and cannonballs ignore half of the cover; Formation does not help against them.":
     "Валуни та ядра ігнорують половину укриття; стрій від них не захищає.",
+  // the bonus campaigns and the Resume Episode II setting (ours)
+  "Replace your Episode II progress and army with this file? This cannot be undone.":
+    "Замінити ваш прогрес і армію в Епізоді II даними з цього файлу? Це не можна скасувати.",
+  "Episode II marked complete. Your army: {u} units and {s} collectibles. The bonus campaigns are open.":
+    "Епізод II позначено пройденим. Ваша армія: загонів — {u}, трофеїв — {s}. Бонусні кампанії відкрито.",
+  "Resume Episode II": "Продовжити Епізод II",
+  "Resume from an army file": "Продовжити з файлу армії",
+  "Resume with the veteran army": "Продовжити з армією ветеранів",
+  "Resume from an army file: every Episode II battle and raid is marked won, your army and collectibles become exactly those in the file (an Episode II army exported above), and the bonus campaigns open. Resume with the veteran army, for testing: every battle of every campaign, the bonus ones included, is marked won and open to replay, with 8 of every unit and collectible. Either replaces your current Episode II save.":
+    "Продовжити з файлу армії: усі битви й набіги Епізоду II позначаються виграними, ваша армія і трофеї стають точно такими, як у файлі (армія Епізоду II, експортована вище), і відкриваються бонусні кампанії. Продовжити з армією ветеранів, для перевірки: виграними позначаються всі битви всіх кампаній, зокрема бонусні, їх можна переграти, і ви отримуєте по 8 загонів і трофеїв кожного виду. В обох випадках поточне збереження Епізоду II замінюється.",
+  "Bonus campaign — not part of the original game": "Бонусна кампанія — не входить до оригінальної гри",
+  "Bonus campaign": "Бонусна кампанія",
+  "A fan-made bonus campaign — not part of the original game. New story, maps and units.":
+    "Фанатська бонусна кампанія — не входить до оригінальної гри. Новий сюжет, карти й загони.",
+  "This army is from Episode I — resuming needs an Episode II army file.":
+    "Ця армія з Епізоду I — для продовження потрібен файл армії Епізоду II.",
+  "The bonus campaigns of Tilicia and Isoluccia, their maps, story and six units are fan-made additions and are not part of the original game.":
+    "Бонусні кампанії Тіліції та Ізолуччії, їхні карти, сюжет і шість загонів — фанатські доповнення, вони не входять до оригінальної гри.",
+  "Every battle unlocked. Your army: {u} units and {s} collectibles.":
+    "Усі битви відкрито. Ваша армія: загонів — {u}, трофеїв — {s}.",
 };

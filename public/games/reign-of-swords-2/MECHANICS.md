@@ -521,7 +521,8 @@ value, cmd]`), 6 tile reached `[x, y, cmd]` / Ep2 `[x, y, counter, count, team, 
   sound id of §9 and every effect strip of §10; the tutorial battles and their lines.
 - **Ours**: the AI's one-pass choice over the tiles a unit can reach and its tie-breaks (§7); frame timings and projectile visuals; the parchment UI, camera and ambient playlist;
   the special win rules pinned from objective text; the kind grouping and ability description prose; the player's
-  heraldry ranks; the Ep2 world map keeping the Episode I kingdoms.
+  heraldry ranks; the Ep2 world map keeping the Episode I kingdoms; the two bonus campaigns of Tilicia and Isoluccia,
+  with their maps, story, six units and unit art (§13).
 - **Open**: the original's wall pathing bound (9999) in `calcShortestPath`. Every deliberate difference from the
   original is listed in §13.
 
@@ -620,6 +621,236 @@ not on this list is meant to match the binaries — a difference that is not lis
 - **Battle Lab** — batch simulations, autopilot strategies and same-seed replays.
 - Raid medal tracking on the world map; the raid titles (the original names them only "Hunewold Raid 1"…); the
   player's heraldry ranks; the Story Codex, the downloads and the map and animation atlases.
+
+### The bonus campaigns: ten regions after Episode II (Episode II only)
+
+Ten fan-made campaigns, entirely ours (user decision). Nothing in this section comes from the original games; it is
+kept apart from the original data so that everything else stays checkable against the binaries.
+
+- **Where it lives.** `bonus.json` (built by `tools/ros/bonus/build_bonus.py` from the hand-written level files
+  beside it) holds the ten regions, their 30 story battles and 22 raids (map ids 5902-5913 Tilicia, 5914-5918 Jarnheim,
+  5924-5933 Isoluccia, 5934-5938 Khemret, 5941-5952 Mare Nostra, 5944-5948 Moananui, 5954-5958 Coatlan, 5961-5972
+  Satoshi, 5981-5992 the Mirror Sea, 5994-5998 Tezcal), rewards, hold tiles and heraldry, in the same record shapes as the exported files. It is loaded beside
+  `levels.json`, `campaign.json` and `rewards.json`, which are not edited. The units are in
+  `src/reign-of-swords/data/bonus-units.js`, merged into the unit tables at load; their rules are marked `BONUS` in
+  the code. Their sprites are cut from art sheets supplied for this project
+  (`tools/ros/bonus/art/`, sliced and given team colours by `import_sheet.py`); the six ability icons were drawn
+  for it (`draw_units.py`).
+- **Story.** They follow Episode II's last line (the letters naming Tilicia, Isoluccia and the "Battlemage"). The
+  maps reuse the Episode II tileset, the speakers reuse its portraits, and every battle runs on the original scenario
+  script (round, kill, tile, escape and escort triggers), with no new script commands.
+- **Opening.** The kingdoms appear on the Episode II world map, marked "Bonus campaign", once Oasis Standoff is won.
+  Tilicia opens first, then Isoluccia, then Mare Nostra (the five ship battles first built as "the Mirror Sea";
+  renamed by user decision, its marker in Mare Nostra); Satoshi (the top-right corner) and the Mirror Sea (a second
+  naval campaign, its marker on the northern sea under the map's own "Mirror Sea" label) both open after Mare Nostra. Until then nothing of them shows: not the kingdoms, the units, their
+  Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
+  battle, raid or battlefield.
+- **Twenty-four units** (and the Hounds and Imps two of them call), each on the damage row of an original weapon and an original armour column (§2), so the real
+  weapon x armour table prices them:
+
+  | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
+  |---|---|---|---|---|---|---|
+  | Cragsmen | 4, skirmish | Javelin 2-3 (Spear), Spear | Light | 2 | 175 | Climb, Shoot and Move |
+  | Spellwardens | 3, formation | Mace (Sword) | Heavy & Shield | 3 | 225 | Nullify, Mending Runes, Formation |
+  | Stone Sentinel | 4, formation | Stone Fist (Greatsword) | Heavy & Shield, shown as Living Stone | 4 | 300 | Bulwark, Unyielding, Fear, Fearless |
+  | Marines | 4, skirmish | Boarding Musket 2-3 (Musket), Sword | Light & Shield | 3 | 150 | Amphibious, Grapple, Breach, Move or Shoot |
+  | Pavisiers | 4, formation | Crossbow, Short Sword | Breastplate | 2 | 200 | Pavise, Formation, Move or Shoot |
+  | Battlemage | 4, teleport | Chain Lightning 2-7 (Fireball), Runesword | Relic | 3 | 750, elite | Chain Lightning, Teleport, Shoot and Move, First Strike, Battle Standard, Fear |
+  | Gladiators | 4, skirmish | Gladius (Sword) | Heavy & Shield (-10 taken) | 3 | 175 | Whirl |
+  | Samurai | 4, formation | Katana (Sword, +10) | Heavy (-10 taken) | 3 | 250 | Lesser Shroud, Pike Wall |
+  | Dragon Riders | 8, flying | Dragonfire 2-8 (Cannonball), Lance | Relic | 5 | 750, elite | Dragonfire, Fire and Lance, First Strike, Fear, Charge |
+  | Beast Master | 4, formation | Whip (Spear) | Shield | 1 | 250 | Call Hounds |
+  | Hounds (called) | 7, skirmish | Fangs (Antlers) | Nature's Cloak | 2 | - | leashed, as the Conjurer's minions |
+  | Sohei | 4, formation | Naginata (Halberd, +5) | Holy Vestment | 4 | 175 | Sutra, Fearless |
+  | Shinobi | 5, skirmish | Shuriken 2-3 (Spear), Ninjato | Light | 3 | 225 | Shadow, Stealth |
+  | Oni | 3, formation | Kanabo (Greatsword) | Heavy, shown as Oni Hide | 4 | 350 | Earthshaker, Fear, Fearless |
+  | Tengu | 7, flying | Gale Blade (Sword, +20) | Feathered Hide (-10 taken) | 5 | 325 | Gale |
+  | Alchemist | 4, formation | Acid Flask 2-6 (Fireball), Dagger | Holy Vestment | 3 | 250 | Acid Flask, Elixir, Summon Imp |
+  | Imp (summoned) | 6, flying | Claws (Short Sword) | Minor Ward | 2 | - | leashed, as the Conjurer's minions |
+  | Golem | 3, formation | Rune Fists (Greatsword) | Heavy & Shield, shown as Rune Stone | 4 | 400 | Stoneskin, Unyielding, Fear, Fearless |
+  | Unicorn | 7, flying | Starlight 2-4 (Lightning Storm), Antlers | Feathered Hide | 3 | 275 | Purity |
+  | Efreet | 5, flying | Flame Jet 2-4 (Fireball, with its + cross), Burning Hands | Feathered Hide (-10 taken), shown as Living Flame | 5 | 350 | Burning Aura (20), Fear |
+  | Naga | 5, skirmish | Twin Scimitars (Sword, +10) | Heavy & Shield (-10 taken) | 5 | 300 | Constrict, Whirl, Amphibious |
+  | Skeletons | 4, formation | Rusted Sword (Sword, +10) | Heavy & Shield (-10 taken) | 5 | 500 | Rise Again (at full HP), Fearless |
+  | Jaguar Warriors | 5, skirmish | Macuahuitl (Sword) | Light & Shield (-5 taken) | 3 | 150 | Jungle Stride, Pounce |
+  | Eagle Warriors | 5, skirmish | Atlatl Dart 2-3 (Spear), Macuahuitl | Light | 2 | 175 | Jungle Stride, Eagle Eye, Shoot and Move |
+  | Sun Priest | 4, formation | Sunbeam 2-7 (Fireball, +30), Obsidian Knife | Holy Vestment | 4 | 400, elite | Sun Magic |
+  | Feathered Serpent | 7, flying | Gale 2-4 (Lightning Storm, +10), Fangs | Feathered Hide | 4 | 300 | Tailwind, Shoot and Move |
+
+- **Four more cultures, eight tokens and the Primal Warden** (the fifth wave; all art supplied by the user).
+  *Regions.* Jarnheim (Norse; map ids 5914-5918), Khemret (Egyptian; 5934-5938), Moananui (Polynesian; 5944-5948)
+  and Coatlan (a second Aztec region; 5954-5958), three story battles and two raids each. All four open with the
+  bonus campaigns (the rule Tilicia has) and are nobody's prerequisite. Markers: Jarnheim in the northern range
+  between Hunewold and Rukiev, Khemret on the east bank of the south-east river, Moananui on the island chain west of
+  Mare Nostra, Coatlan in the eastern mountains south-east of Tilicia. That makes ten bonus regions, 30 story battles
+  and 22 raids.
+  *Units* (cost; ability): Berserkers 175 (Rage: +1 on the cell per 2 HP lost; Fearless), Shieldmaidens 200 (Shield
+  Wall: a friend beside one takes a quarter less hand to hand), Einherjar 275 (Chosen of the Slain: +50 HP for each
+  foe struck down), Jotunn 425 (Frost Slam: its target and the foes beside it move at half pace until their next turn
+  ends; Fear); Medjay 175 (Composite Bow 2-7; Desert Stride: terrain types 3, 22, 27, 28 cost 1), Khopesh Warriors
+  175 (Shield Hook: the target's armour column is read without its shield, 1 to 0, 6 to 3, 10 to 8), Anubis Priest
+  275 (Soulfire 2-6, +1 on the cell per 3 HP the target has lost; magic), Ammit 275 (Devourer: a bite that leaves a
+  foe at 20 HP or fewer kills it, war engines excepted; Fear); Toa Warriors 150 (First Thrust: +20 at a foe at full
+  health; shallows cost 1), Tahuanui Riders 250 (flier; Sky Hunter: +25 against war engines and units with a ranged
+  weapon), Tohunga 250 (Spirit Wisps 2-5; Karakia: at the start of its side's turn the most wounded friend within 3
+  tiles mends 15 HP), Taniwha 375 (deep water and shallows cost 1 and it attacks from them; +20 from water; Fear);
+  Coatecpatl Warriors 200 (Serpent Venom: the flask's acid, 5 HP for 3 turns; Jungle Stride), Ahuizotl 175
+  (Drowning Grasp: the foe it strikes has no targets on its next turn; Amphibious), Cuahchic Chieftain 275 (war
+  darts 2-4, Shoot and Move, Battle Standard; Vanguard: a friend beside it counts as having First Strike),
+  Tzitzimitl 250 (flier; Starfire 2-5, half its damage returns as health; Fear; magic).
+  *The Primal Warden* (a design supplied by the user; 400, elite): Druids + Void. A healer (20 HP at 2 tiles, which
+  also lifts acid, chill, blindness and holds) with a Prism Bolt (2-4), that shapeshifts by the Druid's rule (one
+  shift a turn, HP kept, not over water or cliffs) into the Storm-Stalker Panther (move 8; Static Arc 2-3, Shoot and
+  Move), the Volcanic Siege-Tortoise (move 2; Magma Mortar 2-5 on the 3 x 3 around its target at 100% / 60%, friend
+  or foe, never at a tile beside it, where it has only a Bite; everything but magic does half damage to it) or the
+  Astral Manta (flier; Void Beam 1-4, which goes on through three tiles beyond its target at full strength, friend
+  or foe). The computer picks the Panther where a Druid would take the Stag, the Tortoise for the Bear, the Manta for
+  the Eagle.
+  *Tokens.* Eight new collectibles, one per culture: Glacial Bloodstone (Jarnheim), Scarab of the Duat (Khemret),
+  Smoldering Obsidian (Coatlan), Carved Whalebone (Moananui), Triton's Anchor (Mare Nostra and the Mirror Sea),
+  Tsuba of the Shogunate (Satoshi), Sacred Jade Jaguar (Tezcal) and Void Rift Crystal (Tilicia and Isoluccia). Every
+  battle and raid of a region rewards 2 of its token (The Harbour Chain also 2 Anchors and The Admiral's Deck 1 Void
+  Crystal, for the units they open). They are spent like any collectible, one a unit, but the Merchant does not
+  trade them, and the camp shows them once the bonus campaigns are open. Upgrades paid in tokens: Anchor: Militia
+  to Marines, Footmen to Gladiators, Raiders to Beast Master. Tsuba: Shamans to Sohei, Footmen to Samurai, Archers to
+  Shinobi, Samurai to Oni, Beast Master to Tengu. Void: Griffon Riders to Dragon Riders, Priests to Alchemist, Stone
+  Sentinel to Golem, Druids to Primal Warden. Jade: Militia to Jaguar Warriors, Archers to Eagle Warriors, Cavalry to
+  Feathered Serpent, Shamans to Sun Priest. Bloodstone: Militia to Berserkers, Footmen to Shieldmaidens,
+  Shieldmaidens to Einherjar, Berserkers to Jotunn. Scarab: Archers to Medjay, Militia to Khopesh Warriors, Priests
+  to Anubis Priest, Blood Gorgers to Ammit. Whalebone: Militia to Toa, Raiders to Tahuanui Riders, Shamans to
+  Tohunga, Dune Sirens to Taniwha. Obsidian: Jaguar Warriors to Coatecpatl, Blood Gorgers to Ahuizotl, Eagle
+  Warriors to Cuahchic Chieftain, Shamans to Tzitzimitl. Cragsmen, Spellwardens, Stone Sentinel, Pavisiers and the
+  Battlemage keep the original collectibles. The tokens give a unit a branch per culture beside its six original
+  slots, start each culture from the Militia or another early unit, and exist only after Episode II is won, so no
+  bonus unit can be taken back into the original campaigns before they are finished. (Paths written elsewhere in
+  this section with original collectibles for these units are superseded by this list.)
+  *Balance.* `docs/unit-balance.md` holds the arena's present numbers for every unit, original ones included; its
+  "original finals" test (the last battle of each original kingdom fought with an army of the unit) was added to
+  catch units that would steamroll the original game, and the Battlemage (range 2-6, +5 on its bolts), Gladiators,
+  Tengu, Tohunga, Medjay and the Chieftain were reduced after it.
+- **Tilicia and Isoluccia are three battles each** (user decision; they were built with six). Every battle of
+  the two regions is now fought with an army the player deploys: the fixed-force battles (The Tolm Road, The Sleepers
+  Wake, Landfall, Free Company) are gone, with The Sealed Vale and The Causeway. Tilicia is Ostrak's Bargain,
+  Frostgate, The Empty Tomb (5902, 5904, 5906); Isoluccia is The Harbour Chain, The Arsenal, Reign of the Battlemage
+  (5924-5926). The Marines' upgrade now opens after The Harbour Chain and the Golem's after the Quarry of Giants raid.
+  With three battles and three raids, a bonus region's last raid opens with its last battle (`raidGate`; the
+  original kingdoms keep the original rule).
+- **Hidden for now** (user decision): the Unicorn, Efreet, Naga and Skeletons. Their data, rules, art and tests
+  stay (`BONUS_HIDDEN` in `data/bonus-units.js`), but the game offers none of them: no camp or Field Manual card, no
+  upgrade branch, no reward, no place in any battle or in the veteran army. What is written of them below describes
+  the units as built.
+- **Tezcal and the upgrade rule** (the fourth wave; art supplied by the user). A sixth region, the Jungles of
+  Tezcal (map ids 5994-5998: three story battles, two raids), opens after the Mirror Sea; its marker is east of the
+  Mirror Sea, between Satoshi and Tilicia. *Jungle Stride* (Jaguar and Eagle Warriors): woods (terrain types 4, 28)
+  cost 1. *Pounce* (Jaguar): +20 on the cell of a blow struck from woods, tall grass, scrub or rocks (types 3, 4, 22,
+  27, 28). *Eagle Eye*: an Eagle Warrior's dart counts its target's tile cover as none. *Sun Magic* (Sun Priest, the
+  Wizard's counterpart): Sunbeam, its attack, is the Fireball's row +30 on one target and burns on through the two
+  tiles beyond it (60% then 35%, the Dragonfire's line), and Nullify stops it; Dawn mends every friend within 2 tiles
+  by 15 HP (not war engines or Stone Sentinels); Eclipse blinds a foe within 5 tiles, halving every blow it deals
+  until its own next turn ends. The computer casts only Sunbeam. *Tailwind* (Feathered Serpent): a friend beside it
+  has 1 more movement. Upgrades: Pikemen + Beasts to Jaguar Warriors (Tezcal 1), Archers + Lore to Eagle Warriors
+  (Tezcal 2), Cavalry + Spirit to Feathered Serpent and Priests + Medal to Sun Priest (Tezcal 3).
+  *The Beast Master's tree* (user decision): Unicorn (Lore), Efreet (Weapons), Naga (Beasts) and Skeletons (Armor)
+  are now upgraded from the Beast Master, beside the Tengu (Spirit); their unlock battles are unchanged.
+  *An upgrade beats its base* (user decision): six of a unit must beat six of the unit it is upgraded from, one for
+  one (the arena's `upgrade` duel, the mean of both sides and two dice seeds). To pass it Marines, Skeletons, Naga,
+  Efreet, Tengu, Jaguar Warriors, the Feathered Serpent and Sohei were strengthened and re-priced (the table above
+  has their present numbers); the four made from a Beast Master had to outfight a master and its two packs of Hounds,
+  which is why Skeletons are now a 500-point unit that rises at full health.
+- **Stone Sentinel and Pavisiers, improved** (user decision, from the arena's battle types). The Sentinel no
+  longer strikes last and has *Bulwark* (the Golem too): a charge adds nothing against it, the flank bonus is not
+  applied against it, and a Tengu's Gale does not move it; it costs 300. A planted *Pavise* now also takes a quarter
+  off every blow hand to hand (not with Siege Armor), and the Pavisiers' own shots from a planted pavise add 10 to
+  the Crossbow's cell.
+- **The laboratory and its creatures** (the third wave; art supplied by the user, its Gryphon Rider row unused).
+  *Acid Flask* (Alchemist): a Fireball in everything but colour, the same + cross at 100% / 60% on friend and foe,
+  flying and bursting green; every unit it burns (not war engines) carries acid, 5 HP at the start of each of its
+  side's next 3 turns, a fresh flask restarting the count. Point-blank the Alchemist uses its Dagger, with no burst.
+  *Elixir*: the Priest's Heal with its own numbers, 30 HP on the shown HP at up to 2 tiles. *Summon Imp*: the
+  Conjurer's Conjure with one summon, as the Beast Master's Hounds. *Stoneskin* (Golem): a blow's damage is capped at
+  20 HP after every other rule. *Purity* (Unicorn): a unit within 2 tiles of a friendly Unicorn passes every Fear
+  check and loses its acid at the start of its turn. *Burning Aura* (Efreet): a unit that begins its side's turn
+  beside an enemy Efreet loses 10 HP. *Constrict* (Naga): the unit it strikes hand to hand (not a war engine) has a
+  move of 0 until its own next turn ends. *Rise Again* (Skeletons): the first time its HP reaches 0 it is set to 40
+  instead. Upgrades: Priests + Lore to Alchemist (after Isoluccia 2), Stone Sentinel + Armor to Golem (the Quarry of Giants raid),
+  Knights + Spirit to Unicorn (Satoshi's first raid), Dune Sirens + Lore to Efreet (the Mirror Sea 3), Marines +
+  Beasts to Naga (the Mirror Sea 1), Conjurer + Spirit to Skeletons (hidden); each of those battles fields the
+  creature and rewards one.
+- **More abilities** (added with the later units). *Grapple* (Marines): once a battle, in place of the move, a swing
+  to any free tile within 6 that the Marines could stand on (no step rule, so a rampart will do; not deep water),
+  played as the Wizard's blink; it cannot be undone and the computer does not use it. *Breach* (Marines): the tile
+  cover of a fortification (terrain types 6, 8, 10, 12, 14, 16) counts as none against their blows and shots. *Call
+  Hounds* (Beast Master): the Conjurer's Conjure with one summon, Hounds; the cap of two, the 8-tile leash, the turn
+  of arrival and the death of the pack with its master are the Conjurer's rules unchanged. Upgrade: Militia + Medal,
+  after the Mirror Sea's second battle. *Sutra* (Sohei): at the start of its side's turn every friendly unit
+  orthogonally beside a Sohei mends 10 HP with the village heal (not war engines or Stone Sentinels). *Shadow*
+  (Shinobi): Stealth that hides on any ground, not only in cover; a turn begun in hiding makes its blows that turn an
+  ambush, +30 on the weapon x armour cell. *Earthshaker* (Oni): every other enemy adjacent to its melee target takes
+  half the blow. *Gale* (Tengu): its melee target is moved one tile straight back if that tile is free and ground it
+  could stand on (war engines never), before the counter-attack is judged, so a thrown foe does not strike back.
+  Gladiators now wear the Heavy & Shield column with a further 10 off every cell (the Samurai's rule), at 175.
+  Upgrades of the Satoshi four: Shamans + Armor to Sohei, Rangers + Lore to Shinobi, Greatswordsmen + Spirit to
+  Oni, and Beast Master + Spirit to Tengu (the only bonus unit upgraded from another bonus unit).
+  DELIBERATE FIX found with the Shinobi: a move cut short beside a hidden foe no longer stops on a tile another unit
+  holds (a flier over a friend); it stops on the next free tile.
+- **Eight abilities.** *Whirl* (Gladiators): after its blow lands on an adjacent target, every other enemy adjacent
+  to the Gladiators takes 3/4 of the same blow. *Lesser Shroud* (Samurai): the Shaman's Spirit Shroud with a reach of
+  2 tiles instead of 4, raised the same way. *Mending Runes* (Spellwardens): +10 HP at the start of each of their
+  turns, with the village heal. The *Boarding Musket* reaches 3 tiles, but only 2 when the Marines stand in woods,
+  tall grass, scrub, rocky ground or shallows (terrain types 3, 4, 5, 22, 27, 28). *Master Swordsman* (Samurai): +10
+  on the weapon x armour cell of every blow dealt, -10 on every blow taken (never below 1). *Dragonfire*: a fire weapon on the Cannonball's row that also reaches fliers, at 2-8 tiles, drawn as
+  a fireball; it obeys cover like any shot, unlike the Cannonball, and burns on through the two tiles beyond its
+  target (60% then 35%, friend or foe, structures too) along the line the Ballistae's bolt would take. *Fire and
+  Lance*: each turn the Dragon Rider has one breath, one lance blow and its move, in any order. A tap on a foe it can
+  reach flies in and strikes with the lance (a charge when the lane allows); the Dragonfire button breathes instead.
+  The computer treats it as a melee unit, so it closes in, and follows one attack with the other when a foe is in reach of it. The Battlemage's Teleport is the Wizard's. *Climb*: cliffs (terrain type 21) cost 2. *Amphibious*: deep water (type 19) costs 2, and no
+  attack from a deep-water tile. *Nullify*: a unit within 2 tiles (Manhattan) of a living Spellwarden of its side
+  takes 0 from enemy Fireball, Lightning Storm, Ice Field and Chain Lightning, is not slowed by an enemy Ice Field,
+  ignores an enemy Spirit Shroud and is not stopped or hurt by quicksand. *Unyielding*: no Heal from a Priest, immune
+  to quicksand, mended by Craftsmen like a war engine. *Pavise*: Pavisiers that end a turn without moving are planted
+  (as are those that have not had a turn yet); while planted, they and a friendly unit next to them and farther from
+  the shooter take half ranged damage, the same halving as a Priest's Shield, and the two do not stack. *Chain
+  Lightning*: the bolt and every leap add 10 to the Fireball row's cell. After the bolt lands it leaps up to four
+  times, each leap from the unit last struck to the nearest enemy not yet struck within 2 tiles of it (the weakest on
+  a tie; hidden units and friends are passed over), at 50%, 40%, 30% and 20% of a full bolt on that unit. (First
+  built as two leaps at half strength onto enemies beside the target; lengthened and strengthened by user decision.
+  In the unit arena this puts the Battlemage well above every other unit for its points.)
+  The AI needs no new behaviour: all six act through the movement costs, target lists and damage it already reads.
+- **Upgrades.** Each unit hangs off an original unit in a collectible slot that unit leaves empty, and waits on a
+  bonus battle like Episode II's own units: Archers to Cragsmen (Armor, Ostrak's Bargain), Swordsmen to Spellwardens
+  (Lore, Frostgate), Craftsmen to Stone Sentinel (Spirit, The Empty Tomb), Footmen to Marines (Spirit, The Harbour Chain),
+  Crossbowmen to Pavisiers (Armor, The Harbour Chain), Wizards to Battlemage (Medal, Reign of the Battlemage),
+  Halberdiers to Gladiators (Weapons, The Lashed Convoy), Swordsmen to Samurai (Spirit, Ishiro's Hill), Griffon
+  Riders to Dragon Riders (Medal, The Admiral's Deck).
+- **Ships.** The Mirror Sea's battles are fought on hulls lashed together. There is no ship art: a hull is the
+  Episode II paving tiles laid on open sea, the obelisk as a mast and the house as a cabin, joined by gangplanks. Where a deck meets the sea it carries a
+  wooden bulwark (the sand set's timber wall, by user decision): troops man it from the deck and are covered there
+  as on any rampart, horse and war engines keep to the planking, and Marines climb it straight out of the water
+  (Amphibious waives the wall-walk step rule). Gangplanks and the stem stay open deck.
+- **Unit arena and stress run** (`npm run e2e:arena`, `npm run e2e:stress`). Balance tools, not game content: the
+  arena fights equal-points squads of each unit against a basket of fourteen original units on an emptied Open
+  Field, from both sides and over several dice seeds, and scores the share of points left. It also fights three
+  battle types with a 1500-point squad of the unit: the open field against a mounted army, holding the west castle
+  of the Obbsin battlefield against a storming party with Catapults (Autopilot "Hold the fort"), and standing behind a
+  rank of Pikemen with Archers behind it while the block advances on a mixed army (Autopilot "Advance as one"); the stress run plays the
+  bonus battles at random with the player's army swapped for the bonus units, under the fuzzer's invariants.
+  The bonus units' costs and the Battlemage's rating were set from the arena so that each scores near the original
+  unit it sits beside (Battlemage and Dragon Rider near the Hero).
+- **Resume Episode II** (Settings, Episode II only). *From an army file*: reads an Episode II army file back in
+  without the transfer limits, marks every original Episode II battle and raid won, and replaces the army and
+  collectibles with the file's. *With the veteran army* (for testing): marks every battle of every campaign won, the
+  bonus ones included, so all are open to replay, with 8 of every unit and collectible.
+- **The website offers Episode II only** (user decision). The page boots straight into Episode II: there is no
+  episode switch, an address that still names an episode (`#reign-of-swords`, `#reign-of-swords-2`) lands on
+  Episode II and the hash is dropped, and the page's search metadata describes Episode II alone. Episode I is hidden,
+  not removed: its data, rules and tests stay in the repository (Episode II draws its sprites and sounds from
+  Episode I's folder), and its saves are neither read nor deleted. In Episode II's Settings the Army transfer group
+  is the export alone ("Army file", the file Resume Episode II reads back); importing an Episode I army is no longer
+  offered there.
+- **The page.** The standalone site gives the game the whole window: the page never scrolls, the campaign screen's
+  map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
+  battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the
+  muster roster) in a side column on the right. Phones keep their own layout.
 
 ### Not reproduced
 

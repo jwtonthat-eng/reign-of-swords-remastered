@@ -245,7 +245,10 @@ export class LoopMethods {
       // Unit::onTick (iOS Ep2 @0x7839c): a step onto a tile next to a HIDDEN foe ends the move there (no ride shot
       // that step); the foe is dealt with when the move finishes (_bumpAmbush).
       const here = a.path[a.seg];
-      if (a.seg < a.path.length - 1 && this._hiddenFoeBeside(a.u, here)) {
+      // (not on a tile another unit holds — a mover passing through a friend, or a flier over anyone, stops on the
+      // next free tile instead: with Shinobi hiding on open ground this came up, and two units shared a tile)
+      const held = this.units.some((o) => !o.dead && o !== a.u && o.tx === here.tx && o.ty === here.ty);
+      if (a.seg < a.path.length - 1 && !held && this._hiddenFoeBeside(a.u, here)) {
         a.path = a.path.slice(0, a.seg + 1);
         a.t = 0;
         break;
@@ -388,7 +391,10 @@ export class LoopMethods {
   _landHeal(a) {
     const target = a.target,
       tile = this.tile;
-    const gained = this._healTick(target);
+    const gained = this._healTick(target, a.u && a.u.T.healAmount);
+    // BONUS: Cleansing Touch — a Primal Warden's Heal also lifts what ails its target
+    if (a.u && a.u.T.cleanse)
+      Object.assign(target, { _acid: null, _chilled: false, _blind: false, _held: false, _seized: false });
     target.flash = 0.14;
     // the Heal state's overlay (5017 #3) plays on the healed unit — renderOverlay @0x7641a draws it at Map+0x1c, which
     // Unit::heal (@0x6bfac) points at the target; nothing plays on the Priest

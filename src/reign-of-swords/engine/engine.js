@@ -30,6 +30,7 @@ import { LoopMethods } from "./loop.js";
 import { ScenarioRunner } from "./script.js";
 import { AbilityMethods } from "../rules/abilities.js";
 import { DebugMethods } from "./debug.js";
+import { BONUS_ALL, BONUS_SUMMONS, BONUS_FORMS } from "../data/bonus-units.js";
 import { UNIT_TYPES, TINCTURE_RGB, FX_TYPES, DEPLOY_COST, UNIT_RAMPS } from "../data/game-data.js";
 import { DEPLOY_ELITE, DEPLOY_ORDER, DEPLOY_ROSTER, fallbackMission, buildMissions } from "../data/missions.js";
 export { ASSET_V, UNIT_TYPES }; // re-exported for the React layer (ReignShell imports them from here)
@@ -138,6 +139,9 @@ const STAND_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_SUMMONS,
+  ...BONUS_FORMS,
+  ...BONUS_ALL, // the bonus units (cut from the supplied art sheet — tools/ros/bonus/import_sheet.py; the Battlemage, like the Wizard, has no walk sheet)
 ];
 // WALKING animation: each unit has its own 4-frame walk cycle (android walk sheets, 256x72 = 4 frames @ 64x72),
 // extracted to sprites/walk/<key>.png. A unit uses this real leg cycle while it moves; before, everything glided.
@@ -175,6 +179,9 @@ const WALK_UNITS = [
   "bodyguard",
   "dunesirens",
   "bloodgorgers",
+  ...BONUS_SUMMONS,
+  ...BONUS_FORMS,
+  ...BONUS_ALL, // the bonus units (cut from the supplied art sheet — tools/ros/bonus/import_sheet.py; the Battlemage, like the Wizard, has no walk sheet)
 ];
 // (WALK_FRAMES/WALK_W/WALK_H — the walk-strip frame dimensions — live in render/render.js, their only consumer.)
 async function loadAssets(base, dataBase = base) {
@@ -748,7 +755,28 @@ class Game {
   healOnKeeps(team, only) {
     for (const u of this.units) {
       if (u.dead || u.team !== team || (only && !only(u))) continue;
-      const terrain = this.terrainAt(u.tx, u.ty);
+      this._turnStartAilments(u); // BONUS: acid, an Efreet's Burning Aura
+      if (u.dead) continue;
+      // BONUS: Spellwardens mend themselves (T.regen) at the same moment, on top of anything the ground heals
+      const ground = this.terrainAt(u.tx, u.ty);
+      // …and a Sohei's Sutra mends every friend standing beside it (not what a Priest cannot heal)
+      const sutra =
+        u.T.al === 4 || u.T.unyielding
+          ? 0
+          : this.units.reduce(
+              (best, o) =>
+                !o.dead &&
+                o !== u &&
+                o.team === u.team &&
+                o.T.sutra &&
+                Math.abs(o.tx - u.tx) + Math.abs(o.ty - u.ty) === 1
+                  ? Math.max(best, o.T.sutra)
+                  : best,
+              0,
+            );
+      if (u.T.shadowStep) u._ambushReady = !!u._hidden; // Shinobi: a turn begun in hiding is an ambush
+      const mend = (u.T.regen || 0) + sutra;
+      const terrain = mend ? { heal: (ground.heal || 0) + mend } : ground;
       if (terrain.heal && u.hp < 100) {
         // GameScreen::hideCurrentMenu's turn-start heal (iOS Ep2 @0x1f856) works on the shown HP: + bonus, capped at 100
         const before = u.hp;
@@ -787,12 +815,18 @@ class Game {
     // only fall back to half the viewport if the stage hasn't been measured yet (rect.height 0 on first mount).
     const availH = mobile
       ? Math.round(rect.height) || Math.round((window.innerHeight || 800) * 0.5)
-      : clamp((window.innerHeight || 800) - 470, 300, 530);
+      : frame && frame.height
+        ? Math.max(200, frame.height) // the two-column desktop battle: the board column is as tall as the window
+        : clamp((window.innerHeight || 800) - 510, 240, 530); // (the stacked layout: 510 = the bars and panel around the board)
     // Tile sized so ~N columns fill the available width. Desktop targets ~15 cols; on a phone we target fewer so
     // tiles (and tap targets) stay large — the camera pans/zooms to reveal wider maps.
     this.tile = mobile
       ? clamp(Math.round(availW / Math.min(this.cols, 10)), 40, 64)
-      : clamp(Math.round(availW / Math.min(this.cols, 15)), 34, 56);
+      : frame && frame.height
+        ? // the two-column desktop battle: tiles shrink until the WHOLE map fits its column (never below 34px, where
+          // units get hard to read — a bigger map then scrolls), and a small map grows to fill it (up to 56px)
+          clamp(Math.floor(Math.min(availW / this.cols, availH / this.rows)), 34, 56)
+        : clamp(Math.round(availW / Math.min(this.cols, 15)), 34, 56);
     this.world = { w: this.tile * this.cols, h: this.tile * this.rows };
     const viewW = Math.min(availW, this.world.w);
     const viewH = Math.min(availH, this.world.h);
@@ -824,6 +858,18 @@ class Game {
     const cs = getComputedStyle(column),
       ss = getComputedStyle(stage);
     const border = px(ss.borderLeftWidth) + px(ss.borderRightWidth);
+    // The desktop battle is a two-column grid (styles/desktop.css): the board has the first column, whose resolved
+    // width is the first grid track, and the whole height of the frame.
+    if (cs.display === "grid") {
+      const track = px((cs.gridTemplateColumns || "").split(" ")[0]);
+      const height =
+        column.clientHeight -
+        px(cs.paddingTop) -
+        px(cs.paddingBottom) -
+        px(ss.borderTopWidth) -
+        px(ss.borderBottomWidth);
+      if (track > 0 && height > 0) return { room: track - border, border, height };
+    }
     const room = column.clientWidth - px(cs.paddingLeft) - px(cs.paddingRight) - border;
     return room > 0 ? { room, border } : null;
   }
@@ -1073,6 +1119,7 @@ class Game {
       shapeshift:
         !unit.acted && unit.T.shapeshiftForms && unit._shiftTurn !== this.turn ? unit.T.shapeshiftForms : null,
       shapeshiftBlocked: !!unit.T.shapeshiftForms && !this._canShapeshiftHere(unit), // over water / cliffs: greyed out
+      shapeshiftBase: unit._druidType || unit.type, // what "druids" in the list stands for (a Druid, or a Primal Warden)
       canLightning: !!unit.T.canLightning,
       spell: unit.T.canLightning ? unit.spell || "fireball" : null,
       formation: !!unit.T.formation,

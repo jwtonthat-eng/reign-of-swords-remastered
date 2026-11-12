@@ -15,8 +15,10 @@ import {
   subName,
   unseenLines,
   unlocksOf,
+  bonusOpen,
 } from "../data/shell-data.js";
 import { progressBefore } from "../data/campaign-rules.js";
+import { isBonusMap } from "../data/bonus-units.js";
 import { Cutscene } from "./shell/Cutscene.jsx";
 import { UpgradeArmy } from "./shell/UpgradeArmy.jsx";
 import { MerchantShop } from "./shell/MerchantShop.jsx";
@@ -259,6 +261,17 @@ export default function ReignShell({ assetBase = null }) {
     setKingdomOpen(null);
     setScreen("campaign");
   };
+  // ⚙ Settings → Resume Episode II (ours): every battle and raid of the ORIGINAL kingdoms is marked won (bonus battles
+  // already won stay won), and the army file becomes the army. `everything` (the built-in veteran army, for testing):
+  // every battle of every kingdom, the bonus ones included, is marked won — all of them open to replay.
+  const resumeEpisode = (data, everything = false) => {
+    const original = { ...camp, kingdoms: camp.kingdoms.filter((k) => !k.bonus) };
+    const won = progressBefore(everything ? camp : original, levels, -1);
+    for (const mapId of progress) if (isBonusMap(mapId)) won.add(mapId);
+    const got = save.resumeEpisode(data, won);
+    setKingdomOpen(null);
+    return got;
+  };
   const hardReset = () => {
     save.resetSave();
     for (const k of ["ros-muted", "ros-muted-music"]) {
@@ -338,7 +351,7 @@ export default function ReignShell({ assetBase = null }) {
           onAbout={() => setAboutOpen(true)}
         />
       )}
-      {aboutOpen && <Credits dataBase={dataBase} onClose={() => setAboutOpen(false)} />}
+      {aboutOpen && <Credits dataBase={dataBase} bonus={isEp2} onClose={() => setAboutOpen(false)} />}
 
       {screen === "campaign" && (
         <div className="ros-worldwrap ros-campaign">
@@ -371,6 +384,7 @@ export default function ReignShell({ assetBase = null }) {
               spoils={save.spoils}
               onUpgrade={save.upgradeUnit}
               ep2={isEp2}
+              bonus={bonusOpen(isEp2, progress)}
               progress={progress}
               missionTitle={missionTitle}
               heraldTier={heraldTitle(progress.size).border}
@@ -487,7 +501,9 @@ export default function ReignShell({ assetBase = null }) {
         />
       )}
       {screen === "heraldry" && <Heraldry progress={progress} onBack={() => setScreen(campRef.current)} />}
-      {screen === "help" && <HelpScreen onBack={() => setScreen("menu")} ep2={isEp2} />}
+      {screen === "help" && (
+        <HelpScreen onBack={() => setScreen("menu")} ep2={isEp2} bonus={bonusOpen(isEp2, progress)} />
+      )}
 
       {screen === "online" && (
         // Online Battles: lobbies with a password, live turn-based battles against another player, the leaderboard
@@ -520,6 +536,7 @@ export default function ReignShell({ assetBase = null }) {
           onToggleMusic={toggleMusic}
           onToggleSfx={toggleSfx}
           transfer={inBattle ? null : { ep2: isEp2, onExport: save.exportArmy, onImport: save.importArmy }}
+          resume={inBattle || !isEp2 ? null : { base: dataBase, onResume: resumeEpisode }}
         />
       )}
     </div>

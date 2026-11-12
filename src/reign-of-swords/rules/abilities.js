@@ -17,6 +17,7 @@
    Casting is a full action (the unit is spent), exactly like the AI branches.
    ============================================================ */
 import { manhattan } from "../util/util.js";
+import { moveType } from "./terrain.js";
 import { UNIT_TYPES } from "../data/game-data.js";
 
 export const AbilityMethods = {
@@ -59,7 +60,63 @@ export const AbilityMethods = {
         max: 1,
         desc: "Tap a neighbouring tile: the three sand tiles on that side turn to quicksand for 4 rounds. A unit that steps in is stopped there and takes 5 damage. Fliers and Sirens are immune.",
       });
-    if (unit.T.conjure) {
+    // BONUS — the Sun Priest's two cast spells (its third, Sunbeam, is its attack)
+    if (unit.T.sunPriest) {
+      out.push({
+        id: "dawn",
+        name: "Dawn",
+        icon: "skill_nullify",
+        min: 0,
+        max: 0,
+        desc: "Every friendly unit within 2 tiles (the Sun Priest too) mends 15 HP. War engines and Stone Sentinels do not.",
+      });
+      out.push({
+        id: "eclipse",
+        name: "Eclipse",
+        icon: "skill_chain",
+        min: 1,
+        max: 5,
+        desc: "Blind a foe within 5 tiles: it strikes at half strength until its next turn ends.",
+      });
+    }
+    // BONUS — Grapple (Marines): once a battle, in place of the move
+    if (unit.T.grapple) {
+      const spent = !!unit._grappled,
+        moved = this._movedThisTurn(unit);
+      out.push({
+        id: "grapple",
+        name: "Grapple",
+        icon: "skill_climb",
+        min: 1,
+        max: unit.T.grapple,
+        count: spent ? "0/1" : "1/1",
+        countTitle: "grapples left this battle",
+        countNote: "used",
+        disabled: spent || moved,
+        desc: spent
+          ? "Already used — Marines carry one grapple a battle."
+          : moved
+            ? "The grapple takes the place of the move: it cannot be thrown after moving."
+            : "Swing to any free tile within 6 — over water, walls and enemies (once per battle, in place of the move).",
+      });
+    }
+    // BONUS — the Beast Master's Conjure calls Hounds (one button; the rest is the Conjurer's rule)
+    if (unit.T.conjures) {
+      const kids = this.units.filter((o) => !o.dead && o._conjuredBy === unit.id).length,
+        full = kids >= 2;
+      out.push({
+        id: "conjure_" + unit.T.conjures,
+        name: unit.T.conjures === "imp" ? "Summon Imp" : "Call Hounds",
+        icon: "skill_conjure",
+        min: 1,
+        max: 1,
+        count: kids + "/2",
+        disabled: full,
+        desc: full
+          ? "Limit reached — two of its creatures are already standing. One must fall before it can call another."
+          : "Call its creature onto an adjacent free tile (max 2 standing, leashed within 8 tiles; they are gone if their master falls).",
+      });
+    } else if (unit.T.conjure) {
       const kids = this.units.filter((o) => !o.dead && o._conjuredBy === unit.id).length;
       // At the cap (help 584: "Only two conjured minions can be summoned at any one time") the buttons STAY in the row,
       // disabled and marked, instead of silently vanishing — so it's clear why the Conjurer can't summon.
@@ -125,6 +182,10 @@ export const AbilityMethods = {
       this._castDetonate(sel);
       return true;
     }
+    if (id === "dawn") {
+      this._castDawn(sel);
+      return true;
+    }
     if (id === "absorb") {
       this._castAbsorb(sel);
       return true;
@@ -160,7 +221,13 @@ export const AbilityMethods = {
     }
     if (id === "repair") {
       const engine = this.unitAt(tx, ty);
-      if (engine && engine.team === sel.team && engine.T.al === 4 && engine.hp < 100 && dist === 1) {
+      if (
+        engine &&
+        engine.team === sel.team &&
+        (engine.T.al === 4 || engine.T.unyielding) &&
+        engine.hp < 100 &&
+        dist === 1
+      ) {
         this._castRepair(sel, engine);
         return true;
       }
@@ -173,13 +240,24 @@ export const AbilityMethods = {
       // a tile beside the Siren, or the Siren itself (its default side) — Unit::setAttackTarget takes nothing farther
       if (this._castQuicksand(sel, tx, ty)) return true;
     }
+    if (id === "eclipse") {
+      const foe = this.unitAt(tx, ty);
+      if (foe && !foe.dead && foe.team !== sel.team && dist <= 5 && !this._isHidden(foe)) {
+        this._castEclipse(sel, foe);
+        return true;
+      }
+    }
+    if (id === "grapple" && this._grappleTile(sel, tx, ty)) {
+      this._castGrapple(sel, tx, ty);
+      return true;
+    }
     if (
-      (id === "conjure_sapper" || id === "conjure_bodyguard") &&
+      id.startsWith("conjure_") &&
       Math.max(Math.abs(tx - sel.tx), Math.abs(ty - sel.ty)) === 1 &&
       !this.unitAt(tx, ty) &&
       this.terrainAt(tx, ty).passable
     ) {
-      this._castConjure(sel, id === "conjure_sapper" ? "sapper" : "bodyguard", tx, ty);
+      this._castConjure(sel, id.slice(8), tx, ty);
       return true;
     }
     this.notify("That is not a valid target for this skill.");
@@ -315,6 +393,68 @@ export const AbilityMethods = {
     });
     return true;
   },
+  // BONUS — the Sun Priest. Dawn: friends within 2 tiles mend 15 HP (what a Priest cannot heal, it cannot either).
+  _castDawn(u) {
+    this._castAnim(u, null, () => this._dawn(u), "heal");
+  },
+  _dawn(u) {
+    for (const a of this.units) {
+      if (a.dead || a.team !== u.team || a.T.al === 4 || a.T.unyielding || a.hp >= 100) continue;
+      if (Math.abs(a.tx - u.tx) + Math.abs(a.ty - u.ty) > 2) continue;
+      const gained = this._healTick(a, 15);
+      this.spawnFx("spark", a.px + this.tile / 2, a.py + this.tile * 0.42, {});
+      this.floaters.push({
+        x: a.px + this.tile / 2,
+        y: a.py,
+        t: 0,
+        life: 0.9,
+        vy: -22,
+        text: "+" + gained,
+        heal: true,
+      });
+    }
+  },
+  // Eclipse: the foe strikes at half strength (rules/combat _damage256) until its own next turn ends (grid _endTurnHide).
+  _castEclipse(u, foe) {
+    this._castAnim(u, foe, () => this._eclipse(foe), "cast");
+  },
+  _eclipse(foe) {
+    foe._blind = true;
+    this.floaters.push({
+      x: foe.px + this.tile / 2,
+      y: foe.py - 8,
+      t: 0,
+      life: 1,
+      vy: -14,
+      text: "Blinded",
+      crit: true,
+    });
+  },
+  // BONUS — Grapple (Marines): a free tile it could stand on (no step rule: a rampart will do), within its grapple's
+  // reach, and not deep water.
+  _grappleTile(u, tx, ty) {
+    const dist = Math.abs(tx - u.tx) + Math.abs(ty - u.ty);
+    return (
+      !!u.T.grapple &&
+      !u._grappled &&
+      !this._movedThisTurn(u) &&
+      dist >= 1 &&
+      dist <= u.T.grapple &&
+      this.inBounds(tx, ty) &&
+      !this.unitAt(tx, ty) &&
+      moveType(this.tileAt(tx, ty)) !== 19 &&
+      this.moveCost(u, tx, ty) < 99
+    );
+  },
+  // The swing is the unit's move for the turn (it cannot be undone); what a move leaves it — its sword — it keeps.
+  _castGrapple(u, tx, ty) {
+    u._grappled = true; // once per battle
+    u._movedPrev = u._movedTurn;
+    u._movedTurn = this.turn;
+    this.reach = null;
+    this.targets = null;
+    this._teleportMove(u, { tx, ty }, () => this._afterPlayerMove(u));
+  },
   _castConjure(u, type, tx, ty) {
     if (!UNIT_TYPES[type]) return;
     this._castAnim(
@@ -392,10 +532,26 @@ export const AbilityMethods = {
         const x = unit.tx + dx,
           y = unit.ty + dy,
           e = this.unitAt(x, y);
-        if ((e && !e.dead && e.team === unit.team && e.T.al === 4 && e.hp < 100) || this._structureRepairable(x, y))
+        if (
+          (e && !e.dead && e.team === unit.team && (e.T.al === 4 || e.T.unyielding) && e.hp < 100) ||
+          this._structureRepairable(x, y)
+        )
           push(x, y);
       }
-    } else if (id === "conjure_sapper" || id === "conjure_bodyguard") {
+    } else if (id === "eclipse") {
+      for (const e of this.units)
+        if (
+          !e.dead &&
+          e.team !== unit.team &&
+          !this._isHidden(e) &&
+          Math.abs(e.tx - unit.tx) + Math.abs(e.ty - unit.ty) <= 5
+        )
+          push(e.tx, e.ty);
+    } else if (id === "grapple") {
+      for (let dy = -unit.T.grapple; dy <= unit.T.grapple; dy++)
+        for (let dx = -unit.T.grapple; dx <= unit.T.grapple; dx++)
+          if (this._grappleTile(unit, unit.tx + dx, unit.ty + dy)) push(unit.tx + dx, unit.ty + dy);
+    } else if (id.startsWith("conjure_")) {
       for (const [dx, dy] of AROUND) {
         const x = unit.tx + dx,
           y = unit.ty + dy;

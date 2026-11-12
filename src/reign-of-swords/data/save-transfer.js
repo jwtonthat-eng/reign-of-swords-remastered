@@ -6,7 +6,7 @@
    Pure functions only; the save hook (ui/shell/useCampaignSave.js) applies the result.
    ============================================================ */
 
-import { ALL_TYPES, EP2_ORDER, COLLECTIBLES } from "./shell-data.js";
+import { ALL_TYPES, EP2_ORDER, BONUS_ORDER, COLLECTIBLES, MAX_HELD } from "./shell-data.js";
 
 export const TRANSFER_KIND = "reign-of-swords-army";
 export const TRANSFER_VERSION = 1;
@@ -95,4 +95,28 @@ export function applyTransfer(prev, incoming) {
     }
   }
   return { stored: { units: { ...incoming.units }, granted }, addSpoils: add };
+}
+
+// ---- RESUME EPISODE II (ours — ⚙ Settings, Episode II only) -------------------------------------------------------
+// The other use of an army file: an EPISODE II army read back into Episode II as it stands — every unit and
+// collectible, no transfer limits — so a finished campaign can be picked up again (on another device, or after a
+// reset) at the gates of the bonus campaigns. The save hook marks Episode II's battles won alongside it.
+export function readResume(data) {
+  if (!data || data.kind !== TRANSFER_KIND || typeof data.army !== "object" || data.army === null)
+    throw new Error("This is not a Reign of Swords army file.");
+  if (data.episode !== 2) throw new Error("This army is from Episode I — resuming needs an Episode II army file.");
+  const count = (raw) => Math.min(MAX_HELD, Math.max(0, Math.floor(Number(raw) || 0)));
+  const units = {},
+    spoils = {};
+  for (const k of [...ALL_TYPES, ...EP2_ORDER, ...BONUS_ORDER])
+    if (!SUMMONED.has(k) && count(data.army[k]) > 0) units[k] = count(data.army[k]);
+  for (const { id } of COLLECTIBLES) if (count((data.spoils || {})[id]) > 0) spoils[id] = count(data.spoils[id]);
+  return { units, spoils };
+}
+// The camp changes (upDelta) that make the army exactly `units`, given the unit rewards of the battles marked won.
+export function resumeDelta(units, earned) {
+  const delta = {};
+  for (const k of new Set([...Object.keys(units), ...Object.keys(earned)]))
+    if ((units[k] || 0) !== (earned[k] || 0)) delta[k] = (units[k] || 0) - (earned[k] || 0);
+  return delta;
 }
