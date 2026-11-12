@@ -271,7 +271,9 @@ export class LoopMethods {
       const done = a.done,
         mover = a.u;
       if (mover.T.mountedArcher) mover.attackedTurn = true; // Unit::doFinishMoving @0x773a0: a Horse Bowmen ride counts as its attack (Unit+0x113)
-      if ((mover.ambush || mover.T.ambush) && this._canHide(mover)) this._setHidden(mover, true); // doFinishMoving: an Ambush unit hides on cover
+      // doFinishMoving: an Ambush unit hides on cover (BONUS: and any unit under a Giant Fern Canopy)
+      if ((mover.ambush || mover.T.ambush || this._underFern(mover)) && this._canHide(mover))
+        this._setHidden(mover, true);
       const finish = () => {
         this.scenario.onTileReached(mover); // TILE-REACHED triggers + escort delivery
         this._leashHint(mover); // Leashing warning (help 592)
@@ -280,7 +282,7 @@ export class LoopMethods {
       };
       this.anim = null;
       this._quicksandEnter(mover); // stepped into quicksand: stopped there, 5 damage
-      this._hazardEnter(mover); // BONUS: stepped on enemy caltrops: stopped there, 10 damage
+      this._hazardEnter(mover, a.path); // BONUS: enemy caltrops, and the bonus tiles (coral, tar, black ice …)
       if (this._bumpAmbush(mover, finish)) return;
       // EPISODE II warp portals: a move that ENDS on a usable portal pad warps the unit out beside the exit pad
       // (engine/grid _portalWarp, per Unit::onTick / getPortalOutput); the after-move step runs once it has landed.

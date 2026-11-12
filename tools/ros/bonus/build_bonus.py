@@ -146,6 +146,17 @@ THEMES = {
         "cabin": [249],
     },
 }
+# THE BONUS TILES (import_tiles.py): nineteen kinds of ground of our own, after Episode II's 260 tiles. They carry
+# their own art whatever the theme, so a letter is a tile:
+#   > < A V conveyor belt east / west / north / south   v vent grate   M abyssal muck   C thermal chimney
+#   t tar pit   e giant fern canopy   i black ice   R runic monolith   q quicksand sinkhole   g mirage sand
+#   a altar steps   J overgrown jungle ruins   k razor coral   Q cenote   * astral glyph   n chinampa
+#   ! obsidian spikes   B bamboo thicket   z zen sand garden
+BONUS_TILES = {
+    "A": 260, ">": 261, "V": 262, "<": 263, "v": 264, "M": 265, "C": 266, "t": 267, "e": 268, "i": 269, "R": 270,
+    "q": 271, "g": 272, "a": 273, "J": 274, "k": 276, "Q": 277, "*": 278, "n": 279, "!": 280, "B": 281, "z": 283,
+}
+RUINS_TYPE = 41  # impassable until it is brought down: the checks below count it as a way through
 WATERISH = (19, 20, 5)
 DIRS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # N E S W  -> mask bits 1 2 4 8
 
@@ -201,7 +212,7 @@ def compile_terrain(theme_name, grid, seed):
         for x in range(cols):
             ch = grid[y][x]
             if ch in "~-^" or (ch == "=" and theme["road"] is None):
-                same = {"~": "~-bmc", "-": "~-bmc", "^": "^", "=": "=bG_"}[ch]
+                same = {"~": "~-bmckQM", "-": "~-bmckQM", "^": "^", "=": "=bG_"}[ch]  # (coral, a cenote and muck are wet)
                 mask = 0
                 for i, (dx, dy) in enumerate(DIRS):
                     n = at(x + dx, y + dy)
@@ -255,6 +266,9 @@ def compile_terrain(theme_name, grid, seed):
                     "m": "mast",
                     "c": "cabin",
                 }.get(ch)
+                if key is None and ch in BONUS_TILES:
+                    out.append(BONUS_TILES[ch])
+                    continue
                 if key is None:
                     raise ValueError("unknown terrain %r at %d,%d" % (ch, x, y))
                 out.append(pick(key))
@@ -591,7 +605,7 @@ class Level:
                 if not (0 <= nx < cols and 0 <= ny < rows) or (nx, ny) in reach:
                     continue
                 there = TYPES[tiles[ny * cols + nx]]
-                if self.cost(tiles[ny * cols + nx], move_class) >= 99:
+                if self.cost(tiles[ny * cols + nx], move_class) >= 99 and there != RUINS_TYPE:
                     continue
                 if here != there:  # Map::isMoveAllowed: battlements are walked from inside
                     if there in LINKS and here not in LINKS[there]:

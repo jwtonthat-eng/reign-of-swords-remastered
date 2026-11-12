@@ -29,6 +29,7 @@ import { OnlineMethods } from "./online.js";
 import { LoopMethods } from "./loop.js";
 import { ScenarioRunner } from "./script.js";
 import { AbilityMethods } from "../rules/abilities.js";
+import { TileMethods } from "../rules/tiles.js";
 import { DebugMethods } from "./debug.js";
 import { BONUS_ALL, BONUS_SUMMONS, BONUS_FORMS } from "../data/bonus-units.js";
 import { UNIT_TYPES, TINCTURE_RGB, FX_TYPES, DEPLOY_COST, UNIT_RAMPS } from "../data/game-data.js";
@@ -758,6 +759,7 @@ class Game {
     for (const u of this.units) {
       if (u.dead || u.team !== team || (only && !only(u))) continue;
       this._turnStartAilments(u); // BONUS: acid, an Efreet's Burning Aura
+      this._tileTurnStart(u); // BONUS: a Thermal Chimney burns, a Runic Monolith mends, a sinkhole holds
       if (u.dead) continue;
       // BONUS: Spellwardens mend themselves (T.regen) at the same moment, on top of anything the ground heals
       const ground = this.terrainAt(u.tx, u.ty);
@@ -1248,6 +1250,7 @@ const MIXINS = {
   DebugMethods, // engine/debug.js — bug-report snapshots
   CombatMethods, // rules/combat.js — damage, counters, charges, projectiles, spells
   AbilityMethods, // rules/abilities.js — Episode II skills, Spirit Shroud, leashing
+  TileMethods, // rules/tiles.js — the bonus terrain tiles (ours)
 };
 mixInto(Game, MIXINS);
 export { Game, mixInto }; // the engine class itself — the unit tests build battles with it (src/reign-of-swords/__tests__)

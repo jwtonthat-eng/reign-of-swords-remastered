@@ -1125,8 +1125,9 @@ export class AiMethods {
     const movedHere = !atStart || this.game._movedThisTurn(u);
     return enemies.filter((e) => {
       const dist = manhattan(e, spot);
+      if (dist > 1 && this.game._shotBlocked(u, spot.tx, spot.ty, e.tx, e.ty)) return false; // BONUS: a Vent Grate's steam
       return (
-        (this.game._inWeaponRange(u, dist, movedHere) && !this.game._weaponUselessVs(u, e, dist)) ||
+        (this.game._inWeaponRange(u, dist, movedHere, spot.tx, spot.ty) && !this.game._weaponUselessVs(u, e, dist)) ||
         this.game._chargeReaches(u, spot.tx, spot.ty, e)
       );
     });
@@ -1155,7 +1156,8 @@ export class AiMethods {
     }
     // an ordinary attack: the foe in the weapon's reach from that tile (Move or Shoot weapons are out once moved)
     const movedHere = !atStart || this.game._movedThisTurn(u);
-    if (!this.game._inWeaponRange(u, dToE, movedHere) || this.game._weaponUselessVs(u, e, dToE)) return null;
+    if (!this.game._inWeaponRange(u, dToE, movedHere, spot.tx, spot.ty) || this.game._weaponUselessVs(u, e, dToE))
+      return null;
     const ratio = this._aiDamageRatio(u, spot, e, false);
     if (ratio <= -3000) return null;
     let score = SCORE.ATTACK + ratio * 100;

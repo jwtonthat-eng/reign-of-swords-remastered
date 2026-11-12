@@ -35,7 +35,17 @@ import {
   CARGO,
   HEAVY_ARMOUR,
 } from "../data/bonus-units.js";
-import { isQuicksandTile, isBuildableType, structTrans, structPre, structArmor, moveRow, moveType } from "./terrain.js";
+import {
+  isQuicksandTile,
+  isBuildableType,
+  structTrans,
+  structPre,
+  structArmor,
+  structSoft,
+  moveRow,
+  moveType,
+} from "./terrain.js";
+import { TILE_RULE } from "./tiles.js";
 
 // Which weapon a unit swings at a target `dist` tiles away. A unit can carry two
 // weapons (an[0]/an[1]); the game picks whichever's real range band contains the
@@ -192,6 +202,7 @@ export class CombatMethods {
   // 4 = Mission+0xd0 << 1 lasts 4 rounds). It deals NO damage — quicksand hurts only a unit that walks into it
   // (_quicksandEnter); a unit already standing in it (caught by the cast) is not hurt and walks out freely.
   _quicksandTurn() {
+    this._conveyorTurn(); // BONUS: the round's end is also when the Conveyor Belts carry what stands on them
     if (!this.quicksand || !this.quicksand.size) return;
     for (const [k, turnsLeft] of [...this.quicksand]) {
       if (turnsLeft <= 1) this.quicksand.delete(k);
@@ -386,6 +397,8 @@ export class CombatMethods {
     if (weapon === CHAIN_WEAPON) base += CHAIN_BONUS; // BONUS: the Battlemage's bolt, and each of its leaps
     // BONUS (Samurai): +10 on the cell of every blow it deals, −10 on every blow it takes (never below 1)
     base = Math.max(1, base + (attacker.T.dmgBonus || 0) - (exposed ? 0 : defender.T.armourBonus || 0));
+    // BONUS: armour the Obsidian Spikes shattered lets every blow but magic land harder
+    if (defender._shattered && !MAGIC_WEAPONS.includes(weapon)) base += TILE_RULE.shattered;
     // BONUS — Breach (Marines): the cover of a fortification (palisade, rampart, gate, tower, wall — terrain types
     // 6, 8, 10, 12, 14, 16) counts for nothing against them
     const fortified =
@@ -404,6 +417,9 @@ export class CombatMethods {
     if (dist > 1) {
       // Map::isUnitShielded — a Priest's Shield; BONUS: a planted Pavise halves a shot the same way (they don't stack)
       if (this._shielded(defender) || this._pavised(defender, attacker)) dmg = Math.trunc(dmg / 2);
+      // BONUS: the tile a shot lands on (Mirage Sand, bamboo and a chimney turn part of it; muck and a glyph do not)
+      const share = this._tileShotShare(defender);
+      if (share !== 100) dmg = Math.trunc((dmg * share) / 100);
     } else if (this._siegeArmored(defender))
       dmg = Math.trunc((dmg * 8) / 10); // Map::isSiegedAmor (Ep2)
     else if (this._planted(defender)) dmg = Math.trunc((dmg * 3) / 4); // BONUS: a planted pavise is a wall in melee too
@@ -484,6 +500,7 @@ export class CombatMethods {
   // What a unit's fall sets off: its killer's Apex Roar, and a Volatile Automaton's boiler.
   _onFall(u, killer) {
     if (killer && !killer.dead && killer.T && killer.T.apexRoar && killer.team !== u.team) this._apexRoar(killer);
+    this._altarTithe(u, killer); // BONUS: the Sacrificial Altar Steps heal whoever struck it down on them
     if (u.T.volatile && !u._burst) this._volatileBurst(u);
   }
   // APEX ROAR: every friend within 2 tiles of the killer gains its roar on the attack rating until the end of its
@@ -572,14 +589,16 @@ export class CombatMethods {
     const team = this._caltropsAt(tx, ty);
     return !!team && team !== u.team && u.T.al !== 0 && !u.T.fly;
   }
-  // The end of a move, for the hazards a unit walks into: enemy caltrops.
-  _hazardEnter(u) {
+  // The end of a move (`path` = the tiles walked, or none for a blink, a drag, a throw), for what a unit walks
+  // into: enemy caltrops, and the bonus terrain tiles (rules/tiles _tileEnter).
+  _hazardEnter(u, path) {
     if (!u || u.dead) return;
     if (this._caltropsAgainst(u, u.tx, u.ty)) {
       this._commitMove(u); // stepped on caltrops: no undo
       this.spawnFx("slash", u.px + this.tile / 2, u.py + this.tile * 0.42, {});
       this._rawDamage(u, CALTROP_DAMAGE, null);
     }
+    this._tileEnter(u, path);
   }
   // What the three factions' blows do besides their damage (resolveDamage, after the main hit).
   _factionStrike(attacker, defender, wMain, opts) {
@@ -1018,6 +1037,18 @@ export class CombatMethods {
         name: "On caltrops",
         desc: "Enemy caltrops lie here. They hurt as it stepped on them; it can walk off, or spend its action to clear them.",
       });
+    if (u._sunk)
+      out.push({
+        icon: "skill_quicksand",
+        name: "In a sinkhole",
+        desc: "This turn it can only climb out, to a tile beside it, and cannot attack.",
+      });
+    if (u._shattered)
+      out.push({
+        icon: "status_shroud",
+        name: "Armour shattered",
+        desc: "Obsidian Spikes broke its heavy armour: every blow at it lands 10 harder for the rest of the battle. A Zen Sand Garden mends it.",
+      });
     if (u._roar)
       out.push({
         icon: "status_rally",
@@ -1309,9 +1340,12 @@ export class CombatMethods {
   _castRange(u) {
     if (u.T.canLightning) {
       const spell = this._spellDisplay(u);
-      return [spell.min, spell.max];
+      return [spell.min, spell.max + this._tileRangeBonus(u.tx, u.ty)]; // (BONUS: an Astral Glyph lengthens it)
     }
-    if (this._freeAim(u)) return this._shotRange(u);
+    if (this._freeAim(u)) {
+      const [min, max] = this._shotRange(u);
+      return [min, max + this._tileRangeBonus(u.tx, u.ty)]; // (BONUS: an Astral Glyph lengthens it)
+    }
     return [u.T.minRange || 1, u.T.range];
   }
   _castGroundAoe(attacker, tx, ty) {
@@ -1698,12 +1732,19 @@ export class CombatMethods {
             this._applyHit(e, attacker, shared(this.computeDamage(attacker, e), 0.5), false, false, wMain);
       // BONUS: Gale — the Tengu's foe is thrown one tile straight back (so it is out of reach to strike back), unless
       // it is a war engine or the tile behind is taken or no ground it could stand on
-      if (attacker.T.gale && !defender.dead && defender.T.al !== 4 && !defender.T.bulwark && !defender.T.anchored) {
+      if (
+        attacker.T.gale &&
+        !defender.dead &&
+        defender.T.al !== 4 &&
+        !defender.T.bulwark &&
+        !this._unmovable(defender)
+      ) {
         const bx = defender.tx * 2 - attacker.tx,
           by = defender.ty * 2 - attacker.ty;
         if (this.inBounds(bx, by) && !this.unitAt(bx, by) && this.moveCost(defender, bx, by) < 99) {
           Object.assign(defender, { tx: bx, ty: by, px: bx * this.tile, py: by * this.tile });
           this.spawnFx("sand_puff", bx * this.tile + this.tile / 2, by * this.tile + this.tile * 0.5, {});
+          this._hazardEnter(defender, null); // BONUS: what it was thrown onto
         }
       }
     }
@@ -2400,7 +2441,9 @@ export class CombatMethods {
       nextTile = structTrans(tileVal),
       armor = structArmor(tileVal);
     const weaponId = weapon != null ? weapon : weaponAt(u, manhattan(u, { tx, ty }));
-    const col = (WEAPON_DMG[weaponId] && WEAPON_DMG[weaponId][armor]) || 0;
+    if (isFireWeapon(weaponId) && this._bambooBurn(tx, ty)) return true; // BONUS: fire takes a Bamboo Thicket
+    // (BONUS: the Overgrown Jungle Ruins give way to any weapon — structSoft)
+    const col = Math.max((WEAPON_DMG[weaponId] && WEAPON_DMG[weaponId][armor]) || 0, structSoft(tileVal));
     let a = Math.floor((col * 256) / 100);
     if (share !== 1) a = (a * Math.floor(share * 256)) >> 8; // the cell's blast share (pct*256/100), above 100% too (Detonate 125)
     const skill = Math.floor((((u.T.rf || 75) + this.ratingAura(u)) * 256) / 100);

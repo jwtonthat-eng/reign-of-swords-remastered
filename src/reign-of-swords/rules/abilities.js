@@ -20,6 +20,7 @@ import { manhattan } from "../util/util.js";
 import { moveType } from "./terrain.js";
 import { UNIT_TYPES } from "../data/game-data.js";
 import { OVERDRIVE_COST } from "../data/bonus-units.js";
+import { TILE } from "./tiles.js";
 
 // the tiles a Pterosaur can lift as loose boulders, and the open sand they leave
 const BOULDER_TILES = [136, 137],
@@ -215,6 +216,23 @@ export const AbilityMethods = {
             : "Nothing to lift here: it needs caltrops, quicksand, a Flooded tile or loose boulders under or beside it.",
       });
     }
+    // Dive (a Cenote): any ground unit standing in one, while another is free
+    if (this._tileKind(unit.tx, unit.ty) === TILE.CENOTE && this._grounded(unit)) {
+      const exits = this._cenoteExits(unit).length;
+      out.push({
+        id: "dive",
+        name: "Dive",
+        icon: "skill_amphibious",
+        min: 1,
+        max: 99,
+        disabled: !exits,
+        desc: exits
+          ? "Dive and come up in any other cenote that is free. It is the rest of its move for the turn; it can still attack where it surfaces."
+          : unit._dived === this.turn
+            ? "It has dived once this turn."
+            : "Every other cenote is taken.",
+      });
+    }
     // Clear Caltrops: any ground unit standing on or beside the enemy's
     if (this._caltropsNear(unit).length)
       out.push({
@@ -325,6 +343,10 @@ export const AbilityMethods = {
         this._castAnim(sel, foe, () => this._lure(sel, foe), "shroud");
         return true;
       }
+    }
+    if (id === "dive" && this._cenoteExits(sel).some((c) => c.x === tx && c.y === ty)) {
+      this._castDive(sel, tx, ty);
+      return true;
     }
     if (id === "harvest" && this._harvestable(sel, tx, ty)) {
       this._castAnim(
@@ -637,6 +659,8 @@ export const AbilityMethods = {
           push(e.tx, e.ty);
     } else if (id === "lure") {
       for (const e of this.units) if (this._lureTarget(unit, e)) push(e.tx, e.ty);
+    } else if (id === "dive") {
+      for (const c of this._cenoteExits(unit)) push(c.x, c.y);
     } else if (id === "harvest") {
       for (const [dx, dy] of [[0, 0], ...ORTHO])
         if (this._harvestable(unit, unit.tx + dx, unit.ty + dy)) push(unit.tx + dx, unit.ty + dy);
@@ -669,7 +693,7 @@ export const AbilityMethods = {
   // (quicksand, caltrops).
   _lureTarget(u, foe) {
     if (!u.T.lure || !foe || foe.dead || foe.team === u.team || this._isHidden(foe)) return false;
-    if (foe.T.al === 4 || foe.T.anchored) return false;
+    if (foe.T.al === 4 || this._unmovable(foe)) return false; // (the Immovable, and a unit in a Zen Sand Garden)
     const dist = Math.abs(foe.tx - u.tx) + Math.abs(foe.ty - u.ty);
     return dist >= 2 && dist <= u.T.lure;
   },
@@ -708,7 +732,7 @@ export const AbilityMethods = {
       if (foe.T.pavise) foe.planted = false; // a dragged pavise is not planted
       foe.walled = false;
       this._quicksandEnter(foe);
-      this._hazardEnter(foe);
+      this._hazardEnter(foe, null);
     }
     this._snare(foe);
   },

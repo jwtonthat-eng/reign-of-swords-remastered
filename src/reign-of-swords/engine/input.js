@@ -12,6 +12,7 @@
 import { key, manhattan, FAR } from "../util/util.js";
 import { tr } from "../i18n/i18n.js";
 import { tileName, moveType, moveRow } from "../rules/terrain.js";
+import { TILE_HELP } from "../rules/tiles.js";
 
 export class InputMethods {
   // --- input: tap to act, drag to pan ---
@@ -232,6 +233,11 @@ export class InputMethods {
     const dist = Math.abs(tx - sel.tx) + Math.abs(ty - sel.ty);
     this.aimMode = false;
     if (!sel.acted && dist >= mn && dist <= mx && this.inBounds(tx, ty)) {
+      if (this._shotBlocked(sel, sel.tx, sel.ty, tx, ty)) {
+        this.notify("The steam of a vent hides that tile."); // BONUS: a Vent Grate
+        this._emit();
+        return;
+      }
       this._castGroundAoe(sel, tx, ty);
       return;
     }
@@ -474,6 +480,8 @@ export class InputMethods {
         name: "Flooded",
         desc: "A Brine Hurler's coral flooded this tile for the rest of the battle: ground units pay double to enter and take 20% more damage here. The Trench Brood and fliers are not troubled.",
       });
+    const help = TILE_HELP[this._tileKind(tx, ty)];
+    if (help) out.push({ icon: "status_rally", name: tileName(this.tileAt(tx, ty)), desc: help });
     const team = this._caltropsAt(tx, ty);
     if (team)
       out.push({
@@ -1017,7 +1025,7 @@ export class InputMethods {
           this._leashHint(u);
           done && done();
         };
-        this._hazardEnter(u); // BONUS: a blink onto enemy caltrops
+        this._hazardEnter(u, null); // BONUS: a blink onto enemy caltrops or a bonus tile
         if (!this._portalWarp(u, finish)) finish();
         this._emit();
       });

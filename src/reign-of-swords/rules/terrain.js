@@ -100,7 +100,10 @@ const TILE_NAME = {
 };
 export function tileName(tileVal) {
   const typeIdx = MOVE && MOVE.types ? MOVE.types[tileVal] : null;
-  if (typeIdx != null && typeIdx >= 0) return TILE_NAME[tileVal] || TYPE_NAME[typeIdx] || null;
+  // (BONUS: the bonus tiles' names travel with their table — movement.json names / tileNames, import_tiles.py)
+  if (MOVE && MOVE.tileNames && MOVE.tileNames[tileVal]) return MOVE.tileNames[tileVal];
+  if (typeIdx != null && typeIdx >= 0)
+    return TILE_NAME[tileVal] || TYPE_NAME[typeIdx] || (MOVE.names && MOVE.names[typeIdx]) || null;
   return null;
 }
 
@@ -170,6 +173,10 @@ export function structPre(tileVal) {
 }
 export function structArmor(tileVal) {
   return (STRUCT && STRUCT.armor[tileVal]) || 0;
+}
+// BONUS: the least any weapon does to a structure (the Overgrown Jungle Ruins fall to a sword as to a catapult).
+export function structSoft(tileVal) {
+  return (STRUCT && STRUCT.soft && STRUCT.soft[tileVal]) || 0;
 }
 // The props of a structure knocked down to its end tile (used only for cells razed DURING the battle).
 export function rubbleProp(tileVal) {

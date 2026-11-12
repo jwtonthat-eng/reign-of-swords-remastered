@@ -1462,6 +1462,7 @@ export default {
   Pearl: "Жемчужина Бездны",
   Mainspring: "Заводная пружина",
   Amber: "Янтарь",
+  "The steam of a vent hides that tile.": "Пар из решётки скрывает эту клетку.",
   Slowed: "Замедлен",
   "An Ice Field cuts its movement to three quarters until the end of its next turn.":
     "Ледяное поле сокращает его движение до трёх четвертей до конца его следующего хода.",
