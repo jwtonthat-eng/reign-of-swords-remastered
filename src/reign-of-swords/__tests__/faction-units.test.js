@@ -134,6 +134,8 @@ describe("the Trench Brood", () => {
     g.click({ tx: foe.tx, ty: foe.ty });
     settle(g);
     expect([foe.tx, foe.ty, foe.hp, g.moveOf(foe), siren.acted]).toEqual([6, 5, 100, 0, true]);
+    // up close she fights with a plain Spear (the original weapon), as the Footmen do
+    expect([UNIT_TYPES.siren.weapon, UNIT_TYPES.siren.weaponName, UNIT_TYPES.siren.range]).toEqual([3, "Spear", 1]);
   });
   it("Lure: whatever stands in the way stops the drag, and a foe beside her is out of her reach", () => {
     const g = field();

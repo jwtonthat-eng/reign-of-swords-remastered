@@ -467,13 +467,6 @@ export const BONUS_WEAPONS = {
     tags: [],
     desc: "A Crusher Claw delivers decent damage against all but the heaviest armor, and does not let go.",
   },
-  90: {
-    name: "Coral Trident",
-    row: 3, // Spear
-    range: [1, 1],
-    tags: [],
-    desc: "A Coral Trident delivers decent damage against all but the heaviest armor: it is for whatever her song has brought within reach.",
-  },
   91: {
     name: "Toxic Coral",
     row: 20, // Rock
@@ -1149,7 +1142,7 @@ export const BONUS_COMBAT = {
   },
   siren: {
     move: 5,
-    weapon: 90,
+    weapon: 3, // the original Spear
     weapon2: 0,
     armour: 9,
     rating: 4,
@@ -2810,8 +2803,8 @@ export const BONUS_META = {
   },
   siren: {
     role: "Deep Singer",
-    kit: "⚔ Lure / Coral Trident · 🛡 Holy Vestment",
-    note: "A caster of the drowned temples whose song does no harm. It drags a foe 2 tiles out of its line, into the open or into whatever the Brood has made of the ground, and leaves it Snared there, within reach of her trident.",
+    kit: "⚔ Lure / Spear · 🛡 Holy Vestment",
+    note: "A caster of the drowned temples whose song does no harm. It drags a foe 2 tiles out of its line, into the open or into whatever the Brood has made of the ground, and leaves it Snared there, within reach of her spear.",
   },
   brinehurler: {
     role: "Coral Artillery",

@@ -882,7 +882,7 @@ those choices are marked.
   | Unit | Move | Weapon (row) | Armour column | Rating | Cost | Abilities |
   |---|---|---|---|---|---|---|
   | Carapace Scuttler | 3, skirmish | Crusher Claw (Spear) | Heavy & Shield, shown as Carapace | 3 | 225 | Carapace, Amphibious, Crush Depth |
-  | Siren Channeler | 5, skirmish | Coral Trident (Spear) | Holy Vestment | 4 | 225 | Lure, Wayfinder, Crush Depth |
+  | Siren Channeler | 5, skirmish | Spear (the original) | Holy Vestment | 4 | 225 | Lure, Wayfinder, Crush Depth |
   | Brine Hurler | 4, formation | Toxic Coral 3-7 (Rock), Short Sword | Breastplate | 3 | 250 | Flooded Ground, Move or Shoot, Crush Depth |
   | Trench Behemoth | 4, formation | Sweeping Bite (Halberd) | Heavy (-10 taken), shown as Shark Hide | 5 | 500, elite | Sweeping Bite, Immovable, Lurker of the Deep, Fear, Crush Depth |
   | Brass Phalanx | 3, formation | Piston Mace (Sword) | Heavy & Shield | 4 | 225 | Shield Lock, Formation, Overdrive |
@@ -903,9 +903,9 @@ those choices are marked.
   - *Lure* (Siren): a skill in place of her attack, at 2-4 tiles on a visible foe. The foe is dragged up to 2 tiles
     towards her — a step at a time along the longer side of the gap first, onto ground it could stand on, stopping at
     anything in the way — and is Snared. No damage. What it is dragged onto does its work (quicksand, caltrops, the
-    tiles below). The design gave her no attack at all; she carries a Coral Trident so that a squad of Sirens can
+    tiles below). The design gave her no attack at all; she carries a Spear (user decision) so that a squad of Sirens can
     finish what it drags in (in the arena a Siren with no weapon lost to the Dune Sirens she is made from). The
-    computer sings when her trident can reach nobody this turn.
+    computer sings when her spear can reach nobody this turn.
   - *Flooded Ground* (Brine Hurler): the tile its coral lands on — under a foe or on empty ground — is Flooded for
     the rest of the battle: ground units not of the Trench pay double to enter it and take 20% more damage on it.
     Not on deep water or cliffs.
