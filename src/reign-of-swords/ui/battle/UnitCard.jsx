@@ -19,14 +19,28 @@ export default function UnitCard({ state, ctrl }) {
         : "";
   useEffect(() => setOpen(false), [key, state.aimActive, state.phase]);
   return (
+    <CardFrame shown={!!key} open={open} setOpen={setOpen}>
+      {state.selected ? (
+        <SelectedUnit u={state.selected} state={state} ctrl={ctrl} />
+      ) : state.inspect ? (
+        <InspectedUnit u={state.inspect} />
+      ) : state.tileInfo ? (
+        <TerrainInfo tile={state.tileInfo} />
+      ) : (
+        <div className="ros-uc-empty">{emptyPrompt(state)}</div>
+      )}
+    </CardFrame>
+  );
+}
+
+// The frame a readout sits in: the card, and on phones the ⓘ that opens it as a sheet. `shown` = it holds a unit or
+// a tile (not the empty prompt).
+function CardFrame({ shown, open, setOpen, children }) {
+  return (
     <div className="ros-uc-slot">
       {open && <div className="ros-uc-scrim" onClick={() => setOpen(false)} />}
-      <div
-        className={
-          "ros-unitcard" + (state.selected || state.inspect || state.tileInfo ? "" : " empty") + (open ? " open" : "")
-        }
-      >
-        {key && (
+      <div className={"ros-unitcard" + (shown ? "" : " empty") + (open ? " open" : "")}>
+        {shown && (
           <button
             className="ros-uc-more"
             onClick={() => setOpen((o) => !o)}
@@ -37,17 +51,47 @@ export default function UnitCard({ state, ctrl }) {
             {open ? "✕" : "ⓘ"}
           </button>
         )}
-        {state.selected ? (
-          <SelectedUnit u={state.selected} state={state} ctrl={ctrl} />
-        ) : state.inspect ? (
-          <InspectedUnit u={state.inspect} />
-        ) : state.tileInfo ? (
-          <TerrainInfo tile={state.tileInfo} />
-        ) : (
-          <div className="ros-uc-empty">{emptyPrompt(state)}</div>
-        )}
+        {children}
       </div>
     </div>
+  );
+}
+
+// THE MUSTER'S READOUT (ours): the unit type picked in the deployment tray, read from the unit table — what a fresh
+// unit of it brings. The same head, stats, kit and skill chips as a unit's card in battle, without the HP it has
+// not lost yet. It takes the place of the deployment help under the tray while a unit is picked (ReignOfSwords.jsx).
+export function MusterCard({ type }) {
+  const [open, setOpen] = useState(false);
+  useEffect(() => setOpen(false), [type]);
+  const T = UNIT_TYPES[type];
+  if (!T) return null;
+  const u = {
+    type,
+    name: T.name,
+    kind: T.kind,
+    move: T.move,
+    atk: T.atk,
+    range: T.range,
+    minRange: T.minRange || 1,
+    weapon: T.weaponName || null,
+    weaponDesc: T.weaponDesc || null,
+    weapons: T.weaponSlots || null,
+    armour: T.armourName || null,
+  };
+  return (
+    <CardFrame shown open={open} setOpen={setOpen}>
+      <UnitHead u={u} role={tr(ROLE[u.kind] || u.kind)} />
+      <UnitStats u={u} />
+      <UnitKit u={u} />
+      <UnitChips unitKey={type} base={base} />
+      {T.ability ? (
+        <div className="ros-charge">
+          {abilIcon(T.ability) ? <SkIco n={abilIcon(T.ability)} /> : "✦"} {tr(T.ability)}
+        </div>
+      ) : descFor(u) ? (
+        <div className="ros-charge">{tr(descFor(u))}</div>
+      ) : null}
+    </CardFrame>
   );
 }
 
@@ -88,13 +132,18 @@ function UnitHead({ u, role }) {
 function UnitStats({ u }) {
   return (
     <div className="ros-uc-stats">
-      <span className="ros-hpbar">
-        <i style={{ width: u.hp + "%" }} />
-      </span>
-      <span className="ros-uc-stat">
-        {tr("HP")}
-        <b>{u.hp}</b>
-      </span>
+      {u.hp != null && (
+        // (a unit type in the muster has no HP to show: every unit takes the field at 100)
+        <>
+          <span className="ros-hpbar">
+            <i style={{ width: u.hp + "%" }} />
+          </span>
+          <span className="ros-uc-stat">
+            {tr("HP")}
+            <b>{u.hp}</b>
+          </span>
+        </>
+      )}
       <span className="ros-uc-stat">
         {tr("MOV")}
         <b>{u.move}</b>

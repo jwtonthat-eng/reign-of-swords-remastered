@@ -45,6 +45,13 @@
     max-height: 22vh;
     overflow: hidden auto;
   }
+  /* the muster's unit card (battle/UnitCard.jsx, MusterCard) stands where the deployment help does */
+  .ros.ros-battle > .ros-uc-slot {
+    grid-row: 3;
+    margin: 8px 0 0;
+    max-height: 34vh;
+    overflow: hidden auto;
+  }
   /* the frame's corner ornaments stay on the frame itself, and the game frame around the battle (.ros-shell)
      gives up its menu width so the battle can take the window */
   .ros.ros-battle > .ros-corner {

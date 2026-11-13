@@ -860,6 +860,11 @@ kept apart from the original data so that everything else stays checkable agains
   map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
   battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the
   muster roster) in a side column on the right. Phones keep their own layout.
+- **The muster shows the picked unit's stats** (ours; user decision). While a unit type is picked in the deployment
+  tray, the deployment help under the tray gives way to that unit's card: the readout a unit has in battle (movement,
+  attack, reach, every weapon with its range, armour, the skill chips, its trait) read from the unit table, without
+  HP — every unit takes the field at 100. On phones it is the same two-line strip, with ⓘ for the full card. The
+  deployment drill keeps its tips instead.
 
 ### The three factions and the bonus terrain tiles (Episode II only)
 
