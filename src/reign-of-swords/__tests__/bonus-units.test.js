@@ -208,16 +208,15 @@ describe("bonus units: upgrade paths", () => {
       expect(upgradeGate(to, false)).toBeNull();
     }
   });
-  it("the branches are offered only in Episode II, and only once the bonus campaigns are open", () => {
+  it("the branches are offered only in Episode II, where the bonus campaigns are open from the start", () => {
     const branch = UNIT_META.archers.upgrades.find((b) => b.to === "cragsmen");
     expect(upgradeOffered(branch, false, false)).toBe(false);
     expect(upgradeOffered(branch, true, false)).toBe(false);
     expect(upgradeOffered(branch, true, true)).toBe(true);
     const original = UNIT_META.archers.upgrades.find((b) => b.to === "crossbowmen");
     expect(upgradeOffered(original, false)).toBe(true);
-    expect(bonusOpen(true, new Set([5431]))).toBe(false);
-    expect(bonusOpen(true, new Set([5432]))).toBe(true);
-    expect(bonusOpen(false, new Set([5432]))).toBe(false);
+    expect(bonusOpen(true)).toBe(true);
+    expect(bonusOpen(false)).toBe(false);
   });
 });
 

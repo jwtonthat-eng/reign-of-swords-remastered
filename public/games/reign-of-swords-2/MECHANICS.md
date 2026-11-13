@@ -640,12 +640,20 @@ kept apart from the original data so that everything else stays checkable agains
 - **Story.** They follow Episode II's last line (the letters naming Tilicia, Isoluccia and the "Battlemage"). The
   maps reuse the Episode II tileset, the speakers reuse its portraits, and every battle runs on the original scenario
   script (round, kill, tile, escape and escort triggers), with no new script commands.
-- **Opening.** The kingdoms appear on the Episode II world map, marked "Bonus campaign", once Oasis Standoff is won.
-  Tilicia opens first, then Isoluccia, then Mare Nostra (the five ship battles first built as "the Mirror Sea";
-  renamed by user decision, its marker in Mare Nostra); Satoshi (the top-right corner) and the Mirror Sea (a second
-  naval campaign, its marker on the northern sea under the map's own "Mirror Sea" label) both open after Mare Nostra. Until then nothing of them shows: not the kingdoms, the units, their
-  Field Manual entries or their upgrade branches. Episode I never has them, and no bonus unit appears in an original
-  battle, raid or battlefield.
+- **Opening, and the army a save begins with** (user decisions; this replaces the opening order the regions were
+  built with). Every bonus region is on the Episode II world map, marked "Bonus campaign", from a save's first day,
+  and every battle and raid in a bonus region can be fought at once, in any order (`kingdomUnlocked`,
+  `missionUnlocked` and `raidUnlocked` in `data/campaign-rules.js` answer yes for a kingdom marked `bonus`; the
+  `unlockAfter` in their data is no longer read). The original kingdoms keep the original order, and an upgrade still
+  waits for the battle that opens it. The units, their Field Manual entries, their upgrade branches and the culture
+  tokens show from the start too (`bonusOpen`). An Episode II save also begins with a standing army
+  (`STARTER_ARMY_EP2` in `data/shell-data.js`): 50 Militiamen, 6 of every other original unit that deploys for under
+  300 points, 2 of every original unit at 300 or more, and 2 of each of the 49 bonus units — not the conjured units,
+  not the hidden four. It is part of every Episode II save's army, one begun before this change included, and it can
+  be mustered in the original campaign: nothing holds a bonus unit back from it any longer. Resuming from an army
+  file still leaves exactly the file's army. Episode I never has the bonus campaigns or their units, and begins with
+  nothing, as the original does. (Where this section says below that a region "opens after" another, or that the
+  tokens exist only once Episode II is won, read it as the order they were built in.)
 - **Twenty-four units** (and the Hounds and Imps two of them call), each on the damage row of an original weapon and an original armour column (§2), so the real
   weapon x armour table prices them:
 

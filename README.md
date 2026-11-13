@@ -46,7 +46,7 @@ It is a remake, not an exact copy.
 - **The original army.** Knights, Pikemen, Swordsmen, Archers, Crossbowmen, Musketeers, Rangers, Horse Bowmen,
   Griffon Riders, Wizards, Druids, Catapults, Trebuchets and Cannon — plus Episode II's Craftsmen, Ballistae,
   Conjurers, Sappers, Bodyguards, Dune Sirens and Blood Gorgers.
-- **Thirteen fan-made bonus campaigns** after Episode II, clearly marked as not part of the originals: Tilicia,
+- **Thirteen fan-made bonus campaigns** in Episode II, clearly marked as not part of the originals: Tilicia,
   Isoluccia, Mare Nostra and the Mirror Sea (ship-to-ship boarding battles), Satoshi, the jungles of Tezcal, Norse
   Jarnheim, Egyptian Khemret, Polynesian Moananui, the highlands of Coatlan, and three factions with ground of their
   own: the Trench Brood of Thalassar, the Clockwork Syndicate of Brasshaven and the Saurian Exiles of the Amber
@@ -54,6 +54,9 @@ It is a remake, not an exact copy.
   that pay for their upgrades; and nineteen new terrain tiles, from conveyor belts to black ice.
   `docs/images/all-units.png` shows every unit, `docs/images/bonus-tiles.png` the tiles; `docs/unit-balance.md` has
   the balance numbers.
+  They are open from the first day of an Episode II save, every battle in any order, and that save begins with a
+  standing army: 50 Militiamen, six of each original unit under 300 points, two of each dearer one and two of every
+  bonus unit. Episode I begins with nothing, as the original does.
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.
 - **Skirmishes and hot-seat** on any battlefield, for one player or two on one device.

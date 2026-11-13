@@ -11,7 +11,7 @@ import {
   saveProgress,
   jload,
   jsave,
-  STARTER_ARMY,
+  starterArmy,
   STARTER_SPOILS,
   COLLECTIBLES,
   MERCHANT_PRICE,
@@ -53,7 +53,7 @@ export function useCampaignSave({ isEp2, rewards, playSfx }) {
   // the losing army that are slain in battle are permanently lost" — so a mission's fixed force never joins the roster
   // and campaign / raid casualties are not permanent. Heroes stack like any unit (no one-Hero cap in the original).
   const armyOf = () => {
-    const parts = [STARTER_ARMY];
+    const parts = [starterArmy(isEp2)];
     for (const mapId of progress) {
       const reward = rewards[mapId];
       if (reward && reward.units) parts.push(reward.units);
@@ -149,7 +149,10 @@ export function useCampaignSave({ isEp2, rewards, playSfx }) {
   // file's exactly, replacing the save. Returns what was read; throws on a wrong file.
   const resumeEpisode = (data, won) => {
     const got = readResume(data);
-    const earned = combineCounts(...[...won].map((mapId) => (rewards[mapId] && rewards[mapId].units) || {}));
+    const earned = combineCounts(
+      starterArmy(isEp2), // (the file's army replaces the starting one as well)
+      ...[...won].map((mapId) => (rewards[mapId] && rewards[mapId].units) || {}),
+    );
     replaceProgress(new Set(won));
     setTransfer({ units: {}, granted: {} });
     setUpDelta(resumeDelta(got.units, earned));

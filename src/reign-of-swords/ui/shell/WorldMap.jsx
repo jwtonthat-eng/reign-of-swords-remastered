@@ -22,8 +22,8 @@ export default function WorldMap({
   return (
     <div className="ros-worldmap" style={{ backgroundImage: `url(${dataBase}worldmap.jpg)` }}>
       {camp.kingdoms.map((kingdom, kingdomIdx) => {
-        // the bonus kingdoms stay off the map until Episode II itself is finished
-        if (kingdom.bonus && !bonusOpen(isEp2, progress)) return null;
+        // the bonus kingdoms are Episode II's
+        if (kingdom.bonus && !bonusOpen(isEp2)) return null;
         const unlocked = kingdomUnlocked(camp, kingdomIdx, progress);
         const done = kingdom.missions.filter((m) => progress.has(m.mapId)).length;
         const complete = done === kingdom.missions.length;

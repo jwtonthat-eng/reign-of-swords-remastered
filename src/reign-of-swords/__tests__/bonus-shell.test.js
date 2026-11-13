@@ -11,8 +11,19 @@ import {
   kingdomRaids,
   progressBefore,
 } from "../data/campaign-rules.js";
-import { combineCounts, KINGDOM_POS_EP2, unlocksOf, ALL_TYPES, EP2_ORDER, BONUS_ORDER } from "../data/shell-data.js";
-import { isBonusMap } from "../data/bonus-units.js";
+import {
+  combineCounts,
+  KINGDOM_POS_EP2,
+  unlocksOf,
+  ALL_TYPES,
+  EP2_ORDER,
+  BONUS_ORDER,
+  STARTER_ARMY_EP2,
+  starterArmy,
+  ARMY_GROUPS,
+} from "../data/shell-data.js";
+import { isBonusMap, BONUS_HIDDEN } from "../data/bonus-units.js";
+import { DEPLOY_COST } from "../data/game-data.js";
 
 const dir = join(process.cwd(), "public/games/reign-of-swords-2");
 const json = (f) => JSON.parse(readFileSync(join(dir, f), "utf8"));
@@ -23,7 +34,33 @@ const campaign = json("campaign.json"),
 const camp = { ...campaign, kingdoms: [...campaign.kingdoms, ...bonus.kingdoms] };
 const original = { ...campaign };
 const idx = (id) => camp.kingdoms.findIndex((k) => k.id === id);
-const storyOf = (id) => camp.kingdoms[idx(id)].missions.map((m) => m.mapId);
+
+describe("the army an Episode II save begins with", () => {
+  it("is 50 Militiamen, six of each original unit under 300 points, two of each at 300 or more, two of every bonus unit", () => {
+    const army = starterArmy(true);
+    expect(army.militiamen).toBe(50);
+    for (const unit of [...ALL_TYPES, ...EP2_ORDER]) {
+      if (unit === "militiamen") continue;
+      const cost = DEPLOY_COST[unit];
+      expect(army[unit], unit).toBe(!cost ? undefined : cost < 300 ? 6 : 2); // (a conjured unit has no cost)
+    }
+    expect([army.footmen, army.archers, army.horsebowmen, army.dunesirens, army.bloodgorgers]).toEqual([6, 6, 6, 6, 6]);
+    expect([army.knights, army.catapult, army.king, army.wizards, army.craftsmen]).toEqual([2, 2, 2, 2, 2]);
+    expect([army.sapper, army.bodyguard]).toEqual([undefined, undefined]);
+    expect(BONUS_ORDER.length).toBe(49);
+    for (const unit of BONUS_ORDER) expect(army[unit], unit).toBe(2);
+    for (const unit of [...BONUS_HIDDEN, "hounds", "imp", "panther"]) expect(army[unit], unit).toBeUndefined();
+    expect(Object.keys(army).length).toBe(28 + 49);
+  });
+  it("every unit of it has a tile in the camp (the grid is drawn from the camp's groups)", () => {
+    const shown = ARMY_GROUPS.flatMap((group) => group.units);
+    for (const unit of Object.keys(starterArmy(true))) expect(shown, unit).toContain(unit);
+    expect(new Set(shown).size).toBe(shown.length);
+  });
+  it("Episode I still begins with nothing", () => {
+    expect(starterArmy(false)).toEqual({});
+  });
+});
 
 describe("bonus kingdoms on the campaign map", () => {
   it("are thirteen extra regions with their story battles and raids, each with a place on the Episode II map", () => {
@@ -69,61 +106,23 @@ describe("bonus kingdoms on the campaign map", () => {
     }
     expect(campaign.kingdoms.some((k) => k.bonus)).toBe(false); // the original campaign file is untouched
   });
-  it("Tilicia opens when Abbisin is complete, Isoluccia when Tilicia is", () => {
-    const beforeLast = new Set([...progressBefore(original, levels, -1)].filter((id) => id !== 5432));
-    expect(kingdomUnlocked(camp, idx("tilicia"), beforeLast)).toBe(false);
-    const done = progressBefore(original, levels, -1);
-    expect(kingdomUnlocked(camp, idx("tilicia"), done)).toBe(true);
-    expect(kingdomUnlocked(camp, idx("isoluccia"), done)).toBe(false);
-    expect(missionUnlocked(camp, idx("tilicia"), 0, done)).toBe(true);
-    expect(missionUnlocked(camp, idx("tilicia"), 1, done)).toBe(false);
-    const tiliciaDone = new Set([...done, ...storyOf("tilicia")]);
-    expect(kingdomUnlocked(camp, idx("isoluccia"), tiliciaDone)).toBe(true);
-    // …then Mare Nostra after Isoluccia, and both Satoshi and the Mirror Sea after Mare Nostra
-    expect(kingdomUnlocked(camp, idx("mare-nostra"), tiliciaDone)).toBe(false);
-    const isolucciaDone = new Set([...tiliciaDone, ...storyOf("isoluccia")]);
-    expect(kingdomUnlocked(camp, idx("mare-nostra"), isolucciaDone)).toBe(true);
-    expect(kingdomUnlocked(camp, idx("satoshi"), isolucciaDone)).toBe(false);
-    expect(kingdomUnlocked(camp, idx("mirror-sea"), isolucciaDone)).toBe(false);
-    const seaDone = new Set([...isolucciaDone, ...storyOf("mare-nostra")]);
-    expect(kingdomUnlocked(camp, idx("satoshi"), seaDone)).toBe(true);
-    expect(kingdomUnlocked(camp, idx("mirror-sea"), seaDone)).toBe(true);
-    // …and Tezcal after the Mirror Sea
-    expect(kingdomUnlocked(camp, idx("tezcal"), seaDone)).toBe(false);
-    const mirrorDone = new Set([...seaDone, ...storyOf("mirror-sea")]);
-    expect(kingdomUnlocked(camp, idx("tezcal"), mirrorDone)).toBe(true);
-  });
-  it("Jarnheim, Khemret, Moananui, Coatlan and the three factions' regions open with the bonus campaigns, beside Tilicia, and nothing waits on them", () => {
-    const beforeLast = new Set([...progressBefore(original, levels, -1)].filter((id) => id !== 5432));
-    const done = progressBefore(original, levels, -1);
-    for (const id of ["jarnheim", "khemret", "moananui", "coatlan", "thalassar", "brasshaven", "amber-reach"]) {
-      expect(camp.kingdoms[idx(id)].unlockAfter).toEqual(camp.kingdoms[idx("tilicia")].unlockAfter);
-      expect(kingdomUnlocked(camp, idx(id), beforeLast)).toBe(false);
-      expect(kingdomUnlocked(camp, idx(id), done)).toBe(true); // with no bonus battle fought yet
-      expect(missionUnlocked(camp, idx(id), 0, done)).toBe(true);
-      expect(missionUnlocked(camp, idx(id), 1, done)).toBe(false);
-      const name = camp.kingdoms[idx(id)].name.replace("Kingdom of ", "");
-      expect(camp.kingdoms.some((k) => (k.unlockAfter || []).includes(name))).toBe(false);
-      // two raids: the first after the second battle, the second after the third
-      const story = storyOf(id);
-      expect(raidUnlocked(camp, idx(id), 0, new Set([...done, story[0]]))).toBe(false);
-      expect(raidUnlocked(camp, idx(id), 0, new Set([...done, story[0], story[1]]))).toBe(true);
-      expect(raidUnlocked(camp, idx(id), 1, new Set([...done, story[0], story[1]]))).toBe(false);
-      expect(raidUnlocked(camp, idx(id), 1, new Set([...done, ...story]))).toBe(true);
+  it("every bonus region is open from a new save, and every battle and raid in it, in any order", () => {
+    const fresh = new Set();
+    for (const kingdom of bonus.kingdoms) {
+      const at = idx(kingdom.id);
+      expect(kingdomUnlocked(camp, at, fresh), kingdom.id).toBe(true);
+      kingdom.missions.forEach((_, missionIdx) =>
+        expect(missionUnlocked(camp, at, missionIdx, fresh), kingdom.id).toBe(true),
+      );
+      kingdomRaids(levels, kingdom).forEach((_, raidIdx) =>
+        expect(raidUnlocked(camp, at, raidIdx, fresh), kingdom.id).toBe(true),
+      );
     }
-  });
-  it("their raids open as the story advances, like the Eastern Kingdoms' (raid n after story battle n + 1)", () => {
-    const done = progressBefore(original, levels, -1);
-    const story = storyOf("tilicia");
-    expect(raidUnlocked(camp, idx("tilicia"), 0, new Set([...done, story[0]]))).toBe(false);
-    expect(raidUnlocked(camp, idx("tilicia"), 0, new Set([...done, story[0], story[1]]))).toBe(true);
-    // Tilicia has three battles and three raids: its last raid opens with its last battle, as the second does
-    expect(story.length).toBe(3);
-    expect(raidUnlocked(camp, idx("tilicia"), 1, new Set([...done, story[0], story[1]]))).toBe(false);
-    expect(raidUnlocked(camp, idx("tilicia"), 2, new Set([...done, story[0], story[1]]))).toBe(false);
-    expect(raidUnlocked(camp, idx("tilicia"), 1, new Set([...done, ...story]))).toBe(true);
-    expect(raidUnlocked(camp, idx("tilicia"), 2, new Set([...done, ...story]))).toBe(true);
-    expect(raidUnlocked(camp, idx("isoluccia"), 2, new Set([...done, ...story, ...storyOf("isoluccia")]))).toBe(true);
+    // the original kingdoms keep the original order: a root, then battle by battle and kingdom by kingdom
+    expect(kingdomUnlocked(camp, 0, fresh)).toBe(true);
+    expect(missionUnlocked(camp, 0, 1, fresh)).toBe(false);
+    expect(kingdomUnlocked(camp, 1, fresh)).toBe(false);
+    expect(raidUnlocked(camp, 0, 0, fresh)).toBe(false);
   });
   it("the battles that hand out a bonus unit also open its upgrade", () => {
     const gives = (mapId) => Object.keys(rewards[mapId].units || {});
@@ -239,7 +238,8 @@ describe("Resume Episode II (⚙ Settings)", () => {
     const won = progressBefore(original, levels, -1);
     expect([...won].some(isBonusMap)).toBe(false);
     expect(won.has(5432) && won.has(5401) && won.has(5631)).toBe(true);
-    const earned = combineCounts(...[...won].map((id) => (rewards[id] && rewards[id].units) || {}));
+    // (the starting army and the battles' unit rewards: what the save holds before the camp's own changes)
+    const earned = combineCounts(STARTER_ARMY_EP2, ...[...won].map((id) => (rewards[id] && rewards[id].units) || {}));
     const got = readResume(exported);
     const army = combineCounts(earned, resumeDelta(got.units, earned));
     for (const k of new Set([...Object.keys(army), ...Object.keys(got.units)]))

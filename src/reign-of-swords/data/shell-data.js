@@ -557,7 +557,7 @@ export const UNIT_META = {
   },
 };
 // BONUS units (Tilicia & Isoluccia — ours; data/bonus-units.js). `bonus` keeps them, and the upgrade branches that
-// lead to them, out of the camp and the Field Manual until the bonus campaigns open (bonusOpen below).
+// lead to them, out of Episode I's camp and Field Manual (bonusOpen below).
 for (const k of BONUS_ORDER)
   UNIT_META[k] = {
     name: UNIT_TYPES[k].name,
@@ -622,9 +622,9 @@ UNIT_META.imp = {
 };
 for (const { from, to, need } of BONUS_UPGRADES)
   UNIT_META[from].upgrades = [...(UNIT_META[from].upgrades || []), { to, need, ep2: true, bonus: true }];
-// The bonus campaigns open once Episode II is finished: Oasis Standoff (5432), Abbisin's last battle, is won.
-export const BONUS_OPENS_AFTER = 5432;
-export const bonusOpen = (isEp2, progress) => !!isEp2 && !!progress && progress.has(BONUS_OPENS_AFTER);
+// The bonus campaigns are open from the first day of an Episode II save (user decision; they used to wait for
+// Oasis Standoff, Episode II's last battle). Episode I never has them.
+export const bonusOpen = (isEp2) => !!isEp2;
 // Your Army grid order (one flat grid, no headers): by unit class — infantry, ranged, cavalry, casters, war engines,
 // flyers — and, inside a class, by upgrade depth (TREE_COL/TREE_ROW) so every upgrade chain reads in sequence. Ep2 units
 // sit with the class they fight in and show only on the Ep2 route (they are in EP2_ORDER, not ORDER).
@@ -662,13 +662,32 @@ export const ARMY_GROUPS = [
       "taniwha",
       "coatecpatl",
       "ahuizotl",
+      "scuttler",
+      "behemoth",
+      "automaton",
+      "phalanx",
+      "raptor",
+      "ankylosaur",
+      "tyrant",
     ],
   },
   {
     id: "ranged",
     label: "Ranged",
     icon: "skill_ranged",
-    units: ["archers", "crossbowmen", "rangers", "musketeers", "cragsmen", "pavisiers", "medjay", "chieftain"],
+    units: [
+      "archers",
+      "crossbowmen",
+      "rangers",
+      "musketeers",
+      "cragsmen",
+      "pavisiers",
+      "eagle",
+      "medjay",
+      "chieftain",
+      "brinehurler",
+      "arccaster",
+    ],
   },
   {
     id: "cavalry",
@@ -695,6 +714,7 @@ export const ARMY_GROUPS = [
       "tohunga",
       "tzitzimitl",
       "warden",
+      "siren",
     ],
   },
   {
@@ -707,7 +727,18 @@ export const ARMY_GROUPS = [
     id: "fly",
     label: "Flyers",
     icon: "class_fly",
-    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet", "serpent", "tahuanui"],
+    units: [
+      "bloodgorgers",
+      "griffon",
+      "dragonrider",
+      "tengu",
+      "unicorn",
+      "efreet",
+      "serpent",
+      "tahuanui",
+      "gyrocopter",
+      "pterosaur",
+    ],
   },
 ];
 export const ORDER = [
@@ -1095,6 +1126,18 @@ export const ALL_TYPES = [
   "griffon",
 ];
 export const STARTER_ARMY = {}; // the game seeds NO starting roster (La/r.e() zeros it) — you begin empty
+// EPISODE II (ours — user decision): a save begins with a standing army instead. Fifty Militiamen; six of every other
+// original unit that deploys for under 300 points; two of every original unit at 300 or more; two of every bonus
+// unit. Conjured units (no deployment cost) and the hidden bonus units are not part of it. Episode I keeps the
+// original's empty start.
+export const STARTER_MILITIA = 50;
+export const STARTER_ARMY_EP2 = Object.fromEntries([
+  ...[...ALL_TYPES, ...EP2_ORDER]
+    .filter((unit) => DEPLOY_COST[unit] > 0)
+    .map((unit) => [unit, unit === "militiamen" ? STARTER_MILITIA : DEPLOY_COST[unit] < 300 ? 6 : 2]),
+  ...BONUS_ORDER.filter((unit) => DEPLOY_COST[unit] > 0).map((unit) => [unit, 2]),
+]);
+export const starterArmy = (isEp2) => (isEp2 ? STARTER_ARMY_EP2 : STARTER_ARMY);
 // How you obtain a unit you don't yet have. The game grows your army through REAL per-mission
 // rewards (rewards.json, decoded from each scenario record) plus Upgrade-Army conversions — NOT
 // weekly "levies" (the original has no levy table; that was an earlier invention). This static map
@@ -1108,7 +1151,7 @@ export const UPGRADE_FROM = (() => {
   return m;
 })();
 // The upgrades each episode offers: Episode I has none of Episode II's units, so its camp never lists them.
-// …and the bonus units' branches wait for the bonus campaigns (`bonus` = bonusOpen(isEp2, progress)).
+// …and the bonus units' branches are Episode II's alone (`bonus` = bonusOpen(isEp2)).
 export const upgradeOffered = (branch, isEp2, bonus = false) => (isEp2 || !branch.ep2) && (bonus || !branch.bonus);
 // Episode II's new units open with its campaign (MenuScreen::onMenuEvent @0x5d2c2 and UnitSelector::createUnitInfoMenu
 // @0x8376e test the save's story bytes, Context+0x258 + story index): an upgrade TO one of them is listed but refused

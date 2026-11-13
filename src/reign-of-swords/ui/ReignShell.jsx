@@ -384,7 +384,7 @@ export default function ReignShell({ assetBase = null }) {
               spoils={save.spoils}
               onUpgrade={save.upgradeUnit}
               ep2={isEp2}
-              bonus={bonusOpen(isEp2, progress)}
+              bonus={bonusOpen(isEp2)}
               progress={progress}
               missionTitle={missionTitle}
               heraldTier={heraldTitle(progress.size).border}
@@ -501,9 +501,7 @@ export default function ReignShell({ assetBase = null }) {
         />
       )}
       {screen === "heraldry" && <Heraldry progress={progress} onBack={() => setScreen(campRef.current)} />}
-      {screen === "help" && (
-        <HelpScreen onBack={() => setScreen("menu")} ep2={isEp2} bonus={bonusOpen(isEp2, progress)} />
-      )}
+      {screen === "help" && <HelpScreen onBack={() => setScreen("menu")} ep2={isEp2} bonus={bonusOpen(isEp2)} />}
 
       {screen === "online" && (
         // Online Battles: lobbies with a password, live turn-based battles against another player, the leaderboard
