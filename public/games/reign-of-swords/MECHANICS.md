@@ -859,7 +859,10 @@ kept apart from the original data so that everything else stays checkable agains
 - **The page.** The standalone site gives the game the whole window: the page never scrolls, the campaign screen's
   map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
   battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the
-  muster roster) in a side column on the right. Phones keep their own layout.
+  muster roster) in a side column on the right. Phones keep their own layout: the board aims to show twelve
+  columns of the map across, on tiles of at least 34px (`PHONE_COLS`, `PHONE_TILE_MIN` in `engine/engine.js`; user
+  decision — it was ten columns of at least 40px, about nine across on an iPhone held upright, now about eleven by
+  eight), and the rest of the map is reached by dragging.
 - **The campaign map's markers** (ours; user decision: no name over another). With thirteen bonus regions beside
   the eleven kingdoms the Episode II map carries 24 markers. Each prints the place alone (`mapLabel`: "The Isles of
   Satoshi" is Satoshi, as "Kingdom of Carrone" was already Carrone; the region's panel has the full name), stands with

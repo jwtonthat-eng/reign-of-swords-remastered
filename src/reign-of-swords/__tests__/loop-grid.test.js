@@ -5,6 +5,7 @@ import { describe, it, expect, beforeAll, vi } from "vitest";
 import { loadEpisode, makeGame, startBattle, spawn, only, put, settle, step } from "./battle.js";
 import { UNIT_TYPES } from "../data/game-data.js";
 import { LoopMethods } from "../engine/loop.js";
+import { PHONE_COLS, PHONE_TILE_MIN } from "../engine/engine.js";
 import { buildMissions } from "../data/missions.js";
 import { patchFetch } from "./shell-helpers.js";
 
@@ -147,6 +148,35 @@ describe("the frame loop", () => {
     } finally {
       window.innerWidth = width;
       column.remove();
+    }
+  });
+
+  it("a phone shows twelve columns of the map across, on tiles of at least 34px (a small map still fills the screen)", () => {
+    const g = makeGame(5412);
+    const stage = g.canvas.parentElement;
+    const width = window.innerWidth;
+    const room = (px) => (stage.getBoundingClientRect = () => ({ width: px, height: 400, left: 0, top: 0 }));
+    try {
+      expect(g.cols).toBeGreaterThan(12);
+      window.innerWidth = 390; // an iPhone held upright: 370px of board
+      room(370);
+      g.resize();
+      expect([PHONE_COLS, PHONE_TILE_MIN]).toEqual([12, 34]);
+      expect(g.tile).toBe(34); // 370 / 12 would be 31: the floor
+      expect(Math.floor(g.view.w / g.tile)).toBe(10); // ten whole columns in view (it was nine at 40px)
+      expect(Math.floor(g.view.h / g.tile)).toBe(11);
+      window.innerWidth = 768; // a tablet upright: twelve columns exactly, on larger tiles
+      room(748);
+      g.resize();
+      expect(g.tile).toBe(62);
+      g.cols = 6; // a map narrower than twelve columns is drawn as large as it fits, up to 64px
+      room(370);
+      window.innerWidth = 390;
+      g.resize();
+      expect(g.tile).toBe(62);
+    } finally {
+      window.innerWidth = width;
+      delete stage.getBoundingClientRect;
     }
   });
 

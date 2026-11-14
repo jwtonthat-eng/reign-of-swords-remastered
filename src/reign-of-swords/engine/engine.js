@@ -313,6 +313,11 @@ function freshSeed() {
   return Math.floor(Math.random() * 4294967295) + 1;
 }
 
+// The battlefield on a phone: how many columns of the map it aims to show across the screen, and the smallest a tile
+// may be drawn (px).
+export const PHONE_COLS = 12;
+export const PHONE_TILE_MIN = 34;
+
 class Game {
   constructor(canvas, assets, onState, audio, army, godArmy) {
     this.canvas = canvas;
@@ -823,9 +828,11 @@ class Game {
         ? Math.max(200, frame.height) // the two-column desktop battle: the board column is as tall as the window
         : clamp((window.innerHeight || 800) - 510, 240, 530); // (the stacked layout: 510 = the bars and panel around the board)
     // Tile sized so ~N columns fill the available width. Desktop targets ~15 cols; on a phone we target fewer so
-    // tiles (and tap targets) stay large — the camera pans/zooms to reveal wider maps.
+    // tiles (and tap targets) stay large — the camera pans to reveal wider maps. A phone shows 12 columns of at
+    // least 34px (user decision: more of the level on screen; it was 10 columns of at least 40px, which on an
+    // iPhone held in the hand left about nine across). 34px is the desktop's floor too, where units stay readable.
     this.tile = mobile
-      ? clamp(Math.round(availW / Math.min(this.cols, 10)), 40, 64)
+      ? clamp(Math.round(availW / Math.min(this.cols, PHONE_COLS)), PHONE_TILE_MIN, 64)
       : frame && frame.height
         ? // the two-column desktop battle: tiles shrink until the WHOLE map fits its column (never below 34px, where
           // units get hard to read — a bigger map then scrolls), and a small map grows to fill it (up to 56px)
