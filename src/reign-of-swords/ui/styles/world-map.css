@@ -120,9 +120,13 @@
     inset 0 0 60px rgba(20, 12, 4, 0.55),
     0 8px 26px rgba(0, 0, 0, 0.5);
 }
+/* A marker's position is the centre of its DOT: the name and the raid pips hang under it (or, with `up`, stand over
+   it), so a marker does not shift when a kingdom opens and gains its count and pips. The positions in
+   data/shell-data.js are laid out for exactly these sizes — see tools/ros/map_labels.py before changing them. */
 .ros-kmark {
+  --dot: 30px;
   position: absolute;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, calc(var(--dot) / -2));
   cursor: pointer;
   display: flex;
   flex-direction: column;
@@ -133,16 +137,21 @@
   padding: 0;
   transition: transform 0.1s;
 }
-.ros-kmark:hover:not(:disabled) {
-  transform: translate(-50%, -54%);
+.ros-kmark.up {
+  flex-direction: column-reverse;
+  transform: translate(-50%, calc(-100% + var(--dot) / 2));
+}
+.ros-kmark:hover:not(:disabled) .ros-kmark-dot {
+  transform: translateY(-2px);
 }
 .ros-kmark.locked {
   cursor: not-allowed;
   opacity: 0.75;
 }
 .ros-kmark-dot {
-  width: 30px;
-  height: 30px;
+  width: var(--dot);
+  height: var(--dot);
+  transition: transform 0.1s;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -424,9 +433,10 @@
     padding-left: 8px;
     padding-right: 8px;
   }
+  .ros-kmark {
+    --dot: 24px;
+  }
   .ros-kmark-dot {
-    width: 24px;
-    height: 24px;
     font-size: 0.75rem;
   }
   .ros-kmark-label i {
@@ -435,13 +445,10 @@
   .ros-kmark-label {
     padding: 0 3px;
   }
-  /* the label goes ABOVE the dot where the space below is taken: Carrone sits just over Bordavia, Sangsoleil
-     over Merovin, Merovin over Marsur, Abbisin (Episode II) over Sabbi Amar */
-  .ros-kmark[data-k="carrone"],
-  .ros-kmark[data-k="sangsoleil"],
-  .ros-kmark[data-k="merovin"],
-  .ros-kmark[data-k="abbisin"] {
-    flex-direction: column-reverse;
+  /* …and the raid pips go too: with them no layout of 24 markers fits a phone's map. The region's panel lists
+     its raids. */
+  .ros-kmark-raids {
+    display: none;
   }
 }
 

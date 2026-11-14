@@ -73,36 +73,38 @@ export const KINGDOM_POS = {
   tilicia: { left: "87%", top: "47%" },
 };
 
-// Episode II world map ("The Eastern Kingdoms", 480×544). The Ep2 map redraws the empire, so the Ep1 hit-rect
-// coordinates land slightly off each Ep2 settlement. These legacy positions are measured on the Ep2 map itself
-// (label-text centroids sampled from worldmap.jpg), so every chapter dot sits on its own kingdom; the three new
-// Eastern realms keep their read-off positions. Selected in ReignShell when isEp2; the Ep1 route uses KINGDOM_POS.
+// Episode II world map ("The Eastern Kingdoms", 480×544). A position is where the marker's DOT stands (percent of the
+// map); its name and raid pips hang under it, or stand over it with `up`. With thirteen bonus regions beside the
+// eleven kingdoms the map is full, so the whole table is laid out together by tools/ros/map_labels.py: each marker as
+// near as it can be to its place on the painted map (the kingdoms on the names the map prints; the script's WANT
+// table has every home) with no name, dot or pip over another or off the map, on a small desktop window and on a
+// 320px phone alike. Change a name or add a region and run it again rather than moving one marker by hand.
+// Selected in ReignShell when isEp2; the Ep1 route uses KINGDOM_POS.
 export const KINGDOM_POS_EP2 = {
-  hunewold: { left: "29.4%", top: "10.5%" },
-  rukiev: { left: "63.6%", top: "12.6%" },
-  sangsoleil: { left: "11.8%", top: "32.2%" },
-  carrone: { left: "46%", top: "35.6%" },
-  merovin: { left: "26.6%", top: "41.4%" },
-  bordavia: { left: "58.9%", top: "44.3%" },
-  marsur: { left: "40%", top: "54.2%" },
-  aguilleon: { left: "23.3%", top: "77.7%" },
-  zayandi: { left: "45%", top: "94%" },
-  "sabbi-amar": { left: "76%", top: "90%" },
-  abbisin: { left: "87%", top: "76%" },
-  // the two BONUS kingdoms (ours): on the names the Episode II map already prints
-  tilicia: { left: "87.5%", top: "44%" },
-  isoluccia: { left: "75%", top: "64%" },
-  "mare-nostra": { left: "57%", top: "72%" }, // in Mare Nostra, by its sea serpent
-  "mirror-sea": { left: "80%", top: "31%" }, // on the northern sea the map names, under its label
-  satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
-  tezcal: { left: "93%", top: "27%" }, // the land east of the Mirror Sea's shore, between Satoshi and Tilicia
-  jarnheim: { left: "46%", top: "8%" }, // the northern mountain range, between Hunewold and Rukiev
-  khemret: { left: "92%", top: "92%" }, // the east bank of the great river, in the south-east corner
-  moananui: { left: "37%", top: "70%" }, // the chain of small islands on the west side of Mare Nostra
-  coatlan: { left: "93%", top: "59%" }, // the eastern mountains, south-east of Tilicia
-  thalassar: { left: "62%", top: "84%" }, // the deep water south of Mare Nostra
-  brasshaven: { left: "68%", top: "21%" }, // the foundry coast, between Rukiev and the Mirror Sea
-  "amber-reach": { left: "15%", top: "57%" }, // the lost valley beyond the western mountains
+  hunewold: { left: "27.2%", top: "11.3%", up: true },
+  rukiev: { left: "61.1%", top: "11.3%", up: true },
+  sangsoleil: { left: "13.8%", top: "27.6%", up: true },
+  carrone: { left: "45.9%", top: "33.4%", up: true },
+  merovin: { left: "25.8%", top: "41.5%", up: true },
+  bordavia: { left: "58.9%", top: "44.2%" },
+  marsur: { left: "40.7%", top: "50.8%", up: true },
+  aguilleon: { left: "22.3%", top: "74.1%" },
+  zayandi: { left: "45.6%", top: "91.9%", up: true },
+  "sabbi-amar": { left: "76.1%", top: "88.3%" },
+  abbisin: { left: "87.0%", top: "74.5%" },
+  tilicia: { left: "89.5%", top: "39.0%" },
+  isoluccia: { left: "75.2%", top: "60.6%" },
+  "mare-nostra": { left: "55.7%", top: "67.2%", up: true },
+  "mirror-sea": { left: "72.1%", top: "30.3%" },
+  satoshi: { left: "88.4%", top: "6.7%" },
+  tezcal: { left: "89.2%", top: "24.4%" },
+  jarnheim: { left: "44.4%", top: "6.8%" },
+  khemret: { left: "61.3%", top: "84.0%", up: true },
+  moananui: { left: "39.3%", top: "67.7%" },
+  coatlan: { left: "88.2%", top: "60.6%", up: true },
+  thalassar: { left: "28.6%", top: "88.7%" },
+  brasshaven: { left: "70.7%", top: "15.7%" },
+  "amber-reach": { left: "16.1%", top: "54.8%" },
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.

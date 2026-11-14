@@ -5,6 +5,11 @@ import { SvgIcon, ResIcon } from "./common.jsx";
 
 // The campaign world map: a marker per kingdom (locked 🔒, in progress ⚔ / ⚑, complete ♛) and, for the open kingdom,
 // its war-plans panel — the training battles (first kingdom only), the story battles in order and the optional raids.
+// A region's name as its map marker prints it: the place alone ("Kingdom of Carrone" → Carrone, "The Isles of
+// Satoshi" → Satoshi, "The Mirror Sea" → Mirror Sea). The map has no room for more; the region's panel carries the
+// full name.
+export const mapLabel = (name) => name.replace(/^.* of /, "").replace(/^The /, "");
+
 export default function WorldMap({
   camp,
   isEp2,
@@ -30,7 +35,7 @@ export default function WorldMap({
         const raids = unlocked ? kingdomRaids(levels, kingdom) : [];
         const raidsWon = raids.filter((r) => progress.has(r.mapId)).length;
         const raidMedals = raids.filter((r) => medalRaids && medalRaids.has(r.mapId)).length;
-        const pos = (isEp2 ? KINGDOM_POS_EP2 : KINGDOM_POS)[kingdom.id] || { top: "50%", left: "50%" };
+        const { up, ...pos } = (isEp2 ? KINGDOM_POS_EP2 : KINGDOM_POS)[kingdom.id] || { top: "50%", left: "50%" };
         return (
           <button
             key={kingdom.id}
@@ -38,7 +43,8 @@ export default function WorldMap({
               "ros-kmark" +
               (unlocked ? "" : " locked") +
               (complete ? " complete" : "") +
-              (kingdom.bonus ? " bonus" : "")
+              (kingdom.bonus ? " bonus" : "") +
+              (up ? " up" : "")
             }
             title={kingdom.bonus ? tr("Bonus campaign — not part of the original game") : undefined}
             data-k={kingdom.id}
@@ -48,7 +54,7 @@ export default function WorldMap({
           >
             <span className="ros-kmark-dot">{!unlocked ? "🔒" : complete ? "♛" : done > 0 ? "⚔" : "⚑"}</span>
             <span className="ros-kmark-label">
-              {tr(kingdom.name.replace("Kingdom of ", ""))}
+              {tr(mapLabel(kingdom.name))}
               {unlocked ? (
                 <i>
                   {" "}

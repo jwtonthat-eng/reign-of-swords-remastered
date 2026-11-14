@@ -860,6 +860,17 @@ kept apart from the original data so that everything else stays checkable agains
   map and army panel scroll on their own. On a desktop window the battle is two columns as tall as the window: the
   battlefield on the left, as large as the window allows, and the mission bar, controls and unit card (or the
   muster roster) in a side column on the right. Phones keep their own layout.
+- **The campaign map's markers** (ours; user decision: no name over another). With thirteen bonus regions beside
+  the eleven kingdoms the Episode II map carries 24 markers. Each prints the place alone (`mapLabel`: "The Isles of
+  Satoshi" is Satoshi, as "Kingdom of Carrone" was already Carrone; the region's panel has the full name), stands with
+  its dot on its position and its name and raid pips under it, or over it where the table says `up`, and on a
+  phone-width map shows neither the n/3 count nor the pips. The positions (`KINGDOM_POS_EP2`) are laid out together
+  by `tools/ros/map_labels.py` from the measured size of every marker at a range of window sizes: no dot, name or
+  pip over another or off the map from a 320px phone to a wide desktop window, each marker as near its place on the
+  painted map as that allows. Two bonus regions changed place to make it possible: Khemret is in the desert hills
+  south of Mare Nostra (the south-east corner has no room beside Sabbi Amar and Abbisin), Thalassar in the bay
+  between Aguilleon and Zayandi. Marker positions given elsewhere in this section are where the regions were first
+  put.
 - **The muster shows the picked unit's stats** (ours; user decision). While a unit type is picked in the deployment
   tray, the deployment help under the tray gives way to that unit's card: the readout a unit has in battle (movement,
   attack, reach, every weapon with its range, armour, the skill chips, its trait) read from the unit table, without

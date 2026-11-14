@@ -24,6 +24,7 @@ import {
 } from "../data/shell-data.js";
 import { isBonusMap, BONUS_HIDDEN } from "../data/bonus-units.js";
 import { DEPLOY_COST } from "../data/game-data.js";
+import { mapLabel } from "../ui/shell/WorldMap.jsx";
 
 const dir = join(process.cwd(), "public/games/reign-of-swords-2");
 const json = (f) => JSON.parse(readFileSync(join(dir, f), "utf8"));
@@ -59,6 +60,26 @@ describe("the army an Episode II save begins with", () => {
   });
   it("Episode I still begins with nothing", () => {
     expect(starterArmy(false)).toEqual({});
+  });
+});
+
+describe("the campaign map's markers", () => {
+  it("print the place alone: the kingdom or region without its title", () => {
+    expect(camp.kingdoms.map((kingdom) => mapLabel(kingdom.name))).toEqual([
+      ...campaign.kingdoms.map((kingdom) => kingdom.name.replace("Kingdom of ", "")),
+      ...["Tilicia", "Isoluccia", "Mare Nostra", "Satoshi", "Mirror Sea", "Tezcal", "Jarnheim", "Khemret"],
+      ...["Moananui", "Coatlan", "Thalassar", "Brasshaven", "Amber Reach"],
+    ]);
+  });
+  it("every kingdom and region has a position inside the map, and no two share one", () => {
+    const at = camp.kingdoms.map((kingdom) => KINGDOM_POS_EP2[kingdom.id]);
+    for (const pos of at) {
+      expect(parseFloat(pos.left)).toBeGreaterThan(2);
+      expect(parseFloat(pos.left)).toBeLessThan(98);
+      expect(parseFloat(pos.top)).toBeGreaterThan(2);
+      expect(parseFloat(pos.top)).toBeLessThan(98);
+    }
+    expect(new Set(at.map((pos) => pos.left + "," + pos.top)).size).toBe(camp.kingdoms.length);
   });
 });
 
