@@ -1127,7 +1127,7 @@ export const ALL_TYPES = [
 ];
 export const STARTER_ARMY = {}; // the game seeds NO starting roster (La/r.e() zeros it) — you begin empty
 // EPISODE II (ours — user decision): a save begins with a standing army instead. Fifty Militiamen; six of every other
-// original unit that deploys for under 300 points; two of every original unit at 300 or more; two of every bonus
+// original unit that deploys for under 300 points; two of every original unit at 300 or more; four of every bonus
 // unit. Conjured units (no deployment cost) and the hidden bonus units are not part of it. Episode I keeps the
 // original's empty start.
 export const STARTER_MILITIA = 50;
@@ -1135,7 +1135,7 @@ export const STARTER_ARMY_EP2 = Object.fromEntries([
   ...[...ALL_TYPES, ...EP2_ORDER]
     .filter((unit) => DEPLOY_COST[unit] > 0)
     .map((unit) => [unit, unit === "militiamen" ? STARTER_MILITIA : DEPLOY_COST[unit] < 300 ? 6 : 2]),
-  ...BONUS_ORDER.filter((unit) => DEPLOY_COST[unit] > 0).map((unit) => [unit, 2]),
+  ...BONUS_ORDER.filter((unit) => DEPLOY_COST[unit] > 0).map((unit) => [unit, 4]),
 ]);
 export const starterArmy = (isEp2) => (isEp2 ? STARTER_ARMY_EP2 : STARTER_ARMY);
 // How you obtain a unit you don't yet have. The game grows your army through REAL per-mission

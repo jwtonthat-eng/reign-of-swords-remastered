@@ -648,7 +648,7 @@ kept apart from the original data so that everything else stays checkable agains
   waits for the battle that opens it. The units, their Field Manual entries, their upgrade branches and the culture
   tokens show from the start too (`bonusOpen`). An Episode II save also begins with a standing army
   (`STARTER_ARMY_EP2` in `data/shell-data.js`): 50 Militiamen, 6 of every other original unit that deploys for under
-  300 points, 2 of every original unit at 300 or more, and 2 of each of the 49 bonus units — not the conjured units,
+  300 points, 2 of every original unit at 300 or more, and 4 of each of the 49 bonus units — not the conjured units,
   not the hidden four. It is part of every Episode II save's army, one begun before this change included, and it can
   be mustered in the original campaign: nothing holds a bonus unit back from it any longer. Resuming from an army
   file still leaves exactly the file's army. Episode I never has the bonus campaigns or their units, and begins with

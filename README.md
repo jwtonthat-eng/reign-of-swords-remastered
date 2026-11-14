@@ -55,7 +55,7 @@ It is a remake, not an exact copy.
   `docs/images/all-units.png` shows every unit, `docs/images/bonus-tiles.png` the tiles; `docs/unit-balance.md` has
   the balance numbers.
   They are open from the first day of an Episode II save, every battle in any order, and that save begins with a
-  standing army: 50 Militiamen, six of each original unit under 300 points, two of each dearer one and two of every
+  standing army: 50 Militiamen, six of each original unit under 300 points, two of each dearer one and four of every
   bonus unit. Episode I begins with nothing, as the original does.
 - **Sieges** with destructible walls, gates and houses; raids with Medals for a Major Victory; army upgrades and the
   Merchant.

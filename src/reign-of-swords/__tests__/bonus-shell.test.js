@@ -36,7 +36,7 @@ const original = { ...campaign };
 const idx = (id) => camp.kingdoms.findIndex((k) => k.id === id);
 
 describe("the army an Episode II save begins with", () => {
-  it("is 50 Militiamen, six of each original unit under 300 points, two of each at 300 or more, two of every bonus unit", () => {
+  it("is 50 Militiamen, six of each original unit under 300 points, two of each at 300 or more, four of every bonus unit", () => {
     const army = starterArmy(true);
     expect(army.militiamen).toBe(50);
     for (const unit of [...ALL_TYPES, ...EP2_ORDER]) {
@@ -48,7 +48,7 @@ describe("the army an Episode II save begins with", () => {
     expect([army.knights, army.catapult, army.king, army.wizards, army.craftsmen]).toEqual([2, 2, 2, 2, 2]);
     expect([army.sapper, army.bodyguard]).toEqual([undefined, undefined]);
     expect(BONUS_ORDER.length).toBe(49);
-    for (const unit of BONUS_ORDER) expect(army[unit], unit).toBe(2);
+    for (const unit of BONUS_ORDER) expect(army[unit], unit).toBe(4);
     for (const unit of [...BONUS_HIDDEN, "hounds", "imp", "panther"]) expect(army[unit], unit).toBeUndefined();
     expect(Object.keys(army).length).toBe(28 + 49);
   });
