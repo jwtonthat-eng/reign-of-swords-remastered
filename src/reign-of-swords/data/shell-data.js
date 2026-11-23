@@ -73,33 +73,38 @@ export const KINGDOM_POS = {
   tilicia: { left: "87%", top: "47%" },
 };
 
-// Episode II world map ("The Eastern Kingdoms", 480×544). The Ep2 map redraws the empire, so the Ep1 hit-rect
-// coordinates land slightly off each Ep2 settlement. These legacy positions are measured on the Ep2 map itself
-// (label-text centroids sampled from worldmap.jpg), so every chapter dot sits on its own kingdom; the three new
-// Eastern realms keep their read-off positions. Selected in ReignShell when isEp2; the Ep1 route uses KINGDOM_POS.
+// Episode II world map ("The Eastern Kingdoms", 480×544). A position is where the marker's DOT stands (percent of the
+// map); its name and raid pips hang under it, or stand over it with `up`. With thirteen bonus regions beside the
+// eleven kingdoms the map is full, so the whole table is laid out together by tools/ros/map_labels.py: each marker as
+// near as it can be to its place on the painted map (the kingdoms on the names the map prints; the script's WANT
+// table has every home) with no name, dot or pip over another or off the map, on a small desktop window and on a
+// 320px phone alike. Change a name or add a region and run it again rather than moving one marker by hand.
+// Selected in ReignShell when isEp2; the Ep1 route uses KINGDOM_POS.
 export const KINGDOM_POS_EP2 = {
-  hunewold: { left: "29.4%", top: "10.5%" },
-  rukiev: { left: "63.6%", top: "12.6%" },
-  sangsoleil: { left: "11.8%", top: "32.2%" },
-  carrone: { left: "46%", top: "35.6%" },
-  merovin: { left: "26.6%", top: "41.4%" },
-  bordavia: { left: "58.9%", top: "44.3%" },
-  marsur: { left: "40%", top: "54.2%" },
-  aguilleon: { left: "23.3%", top: "77.7%" },
-  zayandi: { left: "45%", top: "94%" },
-  "sabbi-amar": { left: "76%", top: "90%" },
-  abbisin: { left: "87%", top: "76%" },
-  // the two BONUS kingdoms (ours): on the names the Episode II map already prints
-  tilicia: { left: "87.5%", top: "44%" },
-  isoluccia: { left: "75%", top: "64%" },
-  "mare-nostra": { left: "57%", top: "72%" }, // in Mare Nostra, by its sea serpent
-  "mirror-sea": { left: "80%", top: "31%" }, // on the northern sea the map names, under its label
-  satoshi: { left: "90%", top: "9%" }, // the top-right corner of the map
-  tezcal: { left: "93%", top: "27%" }, // the land east of the Mirror Sea's shore, between Satoshi and Tilicia
-  jarnheim: { left: "46%", top: "8%" }, // the northern mountain range, between Hunewold and Rukiev
-  khemret: { left: "92%", top: "92%" }, // the east bank of the great river, in the south-east corner
-  moananui: { left: "37%", top: "70%" }, // the chain of small islands on the west side of Mare Nostra
-  coatlan: { left: "93%", top: "59%" }, // the eastern mountains, south-east of Tilicia
+  hunewold: { left: "27.2%", top: "11.3%", up: true },
+  rukiev: { left: "61.1%", top: "11.3%", up: true },
+  sangsoleil: { left: "13.8%", top: "27.6%", up: true },
+  carrone: { left: "45.9%", top: "33.4%", up: true },
+  merovin: { left: "25.8%", top: "41.5%", up: true },
+  bordavia: { left: "58.9%", top: "44.2%" },
+  marsur: { left: "40.7%", top: "50.8%", up: true },
+  aguilleon: { left: "22.3%", top: "74.1%" },
+  zayandi: { left: "45.6%", top: "91.9%", up: true },
+  "sabbi-amar": { left: "76.1%", top: "88.3%" },
+  abbisin: { left: "87.0%", top: "74.5%" },
+  tilicia: { left: "89.5%", top: "39.0%" },
+  isoluccia: { left: "75.2%", top: "60.6%" },
+  "mare-nostra": { left: "55.7%", top: "67.2%", up: true },
+  "mirror-sea": { left: "72.1%", top: "30.3%" },
+  satoshi: { left: "88.4%", top: "6.7%" },
+  tezcal: { left: "89.2%", top: "24.4%" },
+  jarnheim: { left: "44.4%", top: "6.8%" },
+  khemret: { left: "61.3%", top: "84.0%", up: true },
+  moananui: { left: "39.3%", top: "67.7%" },
+  coatlan: { left: "88.2%", top: "60.6%", up: true },
+  thalassar: { left: "28.6%", top: "88.7%" },
+  brasshaven: { left: "70.7%", top: "15.7%" },
+  "amber-reach": { left: "16.1%", top: "54.8%" },
 };
 // The original's optional training battles (levels.json special group, mapIds 5800-5802). They open
 // the first campaign kingdom's War Plans as a "Training" section rather than a separate main-menu button.
@@ -219,6 +224,10 @@ export const COLLECTIBLES = [
   { id: "Tsuba", icon: "🏵", token: "Tsuba of the Shogunate", culture: "Satoshi" },
   { id: "Jade", icon: "🐆", token: "Sacred Jade Jaguar", culture: "Tezcal" },
   { id: "Void", icon: "🔮", token: "Void Rift Crystal", culture: "Tilicia and Isoluccia" },
+  // …and one per faction: each also names the gift every unit made with it carries (data/bonus-units.js)
+  { id: "Pearl", icon: "🫧", token: "Abyssal Pearl", culture: "Thalassar", gift: "Crush Depth" },
+  { id: "Mainspring", icon: "⚙", token: "Overclocked Mainspring", culture: "Brasshaven", gift: "Overdrive" },
+  { id: "Amber", icon: "🦖", token: "Amber Catalyst", culture: "the Amber Reach", gift: "Apex Roar" },
 ];
 // The game's own six (what the Merchant trades in).
 export const TRADE_GOODS = COLLECTIBLES.filter((c) => !c.token);
@@ -550,7 +559,7 @@ export const UNIT_META = {
   },
 };
 // BONUS units (Tilicia & Isoluccia — ours; data/bonus-units.js). `bonus` keeps them, and the upgrade branches that
-// lead to them, out of the camp and the Field Manual until the bonus campaigns open (bonusOpen below).
+// lead to them, out of Episode I's camp and Field Manual (bonusOpen below).
 for (const k of BONUS_ORDER)
   UNIT_META[k] = {
     name: UNIT_TYPES[k].name,
@@ -615,9 +624,9 @@ UNIT_META.imp = {
 };
 for (const { from, to, need } of BONUS_UPGRADES)
   UNIT_META[from].upgrades = [...(UNIT_META[from].upgrades || []), { to, need, ep2: true, bonus: true }];
-// The bonus campaigns open once Episode II is finished: Oasis Standoff (5432), Abbisin's last battle, is won.
-export const BONUS_OPENS_AFTER = 5432;
-export const bonusOpen = (isEp2, progress) => !!isEp2 && !!progress && progress.has(BONUS_OPENS_AFTER);
+// The bonus campaigns are open from the first day of an Episode II save (user decision; they used to wait for
+// Oasis Standoff, Episode II's last battle). Episode I never has them.
+export const bonusOpen = (isEp2) => !!isEp2;
 // Your Army grid order (one flat grid, no headers): by unit class — infantry, ranged, cavalry, casters, war engines,
 // flyers — and, inside a class, by upgrade depth (TREE_COL/TREE_ROW) so every upgrade chain reads in sequence. Ep2 units
 // sit with the class they fight in and show only on the Ep2 route (they are in EP2_ORDER, not ORDER).
@@ -655,13 +664,32 @@ export const ARMY_GROUPS = [
       "taniwha",
       "coatecpatl",
       "ahuizotl",
+      "scuttler",
+      "behemoth",
+      "automaton",
+      "phalanx",
+      "raptor",
+      "ankylosaur",
+      "tyrant",
     ],
   },
   {
     id: "ranged",
     label: "Ranged",
     icon: "skill_ranged",
-    units: ["archers", "crossbowmen", "rangers", "musketeers", "cragsmen", "pavisiers", "medjay", "chieftain"],
+    units: [
+      "archers",
+      "crossbowmen",
+      "rangers",
+      "musketeers",
+      "cragsmen",
+      "pavisiers",
+      "eagle",
+      "medjay",
+      "chieftain",
+      "brinehurler",
+      "arccaster",
+    ],
   },
   {
     id: "cavalry",
@@ -688,6 +716,7 @@ export const ARMY_GROUPS = [
       "tohunga",
       "tzitzimitl",
       "warden",
+      "siren",
     ],
   },
   {
@@ -700,7 +729,18 @@ export const ARMY_GROUPS = [
     id: "fly",
     label: "Flyers",
     icon: "class_fly",
-    units: ["bloodgorgers", "griffon", "dragonrider", "tengu", "unicorn", "efreet", "serpent", "tahuanui"],
+    units: [
+      "bloodgorgers",
+      "griffon",
+      "dragonrider",
+      "tengu",
+      "unicorn",
+      "efreet",
+      "serpent",
+      "tahuanui",
+      "gyrocopter",
+      "pterosaur",
+    ],
   },
 ];
 export const ORDER = [
@@ -1088,6 +1128,18 @@ export const ALL_TYPES = [
   "griffon",
 ];
 export const STARTER_ARMY = {}; // the game seeds NO starting roster (La/r.e() zeros it) — you begin empty
+// EPISODE II (ours — user decision): a save begins with a standing army instead. Fifty Militiamen; six of every other
+// original unit that deploys for under 300 points; two of every original unit at 300 or more; four of every bonus
+// unit. Conjured units (no deployment cost) and the hidden bonus units are not part of it. Episode I keeps the
+// original's empty start.
+export const STARTER_MILITIA = 50;
+export const STARTER_ARMY_EP2 = Object.fromEntries([
+  ...[...ALL_TYPES, ...EP2_ORDER]
+    .filter((unit) => DEPLOY_COST[unit] > 0)
+    .map((unit) => [unit, unit === "militiamen" ? STARTER_MILITIA : DEPLOY_COST[unit] < 300 ? 6 : 2]),
+  ...BONUS_ORDER.filter((unit) => DEPLOY_COST[unit] > 0).map((unit) => [unit, 4]),
+]);
+export const starterArmy = (isEp2) => (isEp2 ? STARTER_ARMY_EP2 : STARTER_ARMY);
 // How you obtain a unit you don't yet have. The game grows your army through REAL per-mission
 // rewards (rewards.json, decoded from each scenario record) plus Upgrade-Army conversions — NOT
 // weekly "levies" (the original has no levy table; that was an earlier invention). This static map
@@ -1101,7 +1153,7 @@ export const UPGRADE_FROM = (() => {
   return m;
 })();
 // The upgrades each episode offers: Episode I has none of Episode II's units, so its camp never lists them.
-// …and the bonus units' branches wait for the bonus campaigns (`bonus` = bonusOpen(isEp2, progress)).
+// …and the bonus units' branches are Episode II's alone (`bonus` = bonusOpen(isEp2)).
 export const upgradeOffered = (branch, isEp2, bonus = false) => (isEp2 || !branch.ep2) && (bonus || !branch.bonus);
 // Episode II's new units open with its campaign (MenuScreen::onMenuEvent @0x5d2c2 and UnitSelector::createUnitInfoMenu
 // @0x8376e test the save's story bytes, Context+0x258 + story index): an upgrade TO one of them is listed but refused
@@ -1170,6 +1222,9 @@ export const RES_ICON = {
   Tsuba: "tsuba",
   Jade: "jade",
   Void: "void",
+  Pearl: "pearl",
+  Mainspring: "mainspring",
+  Amber: "amber",
 };
 
 export const GET_OPTIONS = [
@@ -1423,44 +1478,56 @@ export const TREE_COL = {
   cragsmen: 2,
   spellwardens: 3,
   sentinel: 3,
-  marines: 1,
+  marines: 2,
   pavisiers: 3,
   battlemage: 3,
-  gladiator: 2,
+  gladiator: 3,
   samurai: 2,
-  dragonrider: 4,
+  dragonrider: 3,
   beastmaster: 2,
-  sohei: 2,
-  shinobi: 2,
+  sohei: 3,
+  shinobi: 3,
   oni: 3,
   tengu: 3,
-  alchemist: 3,
-  golem: 4,
+  alchemist: 2,
+  golem: 3,
   unicorn: 3,
   efreet: 3,
   naga: 3,
   skeleton: 3,
   jaguar: 1,
   eagle: 2,
-  sunpriest: 2,
+  sunpriest: 3,
   serpent: 3,
   berserker: 1,
   shieldmaiden: 2,
   einherjar: 3,
   jotunn: 2,
   medjay: 2,
-  khopesh: 1,
-  anubis: 3,
-  ammit: 4,
+  khopesh: 3,
+  anubis: 2,
+  ammit: 3,
   toa: 1,
   tahuanui: 2,
   tohunga: 2,
   taniwha: 3,
   coatecpatl: 2,
-  ahuizotl: 4,
+  ahuizotl: 2,
   chieftain: 3,
   tzitzimitl: 2,
   warden: 3,
+  scuttler: 2,
+  siren: 3,
+  brinehurler: 3,
+  behemoth: 3,
+  phalanx: 3,
+  arccaster: 3,
+  gyrocopter: 2,
+  automaton: 1,
+  raptor: 2,
+  ankylosaur: 3,
+  pterosaur: 3,
+  tyrant: 3,
 };
 export const TREE_ROW = {
   militiamen: 0,
@@ -1495,44 +1562,56 @@ export const TREE_ROW = {
   cragsmen: 13,
   spellwardens: 8,
   sentinel: 9,
-  marines: 5,
+  marines: 14,
   pavisiers: 10,
   battlemage: 11,
-  gladiator: 14,
+  gladiator: 12,
   samurai: 15,
-  dragonrider: 0,
+  dragonrider: 13,
   beastmaster: 16,
-  sohei: 17,
-  shinobi: 18,
-  oni: 12,
-  tengu: 13,
-  alchemist: 14,
-  golem: 2,
-  unicorn: 15,
-  efreet: 16,
-  naga: 17,
-  skeleton: 18,
-  jaguar: 6,
-  eagle: 19,
-  sunpriest: 20,
-  serpent: 19,
-  berserker: 7,
-  shieldmaiden: 21,
-  einherjar: 20,
-  jotunn: 22,
-  medjay: 23,
-  khopesh: 8,
-  anubis: 21,
-  ammit: 3,
-  toa: 9,
-  tahuanui: 24,
-  tohunga: 25,
-  taniwha: 22,
-  coatecpatl: 26,
-  ahuizotl: 4,
-  chieftain: 23,
+  sohei: 14,
+  shinobi: 15,
+  oni: 16,
+  tengu: 17,
+  alchemist: 17,
+  golem: 18,
+  unicorn: 19,
+  efreet: 20,
+  naga: 21,
+  skeleton: 22,
+  jaguar: 5,
+  eagle: 18,
+  sunpriest: 23,
+  serpent: 24,
+  berserker: 6,
+  shieldmaiden: 19,
+  einherjar: 25,
+  jotunn: 20,
+  medjay: 21,
+  khopesh: 26,
+  anubis: 22,
+  ammit: 27,
+  toa: 7,
+  tahuanui: 23,
+  tohunga: 24,
+  taniwha: 28,
+  coatecpatl: 25,
+  ahuizotl: 26,
+  chieftain: 29,
   tzitzimitl: 27,
-  warden: 24,
+  warden: 30,
+  scuttler: 28,
+  siren: 31,
+  brinehurler: 32,
+  behemoth: 33,
+  phalanx: 34,
+  arccaster: 35,
+  gyrocopter: 29,
+  automaton: 8,
+  raptor: 30,
+  ankylosaur: 36,
+  pterosaur: 37,
+  tyrant: 38,
 };
 export const NEED_COLOR = {
   Armor: "#6f93bf",
@@ -1549,6 +1628,9 @@ export const NEED_COLOR = {
   Tsuba: "#c9a23a",
   Jade: "#3f9a5a",
   Void: "#9a5ce0",
+  Pearl: "#4fd0c8",
+  Mainspring: "#c98a3a",
+  Amber: "#f0a020",
 };
 
 // The heraldic tincture ramps, field/symbol/frame art tables, per-faction crests and the HeraldryShield component

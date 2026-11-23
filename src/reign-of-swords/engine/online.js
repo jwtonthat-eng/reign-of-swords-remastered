@@ -278,6 +278,8 @@ export class OnlineMethods {
       structHp: this.structHp,
       razed: this.razed,
       quicksand: this.quicksand,
+      flooded: this.flooded,
+      caltrops: this.caltrops,
       builtVillages: this.builtVillages,
       captureAreas: this.captureAreas,
       objectives: this.objectives,
@@ -301,6 +303,8 @@ export class OnlineMethods {
     this.structHp = s.structHp || new Map();
     this.razed = s.razed || new Set();
     this.quicksand = s.quicksand || new Map();
+    this.flooded = s.flooded || new Set();
+    this.caltrops = s.caltrops || new Map();
     this.builtVillages = s.builtVillages || new Map();
     if (s.captureAreas) this.captureAreas = s.captureAreas;
     if (s.objectives) this.objectives = s.objectives;

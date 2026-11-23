@@ -80,6 +80,18 @@ SPEAKERS = {
     # Coatlan (Eagle Captain Cuali, above, is its guide too)
     "itzpapal": ("Itzpapal the Star-Eater", "foe", "face083"),
     "itzpapal_hurt": ("Itzpapal the Star-Eater", "foe", "face083"),
+    # Thalassar (the Trench Brood)
+    "nacre": ("Tide-Mother Nacre", "foe", "face083"),
+    "nacre_hurt": ("Tide-Mother Nacre", "foe", "face083"),
+    "brannoch": ("Pilot Brannoch", "you", "face078"),
+    # Brasshaven (the Clockwork Syndicate)
+    "volkmar": ("Chief Artificer Volkmar", "foe", "face072"),
+    "volkmar_hurt": ("Chief Artificer Volkmar", "foe", "face074"),
+    "wren": ("Wren the Tinker", "you", "face086"),
+    # the Amber Reach (the Saurian Exiles)
+    "rashkar": ("Exile-King Rashkar", "foe", "face069"),
+    "rashkar_hurt": ("Exile-King Rashkar", "foe", "face071"),
+    "orin": ("Orin the Trapper", "you", "face075"),
 }
 
 
@@ -146,6 +158,17 @@ THEMES = {
         "cabin": [249],
     },
 }
+# THE BONUS TILES (import_tiles.py): nineteen kinds of ground of our own, after Episode II's 260 tiles. They carry
+# their own art whatever the theme, so a letter is a tile:
+#   > < A V conveyor belt east / west / north / south   v vent grate   M abyssal muck   C thermal chimney
+#   t tar pit   e giant fern canopy   i black ice   R runic monolith   q quicksand sinkhole   g mirage sand
+#   a altar steps   J overgrown jungle ruins   k razor coral   Q cenote   * astral glyph   n chinampa
+#   ! obsidian spikes   B bamboo thicket   z zen sand garden
+BONUS_TILES = {
+    "A": 260, ">": 261, "V": 262, "<": 263, "v": 264, "M": 265, "C": 266, "t": 267, "e": 268, "i": 269, "R": 270,
+    "q": 271, "g": 272, "a": 273, "J": 274, "k": 276, "Q": 277, "*": 278, "n": 279, "!": 280, "B": 281, "z": 283,
+}
+RUINS_TYPE = 41  # impassable until it is brought down: the checks below count it as a way through
 WATERISH = (19, 20, 5)
 DIRS = [(0, -1), (1, 0), (0, 1), (-1, 0)]  # N E S W  -> mask bits 1 2 4 8
 
@@ -201,7 +224,7 @@ def compile_terrain(theme_name, grid, seed):
         for x in range(cols):
             ch = grid[y][x]
             if ch in "~-^" or (ch == "=" and theme["road"] is None):
-                same = {"~": "~-bmc", "-": "~-bmc", "^": "^", "=": "=bG_"}[ch]
+                same = {"~": "~-bmckQM", "-": "~-bmckQM", "^": "^", "=": "=bG_"}[ch]  # (coral, a cenote and muck are wet)
                 mask = 0
                 for i, (dx, dy) in enumerate(DIRS):
                     n = at(x + dx, y + dy)
@@ -255,6 +278,9 @@ def compile_terrain(theme_name, grid, seed):
                     "m": "mast",
                     "c": "cabin",
                 }.get(ch)
+                if key is None and ch in BONUS_TILES:
+                    out.append(BONUS_TILES[ch])
+                    continue
                 if key is None:
                     raise ValueError("unknown terrain %r at %d,%d" % (ch, x, y))
                 out.append(pick(key))
@@ -266,12 +292,13 @@ OP_SPAWN, OP_SCREEN, OP_CAMERA, OP_COUNTER, OP_SETFLAG = 0, 1, 2, 9, 10
 MOVE_CLASS = {
     "cavalry": 3, "knights": 3, "king": 3, "raiders": 3, "horsebowmen": 3,
     "catapult": 4, "trebuchet": 4, "cannon": 4, "ballistae": 4,
-    "griffon": 0, "dragonrider": 0, "tengu": 0, "imp": 0, "unicorn": 0, "efreet": 0, "serpent": 0, "tahuanui": 0, "tzitzimitl": 0, "hounds": 1,
+    "griffon": 0, "dragonrider": 0, "tengu": 0, "imp": 0, "unicorn": 0, "efreet": 0, "serpent": 0, "tahuanui": 0, "tzitzimitl": 0, "gyrocopter": 0, "pterosaur": 0, "hounds": 1,
     "footmen": 2, "swordsmen": 2, "greatswordsmen": 2, "pikemen": 2, "halberdiers": 2, "crossbowmen": 2,
     "musketeers": 2, "conjurer": 2, "bodyguard": 2, "bloodgorgers": 2,
     "spellwardens": 2, "sentinel": 2, "pavisiers": 2, "battlemage": 2, "samurai": 2, "sohei": 2, "oni": 2, "alchemist": 2, "golem": 2, "skeleton": 2, "sunpriest": 2, "tohunga": 2, "shieldmaiden": 2, "einherjar": 2, "jotunn": 2, "khopesh": 2, "anubis": 2, "beastmaster": 2,
+    "brinehurler": 2, "behemoth": 2, "phalanx": 2, "automaton": 2, "ankylosaur": 2, "tyrant": 2,
 }
-CROSSES = {"cragsmen": 21, "marines": 19, "naga": 19, "taniwha": 19, "ahuizotl": 19}  # Climb / Amphibious
+CROSSES = {"cragsmen": 21, "marines": 19, "naga": 19, "taniwha": 19, "ahuizotl": 19, "scuttler": 19, "behemoth": 19}  # Climb / Amphibious
 
 
 def U(key, side="E", group=None, hold=False, name=None):
@@ -590,7 +617,7 @@ class Level:
                 if not (0 <= nx < cols and 0 <= ny < rows) or (nx, ny) in reach:
                     continue
                 there = TYPES[tiles[ny * cols + nx]]
-                if self.cost(tiles[ny * cols + nx], move_class) >= 99:
+                if self.cost(tiles[ny * cols + nx], move_class) >= 99 and there != RUINS_TYPE:
                     continue
                 if here != there:  # Map::isMoveAllowed: battlements are walked from inside
                     if there in LINKS and here not in LINKS[there]:
@@ -660,6 +687,9 @@ def main():
     import khemret
     import moananui
     import coatlan
+    import thalassar
+    import brasshaven
+    import amber_reach
 
     data = build(
         [
@@ -673,6 +703,9 @@ def main():
             khemret.KINGDOM,
             moananui.KINGDOM,
             coatlan.KINGDOM,
+            thalassar.KINGDOM,
+            brasshaven.KINGDOM,
+            amber_reach.KINGDOM,
         ]
     )
     stats = ", ".join("%d %s" % (sum(1 for l in data["levels"] if l["group"] == g), g) for g in ("story", "siege"))

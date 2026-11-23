@@ -67,7 +67,19 @@
   "ahuizotl": 8,
   "chieftain": 8,
   "tzitzimitl": 8,
-  "warden": 8
+  "warden": 8,
+  "scuttler": 8,
+  "siren": 8,
+  "brinehurler": 8,
+  "behemoth": 8,
+  "phalanx": 8,
+  "arccaster": 8,
+  "gyrocopter": 8,
+  "automaton": 8,
+  "raptor": 8,
+  "ankylosaur": 8,
+  "pterosaur": 8,
+  "tyrant": 8
  },
  "spoils": {
   "Medal": 8,
@@ -83,6 +95,9 @@
   "Anchor": 8,
   "Tsuba": 8,
   "Jade": 8,
-  "Void": 8
+  "Void": 8,
+  "Pearl": 8,
+  "Mainspring": 8,
+  "Amber": 8
  }
 }

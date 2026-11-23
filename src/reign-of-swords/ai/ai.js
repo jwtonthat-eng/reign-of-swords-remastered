@@ -104,6 +104,7 @@ export class AiMethods {
     if (!foes.length) return this._aiNoFoesLeft(u);
     if (this._aiAnnounceFaction(u, SIDE, GTAB)) return;
     this.game.aiQueue.shift(); // consume this unit now that its faction is announced
+    this._aiOverdrive(u, enemies); // BONUS: a Clockwork unit may wind itself up for a second action
     this.game._orderField = null;
     this._aiUpdateGroup(u, isMine, foes, SELF);
     const reach = this.game.computeReach(u);
@@ -149,7 +150,59 @@ export class AiMethods {
     if ((u.T.repair || u.T.build) && this._aiTryCraftsmen(u, reach)) return;
     if (u.type === "bodyguard" && u._conjuredBy != null && this._aiTryAbsorb(u, reach)) return;
     if (u.T.detonate && this._aiTryDetonate(u, reach, enemies)) return;
+    // BONUS: the Siren Channeler sings when there is nobody her spear can reach this turn
+    if (u.T.lure && !this._aiHasTarget(u) && this._aiTryLure(u, enemies)) return;
+    if (this._aiTryClearCaltrops(u)) return; // BONUS: a unit the Gyrocopter's caltrops stopped
     this._aiFightOrAdvance(u, { reach, stops, enemies, foes, wizMove, noAttack, foeTeam });
+  }
+
+  // ===== BONUS — the three factions under the computer =================================================================
+  // OVERDRIVE: a Clockwork unit above half health with a foe it can strike this turn winds itself up — it is put back
+  // in the queue after the last unit of its group, takes its second action when it comes round again, and pays as its
+  // side's turn ends (grid _endTurnHide → _overdriveSettle). A unit with nothing to strike (a garrison standing its
+  // ground) never winds up: it would pay for an action it does not take.
+  _aiOverdrive(u, enemies) {
+    const game = this.game,
+      od = u._od && u._od.turn === game.turn ? u._od : null;
+    if (od) {
+      if (od.stage === 0 && u.acted) game._overdriveRewind(u);
+      return;
+    }
+    if (!u.T.overdrive || u.hp <= 50 || !enemies.length || !this._aiHasTarget(u)) return;
+    u._od = { turn: game.turn, stage: 0 };
+    let at = game.aiQueue.length;
+    while (at > 0 && (game.aiQueue[at - 1].group || 0) !== (u.group || 0)) at--;
+    game.aiQueue.splice(at, 0, u);
+  }
+  // LURE: from where she stands, the foe worth most that her song would actually move.
+  _aiTryLure(u, enemies) {
+    const game = this.game;
+    const worth = (e) => this._aiValue(e) * 10 + game._lurePath(u, e).length;
+    const foe = enemies
+      .filter((e) => game._lureTarget(u, e) && !e._held && game._lurePath(u, e).length > 0)
+      .sort((a, b) => worth(b) - worth(a) || a.id - b.id)[0];
+    if (!foe) return false;
+    this._aiPanThen(u.tx, u.ty, () => {
+      u.face = Math.sign(foe.tx - u.tx) || u.face || 1;
+      this._aiCastAt(u, foe, () => {
+        game._lure(u, foe);
+        this._aiCastDone(u);
+      });
+    });
+    return true;
+  }
+  // A unit that starts its turn on the enemy's caltrops, with no foe it could strike from there, clears them.
+  _aiTryClearCaltrops(u) {
+    const game = this.game;
+    if (!game.caltrops || !game.caltrops.size || !game._caltropsAgainst(u, u.tx, u.ty)) return false;
+    if (game.targetsFrom(u, u.tx, u.ty, false).length) return false;
+    this._aiPanThen(u.tx, u.ty, () =>
+      this._aiCastAt(u, { tx: u.tx, ty: u.ty, px: u.px, py: u.py }, () => {
+        game._clearCaltrops(u);
+        this._aiCastDone(u);
+      }),
+    );
+    return true;
   }
 
   // The next unit of the acting side — peeked, not consumed yet (null: the side is done, its phase ended).
@@ -1072,8 +1125,9 @@ export class AiMethods {
     const movedHere = !atStart || this.game._movedThisTurn(u);
     return enemies.filter((e) => {
       const dist = manhattan(e, spot);
+      if (dist > 1 && this.game._shotBlocked(u, spot.tx, spot.ty, e.tx, e.ty)) return false; // BONUS: a Vent Grate's steam
       return (
-        (this.game._inWeaponRange(u, dist, movedHere) && !this.game._weaponUselessVs(u, e, dist)) ||
+        (this.game._inWeaponRange(u, dist, movedHere, spot.tx, spot.ty) && !this.game._weaponUselessVs(u, e, dist)) ||
         this.game._chargeReaches(u, spot.tx, spot.ty, e)
       );
     });
@@ -1102,7 +1156,8 @@ export class AiMethods {
     }
     // an ordinary attack: the foe in the weapon's reach from that tile (Move or Shoot weapons are out once moved)
     const movedHere = !atStart || this.game._movedThisTurn(u);
-    if (!this.game._inWeaponRange(u, dToE, movedHere) || this.game._weaponUselessVs(u, e, dToE)) return null;
+    if (!this.game._inWeaponRange(u, dToE, movedHere, spot.tx, spot.ty) || this.game._weaponUselessVs(u, e, dToE))
+      return null;
     const ratio = this._aiDamageRatio(u, spot, e, false);
     if (ratio <= -3000) return null;
     let score = SCORE.ATTACK + ratio * 100;

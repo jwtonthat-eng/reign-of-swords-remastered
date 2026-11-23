@@ -16,6 +16,7 @@ import {
   tileProp,
   structTrans,
   structArmor,
+  structSoft,
   rubbleProp,
   hasMovement,
   moveType,
@@ -24,6 +25,7 @@ import {
 } from "../rules/terrain.js";
 
 import { WEAPON_RANGE, WEAPON_DMG, WEAPON_TAGS } from "../data/combat-data.js";
+import { FLOOD } from "../data/bonus-units.js";
 
 // Terrain move-cost by unit movement CATEGORY, ported from the real game's mTerrainTable (record 5010
 // af[terrainType][al+1], decompiled from La/j). Columns are the `al` category: [0 Fly, 1 Skirmish/loose,
@@ -232,7 +234,7 @@ export class GridMethods {
   }
   _structDmgCol(u, dist, tileVal) {
     const row = WEAPON_DMG[this._weaponAt(u, dist)];
-    return (row && row[structArmor(tileVal)]) || 0;
+    return Math.max((row && row[structArmor(tileVal)]) || 0, structSoft(tileVal)); // (BONUS: jungle ruins fall to anything)
   }
   // Shooting a structure PLAYS the unit's firing animation (the shot lands at the hit frame). An area weapon (catapult,
   // wizard) drops its whole blast there, so the neighbouring cells — the houses beside a gate — take the splash too.
@@ -265,6 +267,23 @@ export class GridMethods {
   // (fx, fy) = the tile the step comes FROM, when there is one (the reach / path floods pass it): it enables the
   // original's step-link rule. One-off checks (a landing tile, a portal exit) pass none, as getMoveCost(unit, 0, to).
   moveCost(u, tx, ty, fx, fy) {
+    let cost = this._terrainMoveCost(u, tx, ty, fx, fy);
+    // BONUS: a faction on its own ground (the Trench Brood in muck, the Saurians in tar)
+    if (cost < 99 && u.T.culture && this._tileHomeCost(u, moveType(this.tileAt(tx, ty))) != null)
+      cost = this._tileHomeCost(u, moveType(this.tileAt(tx, ty)));
+    // BONUS: Flooded ground (a Brine Hurler's coral) costs every ground unit not of the Trench double
+    if (
+      cost < 99 &&
+      this.flooded &&
+      this.flooded.has(tx + "," + ty) &&
+      u.T.culture !== "trench" &&
+      u.T.al !== 0 &&
+      !u.T.fly
+    )
+      return Math.min(98, cost * FLOOD.cost);
+    return cost;
+  }
+  _terrainMoveCost(u, tx, ty, fx, fy) {
     if (!this.inBounds(tx, ty)) return 99;
     if (this.portals && this._portalBlocks(u, tx, ty)) return 99; // Map::getMoveCost's portal gates (fliers included)
     // BONUS (ours, MECHANICS.md §13): Climb takes Cragsmen over cliffs (type 21) and Amphibious takes Marines through
@@ -438,6 +457,7 @@ export class GridMethods {
   }
   moveOf(u) {
     if (u._held) return 0; // BONUS: held in a Naga's coils
+    if (u._sunk) return 1; // BONUS: in a Quicksand Sinkhole — its turn goes on climbing out, one tile
     // BONUS: Tailwind — a friendly Feathered Serpent beside it carries it a tile further
     const wind = this.units.reduce(
       (best, o) =>
@@ -514,6 +534,7 @@ export class GridMethods {
       from = new Map();
     dist.set(key(u.tx, u.ty), 0);
     const queue = [{ tx: u.tx, ty: u.ty, c: 0 }];
+    const walls = this._shieldWalls(u);
     while (queue.length) {
       queue.sort((a, b) => a.c - b.c);
       const cur = queue.shift();
@@ -523,6 +544,12 @@ export class GridMethods {
       // it. Immune units (fliers / Dune Sirens) glide over it normally. The start tile never blocks its own exit.
       if (this._quicksandAt(cur.tx, cur.ty) > 0 && !this._quicksandImmune(u) && !(cur.tx === u.tx && cur.ty === u.ty))
         continue;
+      // BONUS: enemy caltrops stop a ground unit the same way (the Gyrocopter's)
+      if (this.caltrops && this._caltropsAgainst(u, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
+      // …and so do the bonus tiles a unit steps onto but not through: tar, black ice, a sinkhole, a cenote
+      if (this._tileStops(u, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
+      // …and a tile beside an enemy Shieldmaiden (her Shield Wall)
+      if (this._besideWall(walls, cur.tx, cur.ty) && !(cur.tx === u.tx && cur.ty === u.ty)) continue;
       // 4-DIRECTIONAL movement (orthogonal only) — the original's reach flood-fill `La/q.P()` expands exactly
       // 4 neighbours (`cg=[-1,1,0,0]`, `ch=[0,0,-1,1]`), and its tile metric `a.j.c` is manhattan, so units
       // never step diagonally.
@@ -559,8 +586,18 @@ export class GridMethods {
   // the +30 is the rider's charging flag) in the very next tile along the same lane. We record the lane in dist/from
   // for the dash path and expose ONLY that launch tile as a stop, so a charger can't glide diagonally onto open
   // ground. createChargeTargetList counts a diagonal step's terrain TWICE and the foe's own tile against the move.
+  // BONUS — Shield Wall: the enemy Shieldmaidens a ground unit cannot slip past (none for a flier).
+  _shieldWalls(u) {
+    if (!u.T || u.T.al === 0 || u.T.fly) return [];
+    return this.units.filter((o) => !o.dead && o.team !== u.team && o.T && o.T.shieldWall);
+  }
+  _besideWall(walls, tx, ty) {
+    return walls.some((w) => Math.abs(w.tx - tx) + Math.abs(w.ty - ty) === 1);
+  }
+
   _addChargeLanes(u, moveBudget, dist, from, stops) {
     const chargeable = (f) => !!f && f.team !== u.team && !f.dead;
+    const walls = this._shieldWalls(u);
     for (const [dx, dy] of [
       [1, 1],
       [1, -1],
@@ -601,6 +638,7 @@ export class GridMethods {
           }
           stops.add(key(x, y)); // the launch tile is reachable — to charge FROM, not to loiter on
         }
+        if (this._besideWall(walls, x, y)) break; // BONUS: the gallop ends beside a Shieldmaiden
       }
     }
   }
@@ -742,12 +780,15 @@ export class GridMethods {
     }
     return out;
   }
-  _inWeaponRange(u, dist, moved) {
+  // (tx, ty) = the tile the unit would strike from (its own by default): BONUS, an Astral Glyph lengthens a shot
+  _inWeaponRange(u, dist, moved, tx = u.tx, ty = u.ty) {
     const primary = u.T.weapon || 3,
       secondary = u.T.weapon2;
+    const far = this._tileRangeBonus(tx, ty);
     const inBand = (weapon) => {
       const range = WEAPON_RANGE[weapon];
-      return !!range && dist >= range[0] && dist <= range[1] && !(moved && this._weaponLockedAfterMove(u, weapon));
+      const max = range && range[1] > 1 ? range[1] + far : range && range[1];
+      return !!range && dist >= range[0] && dist <= max && !(moved && this._weaponLockedAfterMove(u, weapon));
     };
     return inBand(primary) || (!!secondary && inBand(secondary));
   }
@@ -756,6 +797,7 @@ export class GridMethods {
     const hasMoved = moved != null ? moved : this._movedThisTurn(u) && tx === u.tx && ty === u.ty;
     const out = [];
     if (u._seized) return out; // BONUS: held by an Ahuizotl's Drowning Grasp — no attack this turn
+    if (u._sunk) return out; // BONUS: climbing out of a Quicksand Sinkhole — no attack this turn
     if (u.T.amphibious && moveType(this.tileAt(tx, ty)) === 19) return out; // BONUS: Marines can't attack from deep water
     for (const other of this.units) {
       if (other.dead || other.team === u.team || this._isHidden(other)) continue; // can't target a hidden (Stealth) unit
@@ -777,7 +819,9 @@ export class GridMethods {
       // BONUS: the Dragon Rider has one lance blow (range 1) and one breath (range 2+) a turn
       if (u.T.twinAttack && (dist === 1 ? u._lanced : u._fired) === this.turn) continue;
       if (u.T.terrainRange && dist > 2 && [3, 4, 5, 22, 27, 28].includes(moveType(this.tileAt(tx, ty)))) continue;
-      if (this._inWeaponRange(u, dist, hasMoved) || this._chargeReaches(u, tx, ty, other) || charged) out.push(other);
+      if (dist > 1 && this._shotBlocked(u, tx, ty, other.tx, other.ty)) continue; // BONUS: a Vent Grate's steam hides it
+      if (this._inWeaponRange(u, dist, hasMoved, tx, ty) || this._chargeReaches(u, tx, ty, other) || charged)
+        out.push(other);
     }
     return out;
   }
@@ -803,7 +847,8 @@ export class GridMethods {
     u._hidden = !!hidden;
   }
   _canHideUnit(u) {
-    return !!(u.T.stealth || u.ambush || u.T.ambush);
+    // (BONUS: under a Giant Fern Canopy any unit hides)
+    return !!(u.T.stealth || u.ambush || u.T.ambush) || this._underFern(u);
   }
   _canHide(u) {
     const tileDamagePct = Math.round(100 - (this.terrainAt(u.tx, u.ty).defBonus || 0) * 100);
@@ -818,6 +863,17 @@ export class GridMethods {
       if (u._blind) u._blind = false; // …and a Sun Priest's Eclipse
       if (u._chilled) u._chilled = false; // …and a Jotunn's chill
       if (u._seized) u._seized = false; // …and an Ahuizotl's grasp
+      if (u._sunk) u._sunk = false; // BONUS: …and a turn spent climbing out of a sinkhole
+      if (u._snareNext) {
+        u._snareNext = false; // BONUS: stuck in a Tar Pit this turn: held for the next
+        u._held = true;
+      }
+      // BONUS: an Apex Roar lasts to the end of the unit's next turn (one more for a unit that had already acted)
+      if (u._roar) {
+        if (u._roarKeep) u._roarKeep = false;
+        else u._roar = 0;
+      }
+      this._overdriveSettle(u); // BONUS: an Overdrive whose second action was never finished still costs its price
       if (u.dead || !this._canHideUnit(u)) continue;
       this._setHidden(u, !u.attackedTurn && this._canHide(u));
     }

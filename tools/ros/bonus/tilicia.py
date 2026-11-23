@@ -15,7 +15,7 @@ LEVELS.append(
         "name": "Ostrak's Bargain",
         "objective": "Defend the clan village from the Warden's men. At least three of the six Cragsmen bands must survive.",
         "turn_limit": 30,
-        "budget": 3000,
+        "budget": 2350,
         "win_switch": False,
         "sides": {"P": "Carrone Army", "A": "Clan Ostrak", "E": "Tolm's Wardens"},
         "terrain": """
@@ -246,7 +246,7 @@ LEVELS.append(
         "name": "The Empty Tomb",
         "objective": "Defeat Warden Tolm before the tomb of the Battlemage.",
         "turn_limit": 30,
-        "budget": 6000,
+        "budget": 5600,
         "sides": {"P": "Carrone Army", "E": "Warden Tolm", "E2": "Stone Sentinels"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -528,7 +528,7 @@ LEVELS.append(
         "mission_type": 2,
         "areas": ["1", "2"],
         "turn_limit": 15,
-        "budget": 2500,
+        "budget": 2550,
         "sides": {"P": "Carrone Army", "E": "Granary Guard"},
         "terrain": """
 .ff.........r.......f.

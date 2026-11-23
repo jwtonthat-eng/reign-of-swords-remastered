@@ -168,6 +168,44 @@ describe("deployment muster", () => {
     expect(tips.textContent).toContain("Captain's drill — deployment.");
     expect(tips.querySelectorAll("li").length).toBe(4);
   });
+
+  it("the unit picked in the tray shows its stats under it, in place of the deployment help", async () => {
+    const { push, container } = await mount({ campaignMapId: 200 });
+    push({ phase: "deploy", deploy: dep(), mission: mission() });
+    expect(uc(container)).toBeNull(); // nothing picked: the help
+    expect(container.querySelector("p.ros-hint").textContent).toContain("Deployment.");
+    push({ phase: "deploy", deploy: dep({ placing: "archers" }), mission: mission() });
+    const card = uc(container);
+    expect(container.querySelector("p.ros-hint")).toBeNull();
+    expect(card.querySelector(".ros-uc-name").textContent).toBe("Archers");
+    expect(card.querySelector(".ros-uc-role").textContent).toBe("Ranged");
+    // movement, attack and reach — and no HP: every unit takes the field at 100
+    expect([...card.querySelectorAll(".ros-uc-stat")].map((stat) => stat.textContent)).toEqual([
+      "MOV4",
+      "ATK22",
+      "RNG6",
+    ]);
+    expect(card.querySelector(".ros-hpbar")).toBeNull();
+    expect(kitText(card)).toBe("Longbow (rng 2–6) Short Sword No Armour");
+    expect(card.querySelector(".ros-uc-wdesc").textContent).toContain("A Longbow delivers good damage");
+    // another pick replaces it; a bonus unit reads from the same table
+    push({ phase: "deploy", deploy: dep({ placing: "samurai" }), mission: mission() });
+    expect(uc(container).querySelector(".ros-uc-name").textContent).toBe("Samurai");
+    expect(kitText(uc(container))).toContain("Katana");
+    // picking nothing again brings the help back
+    push({ phase: "deploy", deploy: dep(), mission: mission() });
+    expect(uc(container)).toBeNull();
+    expect(container.querySelector("p.ros-hint")).toBeTruthy();
+  });
+
+  it("the deployment drill keeps its tips whatever is picked, and a type the table lacks shows no card", async () => {
+    const { push, container } = await mount({ campaignMapId: 300 });
+    push({ phase: "deploy", deploy: dep({ placing: "archers" }), mission: mission({ group: "special" }) });
+    expect(uc(container)).toBeNull();
+    expect(container.querySelector(".ros-tut-tips")).toBeTruthy();
+    push({ phase: "deploy", deploy: dep({ placing: "mysteryman" }), mission: mission() });
+    expect(uc(container)).toBeNull();
+  });
 });
 
 describe("control row", () => {

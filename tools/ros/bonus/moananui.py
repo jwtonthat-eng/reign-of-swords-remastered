@@ -26,11 +26,11 @@ LEVELS.append(
 ....................
 ..f....x..x....f....
 ....................
-...---......---.....
+...k-k......---.....
 ..-----....-----....
 ..--~--....--~--..f.
 ..-----....-----....
-...---......---.....
+...---......k-k.....
 ....................
 .f................f.
 ff......,,......ff..
@@ -124,7 +124,7 @@ LEVELS.append(
         "name": "The Reef Crossing",
         "objective": "Cross the reef to the inner island. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 3250,
+        "budget": 2950,
         "sides": {"P": ARMY, "E": CANOES},
         "terrain": """
 ..f....h..........h....f
@@ -134,11 +134,11 @@ LEVELS.append(
 ......x..........x......
 ........................
 ---------......---------
-----------....----------
+--------kk....kk--------
 --~~---r--------r--~~---
 --~~--------------~~----
 ------r----------r------
----------......---------
+------kkk......kkk------
 ----................----
 ........................
 .f....................f.
@@ -228,7 +228,7 @@ LEVELS.append(
         "name": "The Hill of Spirits",
         "objective": "Storm the hilltop village and defeat Elder Matahi.",
         "turn_limit": 34,
-        "budget": 3250,
+        "budget": 2900,
         "sides": {"P": ARMY, "E": CANOES},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -248,7 +248,7 @@ LEVELS.append(
 ...,,......==......,,...
 ...........==...........
 ---........==........---
------......==......-----
+---kk......==......kk---
 -~~---.....==.....---~~-
 -~~---.....==.....---~~-
 -----......==......-----
@@ -345,12 +345,12 @@ LEVELS.append(
         "name": "The Canoe Fleet",
         "objective": "Reach the war canoes on the beach within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 2000,
+        "budget": 1400,
         "sides": {"P": ARMY, "E": "Canoe Guard"},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~
 ----------------------
-----------------------
+----kkk--------kkk----
 ..x..x..x..x..x..x....
 ......................
 .f..................f.
@@ -429,7 +429,7 @@ LEVELS.append(
         "name": "The Taniwha's Pool",
         "objective": "Hunt the guardians of the lagoon. Eliminate all enemies.",
         "turn_limit": 24,
-        "budget": 2750,
+        "budget": 2500,
         "sides": {"P": ARMY, "E": "Guardians of the Deep"},
         "terrain": """
 ffffffffffffffffffffff
@@ -438,11 +438,11 @@ f...------------....ff
 f..----~~~--~~~----..f
 ...----~~~--~~~----...
 ...----------------...
-....--------------....
+....--k--------k--....
 f....--~~~--~~~--....f
 f....--~~~--~~~--....f
 ......----------......
-..r....--------....r..
+..r....-k----k-....r..
 ......................
 .f..................f.
 ......................

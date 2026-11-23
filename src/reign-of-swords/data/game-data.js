@@ -644,15 +644,22 @@ for (const k in UNIT_TYPES) {
   for (const flag of ["climb", "nullify", "unyielding", "amphibious", "pavise", "chain", "whirl", "lesserShroud"])
     T[flag] = !!c[flag];
   for (const flag of ["terrainRange", "dragonfire", "keen", "twinAttack", "breach"]) T[flag] = !!c[flag];
-  for (const flag of ["shadowStep", "quake", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
+  for (const flag of ["shadowStep", "sunder", "gale"]) T[flag] = !!c[flag]; // Shinobi, Oni, Tengu
   for (const flag of ["flask", "constrict", "bulwark", "forestWalk", "eagleEye", "sunPriest"]) T[flag] = !!c[flag];
   for (const flag of ["cleanse", "physicalHalf"]) T[flag] = !!c[flag]; // Primal Warden, Siege-Tortoise
   for (const flag of ["shoreStride", "aquatic", "venom", "seize", "vanguard"]) T[flag] = !!c[flag]; // Moananui, Coatlan
   for (const flag of ["opening", "skyHunter", "karakia", "lurker", "drain"]) T[flag] = c[flag] || 0;
   for (const flag of ["frost", "desertStride", "hook"]) T[flag] = !!c[flag]; // Jotunn, Medjay, Khopesh Warriors
-  for (const flag of ["rage", "shieldWall", "valhalla", "judgement", "devour"]) T[flag] = c[flag] || 0;
+  for (const flag of ["rage", "valhalla", "judgement", "devour"]) T[flag] = c[flag] || 0;
+  T.shieldWall = !!c.shieldWall; // Shieldmaidens
   for (const flag of ["pounce", "sunbeam", "tailwind"]) T[flag] = c[flag] || 0; // Jaguar, Sun Priest, Feathered Serpent // Alchemist, Naga
   for (const flag of ["stoneskin", "purity", "burn", "undying"]) T[flag] = c[flag] || 0; // Golem, Unicorn, Efreet, Skeleton
+  // the Trench Brood, the Clockwork Syndicate, the Saurian Exiles
+  for (const flag of ["crush", "anchored", "flood", "overdrive", "caltrops", "flankCrit", "harvest", "raze"])
+    T[flag] = !!c[flag];
+  for (const flag of ["carapace", "lure", "sweep", "shieldLock", "arcChain", "volatile", "thorns", "apexRoar"])
+    T[flag] = c[flag] || 0;
+  T.culture = c.culture || null; // whose ground it is at home on (Flooded tiles, Razor Coral, Tar Pits)
   T.sutra = c.sutra || 0; // Sohei: HP mended by each friend beside it at the start of its turn
   T.grapple = c.grapple || 0; // Marines: the reach of their once-a-battle Grapple
   T.conjures = c.conjures || null; // Beast Master: what its Conjure calls (Hounds)

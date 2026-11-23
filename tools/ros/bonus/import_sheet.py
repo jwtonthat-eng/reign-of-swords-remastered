@@ -28,7 +28,8 @@ SHEETS = {"first": "bonus-units-sheet.jpg", "second": "samurai-gladiator-sheet.j
           "alchemy": "alchemy-units-sheet.jpg", "mythic": "mythic-units-sheet.jpg",
           "aztec": "aztec-units-sheet.jpg", "north": "norse-egypt-units-sheet.jpg",
           "ocean": "polynesian-units-sheet.jpg", "aztec2": "aztec2-units-sheet.jpg",
-          "warden": "primal-warden-sheet.jpg"}  # a unit's "sheet" (default first)
+          "warden": "primal-warden-sheet.jpg", "trench": "trench-units-sheet.jpg",
+          "clockwork": "clockwork-units-sheet.jpg", "saurian": "saurian-units-sheet.jpg"}  # a unit's "sheet" (default first)
 SPRITES = os.path.join(ROOT, "public", "games", "reign-of-swords", "sprites")
 FRAME, WALK_W, WALK_H = 88, 64, 72
 GROUND = (83, 116, 79)  # the sheet's green
@@ -385,6 +386,93 @@ UNITS = {
         "stand": 0, "walk": None, "attack": [1, 3, 4, 5], "height": 46, "team": False,
         "frame": (128, 88),
     },
+    # The Trench Brood, the Clockwork Syndicate and the Saurian Exiles (three sheets supplied by the user). "walk_frame":
+    # the size of a walk frame when a pose is wider than the usual 64 x 72; "hover": empty pixels under a flier.
+    "scuttler": {
+        "sheet": "trench", "ground": (56, 72, 59),
+        "boxes": [(71, 207, 362, 429), (378, 207, 659, 429), (730, 241, 1038, 430), (1110, 174, 1450, 430),
+                  (1450, 163, 1770, 430), (1779, 163, 2029, 432), (2109, 196, 2355, 429)],
+        "solo": [3, 4],
+        "stand": 0, "walk": [0, 2, 1, 2], "attack": [1, 3, 4, 5], "height": 54, "team": False,
+        "frame": (112, 88), "walk_frame": (88, 72),
+    },
+    "siren": {
+        "sheet": "trench", "ground": (56, 72, 59),
+        "boxes": [(50, 525, 345, 794), (364, 516, 636, 794), (1289, 475, 1790, 793), (2122, 503, 2357, 793)],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [1, 2, 2, 0], "height": 68, "team": False,
+        "frame": (128, 96), "walk_frame": (80, 72),
+    },
+    "brinehurler": {
+        "sheet": "trench", "ground": (56, 72, 59),
+        "boxes": [(73, 891, 341, 1141), (390, 894, 625, 1141), (751, 903, 938, 1141), (1002, 895, 1197, 1141),
+                  (1279, 880, 1520, 1141), (2172, 912, 2349, 1141)],
+        "stand": 2, "walk": [2, 3, 2, 3], "attack": [2, 0, 4, 2], "height": 62, "team": False,
+    },
+    "behemoth": {
+        "sheet": "trench", "ground": (56, 72, 59),
+        "boxes": [(25, 1228, 365, 1506), (365, 1228, 700, 1506), (709, 1256, 1065, 1506), (1065, 1256, 1392, 1506),
+                  (1422, 1200, 1900, 1511), (2111, 1236, 2381, 1506)],
+        "solo": [0, 1, 2, 3],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 4, 5], "height": 84, "team": False,
+        "frame": (152, 104), "walk_frame": (128, 88),
+    },
+    "phalanx": {
+        "sheet": "clockwork", "ground": (55, 71, 58),
+        "boxes": [(54, 164, 266, 440), (320, 164, 532, 440), (640, 204, 854, 440), (880, 208, 1105, 440),
+                  (1198, 188, 1445, 440), (1445, 188, 1706, 440), (1715, 211, 1964, 440)],
+        "solo": [4, 5],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 6], "height": 70, "team": False,
+    },
+    "arccaster": {
+        "sheet": "clockwork", "ground": (55, 71, 58),
+        "boxes": [(68, 526, 273, 792), (325, 522, 529, 792), (636, 551, 842, 792), (884, 544, 1097, 792),
+                  (1172, 510, 1450, 792), (1734, 556, 1954, 792)],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 4, 5], "height": 66, "team": False,
+    },
+    "gyrocopter": {
+        "sheet": "clockwork", "ground": (55, 71, 58),
+        "boxes": [(44, 907, 314, 1095), (336, 905, 615, 1097), (683, 885, 948, 1072), (981, 900, 1271, 1102),
+                  (1345, 870, 1680, 1110)],
+        "stand": 0, "walk": [0, 1, 2, 3], "attack": [0, 4, 4, 1], "height": 50, "team": False,
+        "frame": (104, 88), "walk_frame": (88, 72), "hover": 12,
+    },
+    "automaton": {
+        "sheet": "clockwork", "ground": (55, 71, 58),
+        "boxes": [(89, 1291, 293, 1495), (370, 1279, 564, 1495), (664, 1285, 918, 1495), (943, 1255, 1241, 1495),
+                  (1354, 1240, 1593, 1495), (2068, 1252, 2332, 1495)],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [1, 4, 4, 5], "height": 50, "team": False,
+    },
+    "raptor": {
+        "sheet": "saurian", "ground": (58, 79, 62),
+        "boxes": [(45, 214, 287, 407), (318, 206, 545, 407), (599, 235, 898, 407), (941, 249, 1274, 407),
+                  (1323, 179, 1683, 407), (1860, 190, 2090, 407), (2147, 177, 2356, 408)],
+        "solo": [5],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 5, 6], "height": 56, "team": False,
+        "frame": (112, 88), "walk_frame": (104, 72),
+    },
+    "ankylosaur": {
+        "sheet": "saurian", "ground": (58, 79, 62),
+        "boxes": [(37, 524, 361, 749), (383, 522, 702, 749), (734, 559, 1010, 749), (1010, 558, 1432, 749),
+                  (1470, 549, 2013, 748), (2030, 502, 2338, 747)],
+        "solo": [2, 3],
+        "stand": 0, "walk": [2, 3, 2, 3], "attack": [1, 4, 4, 5], "height": 58, "team": False,
+        "frame": (144, 88), "walk_frame": (112, 72),
+    },
+    "pterosaur": {
+        "sheet": "saurian", "ground": (58, 79, 62),
+        "boxes": [(26, 847, 398, 1129), (413, 844, 775, 1129), (1353, 797, 1786, 1080), (1994, 830, 2289, 1081)],
+        "solo": [2],
+        "stand": 0, "walk": [0, 1, 0, 1], "attack": [1, 2, 2, 0], "height": 74, "team": False,
+        "frame": (128, 104), "walk_frame": (112, 88), "hover": 8,
+    },
+    "tyrant": {
+        "sheet": "saurian", "ground": (58, 79, 62),
+        "boxes": [(36, 1223, 440, 1514), (440, 1221, 854, 1514), (864, 1213, 1368, 1511), (1379, 1217, 1900, 1511),
+                  (2032, 1210, 2350, 1514)],
+        "solo": [0, 1],
+        "stand": 0, "walk": [0, 2, 1, 2], "attack": [1, 3, 3, 4], "height": 88, "team": False,
+        "frame": (168, 104), "walk_frame": (160, 96),
+    },
 }
 
 
@@ -490,6 +578,12 @@ def scaled(pose, scale, team):
     return team_colours(small, team if isinstance(team, str) else None) if team else small
 
 
+def lifted(pose, by):
+    out = Image.new("RGBA", (pose.width, pose.height + by), (0, 0, 0, 0))
+    out.alpha_composite(pose, (0, 0))
+    return out
+
+
 def feet_x(pose):
     """The middle of what the figure stands on (its lowest rows)."""
     xs = [x for y in range(max(0, pose.height - 5), pose.height) for x in range(pose.width) if pose.getpixel((x, y))[3]]
@@ -522,6 +616,8 @@ def build(sheet, key):
         ]
     scale = unit["height"] / poses[unit["stand"]].height
     small = [scaled(p, scale, unit["team"]) for p in poses]
+    if unit.get("hover"):  # a flier: its poses stand that far above the ground line
+        small = [lifted(p, unit["hover"]) for p in small]
     stand = small[unit["stand"]]
     width, height = unit.get("frame", (FRAME, FRAME))
     strip = Image.new("RGBA", (width * len(unit["attack"]), height), (0, 0, 0, 0))
@@ -537,9 +633,10 @@ def build(sheet, key):
         strip.alpha_composite(frame, (i * width, 0))
     walk = None
     if unit["walk"]:
-        walk = Image.new("RGBA", (WALK_W * 4, WALK_H), (0, 0, 0, 0))
+        walk_w, walk_h = unit.get("walk_frame", (WALK_W, WALK_H))  # (the renderer reads the frame size off the sheet)
+        walk = Image.new("RGBA", (walk_w * 4, walk_h), (0, 0, 0, 0))
         for i, n in enumerate(unit["walk"]):
-            walk.alpha_composite(framed(small[n], WALK_W, WALK_H, WALK_W // 2), (i * WALK_W, 0))
+            walk.alpha_composite(framed(small[n], walk_w, walk_h, walk_w // 2), (i * walk_w, 0))
     return strip, stand, walk
 
 

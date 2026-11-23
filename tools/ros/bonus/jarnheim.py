@@ -16,7 +16,7 @@ LEVELS.append(
         "name": "The Raven Pass",
         "objective": "Force the pass into Jarnheim. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3000,
+        "budget": 3450,
         "sides": {"P": ARMY, "E": HOLD},
         "terrain": """
 ^^^^^^^^.==.^^^^^^^^
@@ -25,7 +25,7 @@ LEVELS.append(
 ^^.r.....==.....r.^^
 ^^......x==x......^^
 ^^^.r....==....r.^^^
-^^^^.....==.....^^^^
+^^^^.ii..==..ii.^^^^
 ^^^^^.r..==..r.^^^^^
 ^^^^.....==.....^^^^
 ^^^..f...==...f..^^^
@@ -36,7 +36,7 @@ LEVELS.append(
 ^^^..,...==...,..^^^
 ^^.......==.......^^
 ^..f.....==.....f..^
-^........==........^
+^...R....==....R...^
 ^........==........^
 ^^.......==.......^^
 ^^^......==......^^^
@@ -129,7 +129,7 @@ LEVELS.append(
         "name": "The Shield Bridge",
         "objective": "Break the shield wall at the river gate. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 4250,
+        "budget": 4050,
         "sides": {"P": ARMY, "E": HOLD},
         "terrain": """
 ^^^^.......==.......^^^^
@@ -140,13 +140,13 @@ LEVELS.append(
 ^..r.......==.......r..^
 ^..........==..........^
 ~~~~~--~~~~bb~~~~--~~~~~
-~~~~~--~~~~bb~~~~--~~~~~
+~~~~~ii~~~~bb~~~~ii~~~~~
 ~~~~~--~~~~bb~~~~--~~~~~
 ...........==...........
 ..f....x...==...x....f..
 .ff........==........ff.
 ...........==...........
-....r......==......r....
+....R......==......R....
 ...........==...........
 ..,,.......==.......,,..
 ...........==...........
@@ -245,7 +245,7 @@ LEVELS.append(
         "name": "The Jarl's Hold",
         "objective": "Storm Jarnborg and defeat Jarl Haldor.",
         "turn_limit": 34,
-        "budget": 4500,
+        "budget": 4250,
         "sides": {"P": ARMY, "E": HOLD},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -254,14 +254,14 @@ LEVELS.append(
 ^^^W__h_____K____h____W^^^
 ^^^W__________________W^^^
 ^^^W_h_____________h__W^^^
-^^^W__________________W^^^
+^^^W____R_____________W^^^
 ^^^W__h__________h____W^^^
 ^^^W__________________W^^^
 ^^^TWWWWWWWTGGTWWWWWWWT^^^
 ^^.........,==,.........^^
 ^..r....x...==...x....r..^
-^...........==...........^
-^^..f.......==.......f..^^
+^........ii.==.ii........^
+^^..f....ii.==.ii....f..^^
 ^^.ff.......==.......ff.^^
 ^...........==...........^
 ^....r......==......r....^
@@ -373,7 +373,7 @@ LEVELS.append(
         "name": "The Mead Hall",
         "objective": "Take the mead hall before the hunting party returns. Eliminate all enemies.",
         "turn_limit": 22,
-        "budget": 2850,
+        "budget": 2600,
         "sides": {"P": ARMY, "E": "Bear-shirt Lodge"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^
@@ -382,13 +382,13 @@ LEVELS.append(
 ^.f.P..........P.f.^
 ^...P.h..hh..h.P...^
 ^...P..........P...^
-^...P.h......h.P...^
+^.R.P.h......h.P...^
 ^.r.P..........P.r.^
 ^...PPPPPppPPPPP...^
 ^........==........^
 ^^..x....==....x..^^
 ^^.......==.......^^
-^...f....==....f...^
+^...f....ii....f...^
 ^..ff....==....ff..^
 .........==.........
 ..,......==......,..
@@ -457,7 +457,7 @@ LEVELS.append(
         "name": "The Giants' Stair",
         "objective": "Hunt down the frost giants on the high rocks. Eliminate all enemies.",
         "turn_limit": 24,
-        "budget": 2750,
+        "budget": 2950,
         "sides": {"P": ARMY, "E": "Sons of the Frost"},
         "terrain": """
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -465,10 +465,10 @@ LEVELS.append(
 ^....................^
 ^r..^^^...rr...^^^..r^
 ^.....^........^.....^
-^..r......o.......r..^
+^..r......R.......r..^
 ^.........,,.........^
 ^^^^....r....r....^^^^
-^..r................r^
+^..r......ii........r^
 ^....o..........o....^
 ^.....r....r.....r...^
 ^..^^^..........^^^..^

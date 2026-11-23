@@ -12,6 +12,7 @@
 import { key, manhattan, FAR } from "../util/util.js";
 import { tr } from "../i18n/i18n.js";
 import { tileName, moveType, moveRow } from "../rules/terrain.js";
+import { TILE_HELP } from "../rules/tiles.js";
 
 export class InputMethods {
   // --- input: tap to act, drag to pan ---
@@ -232,6 +233,11 @@ export class InputMethods {
     const dist = Math.abs(tx - sel.tx) + Math.abs(ty - sel.ty);
     this.aimMode = false;
     if (!sel.acted && dist >= mn && dist <= mx && this.inBounds(tx, ty)) {
+      if (this._shotBlocked(sel, sel.tx, sel.ty, tx, ty)) {
+        this.notify("The steam of a vent hides that tile."); // BONUS: a Vent Grate
+        this._emit();
+        return;
+      }
       this._castGroundAoe(sel, tx, ty);
       return;
     }
@@ -462,7 +468,28 @@ export class InputMethods {
       blocksEngine: costs ? costs.engine == null : props.blocksEngine,
       structure: this._structureInfo(tx, ty),
       quicksand: this._quicksandAt(tx, ty) > 0 ? { turns: this._quicksandAt(tx, ty) } : null, // rounds left
+      hazards: this._tileHazards(tx, ty), // BONUS: what the three factions left here, and what the tile itself does
     };
+  }
+  // BONUS: the lines the terrain card adds for a Flooded tile and for caltrops.
+  _tileHazards(tx, ty) {
+    const out = [];
+    if (this._floodedAt(tx, ty))
+      out.push({
+        icon: "skill_quicksand",
+        name: "Flooded",
+        desc: "A Brine Hurler's coral flooded this tile for the rest of the battle: ground units pay double to enter and take 20% more damage here. The Trench Brood and fliers are not troubled.",
+      });
+    const help = TILE_HELP[this._tileKind(tx, ty)];
+    if (help) out.push({ icon: "status_rally", name: tileName(this.tileAt(tx, ty)), desc: help });
+    const team = this._caltropsAt(tx, ty);
+    if (team)
+      out.push({
+        icon: "skill_ambush",
+        name: team === "blue" ? "Caltrops (yours)" : "Caltrops (the enemy's)",
+        desc: "An enemy ground unit that steps on them stops here and loses 10 HP. They stay until that side spends an action to clear them.",
+      });
+    return out;
   }
   // The ground a unit stands on, for its card: the tile's terrain and what it does to THIS unit — the share of a blow
   // it takes there (calculateAttackDamage: 100 − the tile's defence; a Formation unit sheds 10% more per adjacent
@@ -675,7 +702,8 @@ export class InputMethods {
     // A PRIEST that walked up keeps its PRAYERS: Unit::isAbilityAvailable (iOS Ep2 @0x74e94) puts no condition on
     // Shield / Retribution, so the menu offers them whenever the priest has not acted. A Heal-only unit stays in act
     // mode only with a wounded ally in range; with nothing to do (and no enemy in reach) its turn ends like any other.
-    const canPray = !u.acted && (!!u.T.prayer || this._canHealNow(u));
+    // (BONUS: a unit that has just walked into a Cenote keeps its turn open, so it can Dive)
+    const canPray = !u.acted && (!!u.T.prayer || this._canHealNow(u) || this._cenoteExits(u).length > 0);
     if (this.targets.length || canPray) {
       this.mode = "act";
       this.selected = u;
@@ -693,6 +721,7 @@ export class InputMethods {
   finishUnit(u) {
     this.chargeMode = false;
     this._chargeSpots = null;
+    if (this._overdriveStep(u)) return; // BONUS: an Overdrive opens a second full action instead of ending the turn
     u.acted = true;
     this.selected = null;
     this.reach = null;
@@ -997,6 +1026,7 @@ export class InputMethods {
           this._leashHint(u);
           done && done();
         };
+        this._hazardEnter(u, null); // BONUS: a blink onto enemy caltrops or a bonus tile
         if (!this._portalWarp(u, finish)) finish();
         this._emit();
       });

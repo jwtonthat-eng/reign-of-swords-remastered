@@ -326,6 +326,34 @@ export class TurnFlowMethods {
     const shot = () => {
       const [min, max] = this._castRange(sel);
       const abilities = sel.T.abilities || [];
+      // BONUS: the three ground shots of the factions
+      if (sel.T.flood)
+        return {
+          id: "aim",
+          name: "Toxic Coral",
+          icon: "skill_quicksand",
+          min,
+          max,
+          desc: "Lob coral at any tile in range — an enemy or empty ground. The tile stays Flooded for the rest of the battle.",
+        };
+      if (sel.T.caltrops)
+        return {
+          id: "aim",
+          name: "Strew Caltrops",
+          icon: "skill_ambush",
+          min,
+          max,
+          desc: "Strew caltrops on any tile in range — under an enemy or on empty ground. They stay until an enemy clears them.",
+        };
+      if (sel.T.harvest)
+        return {
+          id: "aim",
+          name: "Drop Load",
+          icon: "skill_siege",
+          min,
+          max,
+          desc: "Drop what it carries on any tile in range — an enemy or empty ground. It bursts on the four tiles around, friend or foe.",
+        };
       if (sel.T.crossBlast)
         return {
           id: "aim",
@@ -388,7 +416,7 @@ export class TurnFlowMethods {
         },
         ...(this._freeAim(sel) ? [shot()] : []),
       ];
-    if (this._aimShot(sel)) return [shot()];
+    if (this._aimShot(sel)) return sel.T.bonus ? [shot(), ...(this._abilitySkills(sel) || [])] : [shot()];
     return this._abilitySkills(sel); // Episode II unit skills (rules/abilities.js)
   }
   // Which aim ability (if any) is currently ARMED — so the shared skill row can highlight it.

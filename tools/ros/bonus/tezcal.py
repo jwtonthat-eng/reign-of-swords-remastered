@@ -15,13 +15,13 @@ LEVELS.append(
         "name": "The Green Road",
         "objective": "Break the ambush on the jungle road. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3750,
+        "budget": 4250,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 fffffffff==fffffffff
 ffff,,..f==f..,,ffff
 fff..h...==...h..fff
-ff...,...==...,...ff
+ff.Q.,...==...,.Q.ff
 fff.....x==x.....fff
 fffff....==....fffff
 ffffff,..==..,ffffff
@@ -34,8 +34,8 @@ fff,ffff.==.ffff,fff
 ff...fff.==.fff...ff
 ff.,..ff.==.ff..,.ff
 fff...f..==..f...fff
-ffff.....==.....ffff
-fff...,..==..,...fff
+ffff.Q...==...Q.ffff
+fff...,*.==.*,...fff
 ff.......==.......ff
 ff.......==.......ff
 fff......==......fff
@@ -130,7 +130,7 @@ LEVELS.append(
         "name": "The Serpent Ford",
         "objective": "Force the river and clear the far bank. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 4500,
+        "budget": 4450,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ffffffffff.==.ffffffffff
@@ -141,15 +141,15 @@ fff.ff....,==,....ff.fff
 ffffff.ff..==..ff.ffffff
 fffffffff..==..fffffffff
 ff,.ffff...==...ffff.,ff
-f....,.....==.....,....f
+f..Q.,.....==.....,.Q..f
 ~~~~~---~~~bb~~~---~~~~~
 ~~~~~---~~~bb~~~---~~~~~
 ~~~~~---~~~bb~~~---~~~~~
-f....,.....==.....,....f
+f.Q..,.....==.....,..Q.f
 ff..ff.....==.....ff..ff
 fff.fff....==....fff.fff
 ff...f.....==.....f...ff
-f.....,....==....,.....f
+f.....,.*..==..*.,.....f
 f..........==..........f
 ff.........==.........ff
 fff........==........fff
@@ -242,13 +242,13 @@ LEVELS.append(
         "name": "The Temple of the Sun",
         "objective": "Storm the temple and defeat Sun-Speaker Itzcal.",
         "turn_limit": 36,
-        "budget": 4750,
+        "budget": 3500,
         "sides": {"P": ARMY, "A": "Cuali's Eagles", "E": TEMPLE},
         "terrain": """
 ffffffffffffffffffffffff
 fff.TWWWWWWWWWWWWWWT.fff
 ff..W______________W..ff
-ff..W_____o__o_____W..ff
+ff..W__*__o__o__*__W..ff
 ff..W______K_______W..ff
 ff..W_____o__o_____W..ff
 ff..W______________W..ff
@@ -258,14 +258,14 @@ ffff.ff....==....ff.ffff
 fffffff.x..==..x.fffffff
 ffff,fff...==...fff,ffff
 ff....ff...==...ff....ff
-ff.,...f...==...f...,.ff
+ff.,Q..f...==...f..Q,.ff
 fff..ffff..==..ffff..fff
 ffffffff...==...ffffffff
 ffff,ff....==....ff,ffff
 ff....f....==....f....ff
 f..........==..........f
 f...hh.....==.....hh...f
-ff.........==.........ff
+ff.Q.......==.......Q.ff
 ff.........==.........ff
 fff........==........fff
 ffff.......==.......ffff
@@ -373,7 +373,7 @@ LEVELS.append(
         "name": "The Night Hunt",
         "objective": "Hold your camp in the clearing for 8 turns against the jaguar hunt.",
         "turn_limit": 12,
-        "budget": 3250,
+        "budget": 3850,
         "win_switch": False,
         "sides": {"P": ARMY, "E": "Jaguar Order"},
         "terrain": """
@@ -386,7 +386,7 @@ ffff....x....x....ffff
 fff.....PP..PP.....fff
 ff......P....P......ff
 f...,..........,.....f
-f.........hh.........f
+f...Q.....hh.....Q...f
 f...,..........,.....f
 ff......P....P......ff
 fff.....PP..PP.....fff
@@ -479,7 +479,7 @@ LEVELS.append(
         "name": "The Sun Treasury",
         "objective": "Reach the temple treasury within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 3500,
+        "budget": 3800,
         "sides": {"P": ARMY, "E": "Treasury Guard"},
         "terrain": """
 ffffffffffffffffffffff
@@ -487,13 +487,13 @@ fffff.TWWWWWWWWT.fffff
 ffff..W___K____W..ffff
 fff...W________W...fff
 fff...TWWWGGWWWT...fff
-ffff......==......ffff
+ffff.Q....==....Q.ffff
 fffff.x...==...x.fffff
 ffffff....==....ffffff
 fff,fff...==...fff,fff
 ff...ff...==...ff...ff
 ff.,..f...==...f..,.ff
-fff.......==.......fff
+fff.Q...*.==.*...Q.fff
 ffff.ff...==...ff.ffff
 fffffff...==...fffffff
 ffff,f....==....f,ffff

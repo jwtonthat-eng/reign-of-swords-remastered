@@ -22,7 +22,7 @@ import {
 } from "./battle/Overlays.jsx";
 import { DeployPanel, DeployHelp } from "./battle/DeployPanel.jsx";
 import ControlRow from "./battle/ControlRow.jsx";
-import UnitCard from "./battle/UnitCard.jsx";
+import UnitCard, { MusterCard } from "./battle/UnitCard.jsx";
 import HotseatSetup from "./battle/HotseatSetup.jsx";
 
 // The battle screen. The engine draws the board on the canvas and sends its state (`s`) here; this component
@@ -411,7 +411,13 @@ export default function ReignOfSwords({
             onPick={(type) => ctrl && ctrl.setPlacing(type)}
             onFight={tryFight}
           />
-          <DeployHelp deploy={state.deploy} drill={!!mission && mission.group === "special"} />
+          {/* under the tray: the stats of the unit picked in it, or — with none picked, and all through the
+              deployment drill — the help */}
+          {state.deploy && state.deploy.placing && !(mission && mission.group === "special") ? (
+            <MusterCard type={state.deploy.placing} />
+          ) : (
+            <DeployHelp deploy={state.deploy} drill={!!mission && mission.group === "special"} />
+          )}
         </>
       ) : (
         <>

@@ -14,9 +14,12 @@ export const kingdomComplete = (kd, progress) => !!kd && kd.missions.every((m) =
 // gives each kingdom one prerequisite and checks that its third story battle is won; the battles go in order, so
 // that is the same as "complete". A kingdom without `unlockAfter` data falls back to "the previous kingdom is
 // complete".
+// BONUS (ours — user decision): a bonus region is open from the start, and so is every battle and raid in it, in
+// any order; its `unlockAfter` no longer holds anything back. The original kingdoms keep the original rules.
 export function kingdomUnlocked(camp, kingdomIdx, progress) {
   if (!camp) return false;
   const kingdom = camp.kingdoms[kingdomIdx];
+  if (kingdom && kingdom.bonus) return true;
   const prereqs = kingdom && kingdom.unlockAfter;
   if (!prereqs) return kingdomIdx === 0 || kingdomComplete(camp.kingdoms[kingdomIdx - 1], progress);
   if (!prereqs.length) return true; // a root (Carrone)
@@ -31,7 +34,7 @@ export function kingdomUnlocked(camp, kingdomIdx, progress) {
 // A kingdom's battles are fought in order.
 export function missionUnlocked(camp, kingdomIdx, missionIdx, progress) {
   if (!kingdomUnlocked(camp, kingdomIdx, progress)) return false;
-  if (missionIdx === 0) return true;
+  if (missionIdx === 0 || camp.kingdoms[kingdomIdx].bonus) return true;
   return progress.has(camp.kingdoms[kingdomIdx].missions[missionIdx - 1].mapId);
 }
 
@@ -62,6 +65,7 @@ export function raidGate(camp, kingdomIdx, raidIdx) {
 
 export function raidUnlocked(camp, kingdomIdx, raidIdx, progress) {
   const gate = raidGate(camp, kingdomIdx, raidIdx);
+  if (gate && camp.kingdoms[kingdomIdx].bonus) return true;
   return !!gate && kingdomUnlocked(camp, kingdomIdx, progress) && progress.has(gate.mapId);
 }
 

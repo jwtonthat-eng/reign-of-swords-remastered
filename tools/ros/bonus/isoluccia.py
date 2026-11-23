@@ -128,7 +128,7 @@ LEVELS.append(
         "name": "The Arsenal",
         "objective": "Hold the Arsenal for 12 turns.",
         "turn_limit": 16,
-        "budget": 5000,
+        "budget": 5400,
         "win_switch": False,
         "sides": {"P": ARMY, "A": "Shipwrights", "E": DOGE, "E2": "Stone Sentinels"},
         "terrain": """
@@ -377,7 +377,7 @@ LEVELS.append(
         "name": "Smugglers' Cove",
         "objective": "Clear the cove. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3000,
+        "budget": 3600,
         "sides": {"P": ARMY, "E": "Smugglers"},
         "terrain": """
 ^^....~~~~~~~~~~....^^
@@ -546,7 +546,7 @@ LEVELS.append(
         "name": "Pavise Row",
         "objective": "Break the shield line in the market square. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 5000,
+        "budget": 4500,
         "sides": {"P": ARMY, "E": DOGE},
         "terrain": """
 ~~~~~~~~~~~~~~~~~~~~~~~~

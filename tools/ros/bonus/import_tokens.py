@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The eight campaign upgrade tokens, cut from the two supplied sheets (tools/ros/bonus/art/campaign-tokens-sheet*.jpg) into
+"""The eleven campaign upgrade tokens, cut from the three supplied sheets (tools/ros/bonus/art/campaign-tokens-sheet*.jpg) into
 52 px icons beside the game's own six collectibles (public/games/reign-of-swords/icons/).
 
     python3 tools/ros/bonus/import_tokens.py
@@ -25,6 +25,11 @@ TOKENS = {
         "tsuba": (1820, 190, 2320, 690),
         "jade": (490, 880, 950, 1360),
         "void": (1850, 870, 2290, 1350),
+    },
+    "campaign-tokens-sheet-3.jpg": {
+        "pearl": (150, 465, 893, 1220),
+        "mainspring": (1028, 493, 1734, 1209),
+        "amber": (1910, 460, 2555, 1231),
     },
 }
 

@@ -18,7 +18,7 @@ LEVELS.append(
         "name": "The Cloud Forest",
         "objective": "Force the forest road into the highlands. Eliminate all enemies.",
         "turn_limit": 30,
-        "budget": 3500,
+        "budget": 4500,
         "sides": {"P": ARMY, "E": ORDER},
         "terrain": """
 ffffffff..==..ffffffff
@@ -28,12 +28,12 @@ f...,.....==.....,...f
 ff.....x..==..x.....ff
 fff.ff....==....ff.fff
 ffffff....==....ffffff
-fff..f....==....f..fff
+fff.Jf....==....fJ.fff
 ff....ff..==..ff....ff
 f..,...f..==..f...,..f
 ff....ff..==..ff....ff
 ffff.fff..==..fff.ffff
-fff...f...==...f...fff
+fff...f.!.==.!.f...fff
 ff........==........ff
 f....,....==....,....f
 ff........==........ff
@@ -126,13 +126,13 @@ LEVELS.append(
         "name": "The Lake Causeway",
         "objective": "Cross the causeway over the highland lake. Eliminate all enemies.",
         "turn_limit": 32,
-        "budget": 2750,
+        "budget": 2600,
         "sides": {"P": ARMY, "E": ORDER},
         "terrain": """
 ffff.......==.......ffff
 ff....h....==....h....ff
 f..........==..........f
-...,.......==.......,...
+...,......a==a......,...
 .......x...==...x.......
 ...........==...........
 ---~~~~~~~~bb~~~~~~~~---
@@ -141,7 +141,7 @@ f..........==..........f
 ---~~~~~~~~bb~~~~~~~~---
 ---~~~~~~~~bb~~~~~~~~---
 ---~~~~~~~~bb~~~~~~~~---
-...........==...........
+....nn.....==.....nn....
 ..f........==........f..
 .ff........==........ff.
 ...........==...........
@@ -233,7 +233,7 @@ LEVELS.append(
         "name": "The Temple of Stars",
         "objective": "Storm the star-temple by night and destroy Itzpapal.",
         "turn_limit": 34,
-        "budget": 3800,
+        "budget": 3500,
         "sides": {"P": ARMY, "E": TEMPLE},
         "terrain": """
 ffffffffffffffffffffffffff
@@ -243,11 +243,11 @@ ff..W____o______o____W..ff
 ff..W_______K________W..ff
 ff..W____o______o____W..ff
 ff..W________________W..ff
-ff..W__h__________h__W..ff
+ff..W__h___a_a____h__W..ff
 ff..W________________W..ff
 ff..TWWWWWWTGGTWWWWWWT..ff
 fff........,==,........fff
-ff.....x....==....x.....ff
+ff.....x.!..==..!.x.....ff
 f...........==...........f
 ff..f.......==.......f..ff
 ff.ff.......==.......ff.ff
@@ -360,18 +360,18 @@ LEVELS.append(
         "name": "The Skull Rack",
         "objective": "Reach the skull rack in the temple court within fourteen turns, or eliminate all enemies.",
         "turn_limit": 14,
-        "budget": 3000,
+        "budget": 3050,
         "sides": {"P": ARMY, "E": "Court Guard"},
         "terrain": """
 ffffffffffffffffffffff
 fff.TWWWWWWWWWWT.fffff
 ff..W__________W..ffff
 ff..W___o__o___W..ffff
-ff..W__________W..ffff
+ff..W______a___W..ffff
 ff..TWWWTGGTWWWT..ffff
 fff......==......fffff
 ff...x...==...x...ffff
-f........==........fff
+f.....J..==.J......fff
 ff..f....==....f...fff
 f...ff...==...ff....ff
 f........==.........ff
@@ -445,7 +445,7 @@ LEVELS.append(
         "name": "The Drowned Village",
         "objective": "Hold the fishing village for 8 turns against the lake.",
         "turn_limit": 12,
-        "budget": 2400,
+        "budget": 2600,
         "win_switch": False,
         "sides": {"P": ARMY, "E": "The Lake"},
         "terrain": """
@@ -454,13 +454,13 @@ LEVELS.append(
 ----~~~~------~~~~----
 ......................
 ..PPPPPPPPppPPPPPPPP..
-..P................P..
+..Pn..............nP..
 ..P..h..........h..P..
 ..P................P..
 ..p................p..
 ..P................P..
 ..P..h..........h..P..
-..P................P..
+..Pn..............nP..
 ..PPPPPPPPppPPPPPPPP..
 ......................
 f....................f
